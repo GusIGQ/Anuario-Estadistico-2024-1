@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="930.24pt" height="498.24pt" viewBox="0 0 930.24 498.24" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-03-31T13:17:14.982588</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 498.24 
+L 930.24 498.24 
+L 930.24 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 15.9552 448.74936 
+L 193.3488 448.74936 
+Q 197.9208 448.74936 197.9208 446.66496 
+L 197.9208 36.45504 
+Q 197.9208 34.37064 193.3488 34.37064 
+L 15.9552 34.37064 
+Q 11.3832 34.37064 11.3832 36.45504 
+L 11.3832 446.66496 
+Q 11.3832 448.74936 15.9552 448.74936 
+z
+" clip-path="url(#pb352d72126)" style="fill: #e8735a"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 212.5512 448.74936 
+L 376.2288 448.74936 
+Q 380.8008 448.74936 380.8008 446.66496 
+L 380.8008 36.45504 
+Q 380.8008 34.37064 376.2288 34.37064 
+L 212.5512 34.37064 
+Q 207.9792 34.37064 207.9792 36.45504 
+L 207.9792 446.66496 
+Q 207.9792 448.74936 212.5512 448.74936 
+z
+" clip-path="url(#pb352d72126)" style="fill: #f0956a"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 395.4312 227.80296 
+L 604.8288 227.80296 
+Q 609.4008 227.80296 609.4008 225.71856 
+L 609.4008 36.45504 
+Q 609.4008 34.37064 604.8288 34.37064 
+L 395.4312 34.37064 
+Q 390.8592 34.37064 390.8592 36.45504 
+L 390.8592 225.71856 
+Q 390.8592 227.80296 395.4312 227.80296 
+z
+" clip-path="url(#pb352d72126)" style="fill: #2f4a6d"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 395.4312 448.74936 
+L 604.8288 448.74936 
+Q 609.4008 448.74936 609.4008 446.66496 
+L 609.4008 236.55744 
+Q 609.4008 234.47304 604.8288 234.47304 
+L 395.4312 234.47304 
+Q 390.8592 234.47304 390.8592 236.55744 
+L 390.8592 446.66496 
+Q 390.8592 448.74936 395.4312 448.74936 
+z
+" clip-path="url(#pb352d72126)" style="fill: #3d5a80"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 624.0312 281.99736 
+L 787.7088 281.99736 
+Q 792.2808 281.99736 792.2808 279.91296 
+L 792.2808 36.45504 
+Q 792.2808 34.37064 787.7088 34.37064 
+L 624.0312 34.37064 
+Q 619.4592 34.37064 619.4592 36.45504 
+L 619.4592 279.91296 
+Q 619.4592 281.99736 624.0312 281.99736 
+z
+" clip-path="url(#pb352d72126)" style="fill: #2196a0"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 624.0312 448.74936 
+L 787.7088 448.74936 
+Q 792.2808 448.74936 792.2808 446.66496 
+L 792.2808 290.75184 
+Q 792.2808 288.66744 787.7088 288.66744 
+L 624.0312 288.66744 
+Q 619.4592 288.66744 619.4592 290.75184 
+L 619.4592 446.66496 
+Q 619.4592 448.74936 624.0312 448.74936 
+z
+" clip-path="url(#pb352d72126)" style="fill: #4aabb5"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 806.9112 281.99736 
+L 915.7248 281.99736 
+Q 920.2968 281.99736 920.2968 279.91296 
+L 920.2968 36.45504 
+Q 920.2968 34.37064 915.7248 34.37064 
+L 806.9112 34.37064 
+Q 802.3392 34.37064 802.3392 36.45504 
+L 802.3392 279.91296 
+Q 802.3392 281.99736 806.9112 281.99736 
+z
+" clip-path="url(#pb352d72126)" style="fill: #17768a"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 806.9112 448.74936 
+L 915.7248 448.74936 
+Q 920.2968 448.74936 920.2968 446.66496 
+L 920.2968 290.75184 
+Q 920.2968 288.66744 915.7248 288.66744 
+L 806.9112 288.66744 
+Q 802.3392 288.66744 802.3392 290.75184 
+L 802.3392 446.66496 
+Q 802.3392 448.74936 806.9112 448.74936 
+z
+" clip-path="url(#pb352d72126)" style="fill: #5bbdd6"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(73.788172 196.180609)">Banda de</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(72.13575 210.737766)">2500 MHz</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="104.652" y="305.993825" transform="rotate(-0 104.652 305.993825)">140</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="294.39" y="203.459187" transform="rotate(-0 294.39 203.459187)">Banda AWS</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="294.39" y="305.993825" transform="rotate(-0 294.39 305.993825)">130</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(469.266172 107.802049)">Banda de</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(467.61375 122.359206)">3500 MHz</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="500.13" y="164.588129" transform="rotate(-0 500.13 164.588129)">100</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(469.266172 316.242049)">Banda de</text>
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(471.749375 330.799206)">700 MHz</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="500.13" y="378.030689" transform="rotate(-0 500.13 378.030689)">90</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="705.87" y="136.758387" transform="rotate(-0 705.87 136.758387)">Banda PCS</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 22px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="705.87" y="199.272545" transform="rotate(-0 705.87 199.272545)">68</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 9.126px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(684.203593 349.858724)">Banda de</text>
+    <text style="font-size: 9.126px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(685.946801 360.077847)">850 MHz</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 15.21px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="705.87" y="395.667057" transform="rotate(-0 705.87 395.667057)">47</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 9.72px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(838.241353 130.411176)">Banda de</text>
+    <text style="font-size: 9.72px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(837.00585 141.295449)">3300 MHz</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 16.2px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="861.318" y="197.672107" transform="rotate(-0 861.318 197.672107)">50</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(844.699016 350.462408)">Banda de</text>
+    <text style="font-size: 7px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #ffffff" transform="translate(846.036125 358.300877)">800 MHz</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 10.53px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="861.318" y="394.37567" transform="rotate(-0 861.318 394.37567)">20</text>
+   </g>
+  </g>
+  <g id="text_17">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start" x="7.2" y="16.798125" transform="rotate(-0 7.2 16.798125)">Figura C.1. Espectro radioeléctrico (MHz) asignado por banda de frecuencia</text>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 472.321641)">Fuente: IFT con datos a agosto de 2024.  |  Total asignado: 645 MHz</text>
+   <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 481.081875)">Nota: El tamaño de los cuadros corresponde a los MHz asignados por banda de frecuencia.</text>
+   <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 489.480234)">La banda AWS corresponde a las bandas de 1.7/2.1 GHz; la banda PCS corresponde a la banda de 1900 MHz.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pb352d72126">
+   <rect x="8.64" y="33.12" width="914.4" height="416.88"/>
+  </clipPath>
+ </defs>
+</svg>

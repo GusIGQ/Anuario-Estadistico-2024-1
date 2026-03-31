@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="628.364545pt" height="393.751797pt" viewBox="0 0 628.364545 393.751797" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-03-31T13:17:22.522518</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 393.751797 
+L 628.364545 393.751797 
+L 628.364545 0 
+L 0 0 
+z
+" style="fill: #f5f5f0"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 43.010249 166.167631 
+C 38.25862 176.265361 35.167273 187.063962 33.855573 198.146451 
+C 32.54388 209.228941 33.028919 220.450814 35.291999 231.378788 
+C 37.555072 242.306763 41.566663 252.798328 47.171864 262.448395 
+C 52.777065 272.098462 59.902809 280.781208 68.273932 288.161345 
+C 76.645055 295.541481 86.152417 301.522795 96.428909 305.874325 
+C 106.705401 310.225855 117.617033 312.890864 128.742474 313.766456 
+C 139.867916 314.642042 151.062094 313.716801 161.892795 311.026444 
+C 172.723496 308.336088 183.049501 303.915684 192.472069 297.93594 
+C 201.894637 291.956196 210.290934 284.495065 217.336728 275.840653 
+C 224.382522 267.186241 229.985961 257.451395 233.930682 247.011983 
+C 237.875402 236.572572 240.109968 225.564738 240.548104 214.413498 
+C 240.98624 203.262257 239.62222 192.113009 236.508723 181.396282 
+C 233.395226 170.679555 228.572836 160.535058 222.22777 151.354521 
+C 215.882704 142.173985 208.097724 134.077123 199.173368 127.376523 
+C 190.249011 120.675923 180.301661 115.458986 169.715432 111.927153 
+C 159.129202 108.395321 148.042112 106.594636 136.882268 106.594636 
+L 136.882273 210.340455 
+z
+" style="fill: #c0392b"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 136.882274 106.594636 
+C 117.197315 106.594636 97.91302 112.197247 81.292464 122.744975 
+C 64.671908 133.292704 51.391699 148.356147 43.010249 166.167631 
+L 136.882273 210.340455 
+z
+" style="fill: #2c3e50"/>
+   </g>
+   <g id="matplotlib.axis_1"/>
+   <g id="matplotlib.axis_2"/>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 28px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="136.882273" y="244.003159" transform="rotate(-0 136.882273 244.003159)">82%</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="193.942473" y="147.872548" transform="rotate(-0 193.942473 147.872548)">18%</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(66.116257 39.992088)">Porcentaje de la población de 6</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(69.825945 50.070119)">años o más en zonas urbanas</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(69.140398 60.580151)">que usan servicios móviles de</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(91.871023 70.658182)">Telecomunicaciones</text>
+   </g>
+   <g id="legend_1">
+    <g id="patch_4">
+     <path d="M 49.210202 357.015404 
+L 64.210202 357.015404 
+L 64.210202 351.765404 
+L 49.210202 351.765404 
+z
+" style="fill: #c0392b; stroke: #c0392b; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_4">
+     <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start" x="70.210202" y="357.015404" transform="rotate(-0 70.210202 357.015404)">Hacen uso de servicios móviles (82%)</text>
+    </g>
+    <g id="patch_5">
+     <path d="M 49.210202 368.023998 
+L 64.210202 368.023998 
+L 64.210202 362.773998 
+L 49.210202 362.773998 
+z
+" style="fill: #2c3e50; stroke: #2c3e50; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_5">
+     <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start" x="70.210202" y="368.023998" transform="rotate(-0 70.210202 368.023998)">No hacen uso de servicios móviles (18%)</text>
+    </g>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_6">
+    <path d="M 415.854827 281.359356 
+C 427.627646 293.896138 442.33511 303.310995 458.649107 308.753756 
+C 474.963103 314.196516 492.377322 315.498254 509.3192 312.541428 
+C 526.261078 309.584596 542.204834 302.460954 555.710688 291.813797 
+C 569.216541 281.16664 579.865343 267.326395 586.69548 251.542882 
+C 593.525617 235.759366 596.32511 218.522427 594.841156 201.388601 
+C 593.357203 184.254774 587.635865 167.755796 578.193781 153.381611 
+C 568.751698 139.007425 555.881921 127.204121 540.746621 119.037556 
+C 525.61132 110.87099 508.680237 106.594636 491.482268 106.594636 
+L 491.482273 210.340455 
+z
+" style="fill: #c0392b"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 491.482274 106.594636 
+C 471.243089 106.594636 451.439487 112.517168 434.523429 123.628946 
+C 417.607371 134.740724 404.307021 150.563418 396.269072 169.138021 
+C 388.231122 187.712626 385.801589 208.239567 389.281299 228.177377 
+C 392.761003 248.115189 402.000149 266.605626 415.854827 281.359356 
+L 491.482273 210.340455 
+z
+" style="fill: #2c3e50"/>
+   </g>
+   <g id="matplotlib.axis_3"/>
+   <g id="matplotlib.axis_4"/>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 28px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="491.482273" y="244.003159" transform="rotate(-0 491.482273 244.003159)">63%</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #ffffff" x="548.542473" y="147.872548" transform="rotate(-0 548.542473 147.872548)">37%</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(420.716257 39.992088)">Porcentaje de la población de 6</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(427.023288 50.070119)">años o más en zonas rurales</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(423.740398 60.580151)">que usan servicios móviles de</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #333333" transform="translate(446.471023 70.658182)">Telecomunicaciones</text>
+   </g>
+   <g id="legend_2">
+    <g id="patch_8">
+     <path d="M 403.810202 357.015404 
+L 418.810202 357.015404 
+L 418.810202 351.765404 
+L 403.810202 351.765404 
+z
+" style="fill: #c0392b; stroke: #c0392b; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_9">
+     <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start" x="424.810202" y="357.015404" transform="rotate(-0 424.810202 357.015404)">Hacen uso de servicios móviles (63%)</text>
+    </g>
+    <g id="patch_9">
+     <path d="M 403.810202 368.023998 
+L 418.810202 368.023998 
+L 418.810202 362.773998 
+L 403.810202 362.773998 
+z
+" style="fill: #2c3e50; stroke: #2c3e50; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_10">
+     <text style="font-size: 7.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start" x="424.810202" y="368.023998" transform="rotate(-0 424.810202 368.023998)">No hacen uso de servicios móviles (37%)</text>
+    </g>
+   </g>
+  </g>
+  <g id="text_11">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #333333" x="314.182273" y="15.198437" transform="rotate(-0 314.182273 15.198437)">Figura C.4. Porcentaje del uso de los servicios móviles de telecomunicaciones por zona geoGráfica</text>
+  </g>
+  <g id="text_12">
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #666666" transform="translate(227.170632 377.921422)">Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.</text>
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #666666" transform="translate(176.058288 385.2)">Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/#tabulados.</text>
+  </g>
+ </g>
+</svg>
