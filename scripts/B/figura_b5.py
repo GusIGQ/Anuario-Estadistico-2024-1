@@ -38,13 +38,13 @@ ax.spines[['top', 'right']].set_visible(False)
 ax.tick_params(axis='y', labelsize=8)
 
 # 5. Título y fuente
-ax.set_title('Figura B.5. LÃ­neas del Servicio Fijo de TelefonÃ­a por cada 100 hogares (1971-2023)',
+ax.set_title('Figura B.5. Líneas del Servicio Fijo de Telefonía por cada 100 hogares (1971-2023)',
              fontsize=11, fontweight='bold', loc='left', pad=10)
-ax.set_ylabel('LÃ­neas por cada 100 hogares', fontsize=9)
+ax.set_ylabel('Líneas por cada 100 hogares', fontsize=9)
 
 fig.text(0.01, -0.04,
          'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones '
-         'a diciembre de cada aÃ±o, del CONAPO y el INEGI.',
+         'a diciembre de cada año, del CONAPO y el INEGI.',
          fontsize=7, color='gray')
 
 # 6. Guardar
@@ -54,5 +54,5 @@ plt.savefig(PROJECT_ROOT / "output" / "Figura_B5.png", dpi=150, bbox_inches='tig
 print("Figura guardada: Figura_B5.png")
 
 # 7. Imprimir valores calculados
-print("\nValores calculados (lÃ­neas por cada 100 hogares, diciembre):")
+print("\nValores calculados (líneas por cada 100 hogares, diciembre):")
 print(df_plot[['ANIO', 'P_H_TELFIJA_E']].to_string(index=False))

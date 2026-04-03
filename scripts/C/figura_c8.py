@@ -69,12 +69,12 @@ ax.yaxis.label.set_color('#555')
 
 # 5. Título y fuente
 fig.text(0.08, 0.96,
-         'â–  Figura C.8.  TrÃ¡fico de salida del servicio mÃ³vil de telefonÃ­a (1997-2023)',
+         'Figura C.8. Tráfico de salida del servicio móvil de telefonía (1997-2023)',
          fontsize=11, fontweight='bold', color='#1f4e79', va='top')
 
 fig.text(0.08, 0.02,
          'Fuente: IFT con datos de los operadores de telecomunicaciones. '
-         'Para cada aÃ±o los datos se presentan acumulados al mes de diciembre.',
+         'Para cada año los datos se presentan acumulados al mes de diciembre.',
          fontsize=7.5, color='#555')
 
 plt.tight_layout(rect=[0, 0.05, 1, 0.94])

@@ -56,7 +56,7 @@ ax.spines['bottom'].set_visible(False)
 
 # Título
 ax.set_title(
-    'Figura B.18. Herfindahl-Hirschman (IHH). ConcentraciÃ³n de mercado\n'
+    'Figura B.18. Herfindahl-Hirschman (IHH). Concentración de mercado\n'
     'del Servicio Fijo de Internet (2013-2023)',
     fontsize=12, fontweight='bold', loc='left', pad=15, color=COLOR_LABEL
 )
@@ -64,8 +64,8 @@ ax.set_title(
 # Fuente
 fig.text(0.08, 0.01,
          'Fuente: IFT con datos proporcionados por los operadores de '
-         'telecomunicaciones a diciembre de cada aÃ±o.\n'
-         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al nÃºmero '
+         'telecomunicaciones a diciembre de cada año.\n'
+         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al número '
          'de accesos del servicio fijo de Internet.',
          fontsize=7.5, color='gray')
 

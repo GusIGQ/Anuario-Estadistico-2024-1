@@ -70,24 +70,25 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.spines['bottom'].set_color('#cccccc')
-ax.set_yticks([]) # Ocultar los nÃºmeros del eje Y
+ax.set_yticks([]) # Ocultar los números del eje Y
 
 # Poner las etiquetas con el porcentaje exacto encima de cada barra
 ax.bar_label(bars, fmt='%.1f%%', padding=5, color='#404040', fontweight='bold', fontsize=10)
 
 # Título de la gráfica
-plt.title('Porcentaje de poblaciÃ³n de 12 aÃ±os y mÃ¡s que viviÃ³ ciberacoso por medios digitales', 
+plt.title('Porcentaje de población de 12 años y más que vivió ciberacoso por medios digitales', 
           fontsize=14, fontweight='bold', color='#404040', pad=20)
 
 # Ajustar márgenes y guardar
+fig.suptitle('Figura F.8. Porcentaje de población de 12 años y más que vivió ciberacoso por medios digitales', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f8.png", dpi=300, bbox_inches='tight')
 
 # Mostrar los datos extraídos en consola para validación
-print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÃ“N ---")
+print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÓN ---")
 for index, row in df_res.iterrows():
     print(f"{row['Medio'].replace(chr(10), ' ')}: {row['Porcentaje']:.1f}%")
 
-print("\nÂ¡GrÃ¡fica generada con Ã©xito como 'grafica_medios_digitales.png'!")
+print("\n¡Gráfica generada con éxito como 'grafica_medios_digitales.png'!")
 plt.show()

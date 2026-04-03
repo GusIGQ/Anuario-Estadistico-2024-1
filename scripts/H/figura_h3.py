@@ -43,7 +43,7 @@ ax.plot(x, [avg_total]*len(x), color=color_total, linestyle='--', linewidth=2, z
 ax.set_ylim(0, 40)
 ax.set_yticks(np.arange(0, 40.1, 5))
 ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
-ax.set_ylabel('ProporciÃ³n de televisores encendidos (%)\nPorcentaje de personas\nviendo la TV por hora (%)', 
+ax.set_ylabel('Proporción de televisores encendidos (%)\nPorcentaje de personas\nviendo la TV por hora (%)', 
               fontsize=9, color='#666666', fontweight='bold', labelpad=15)
 
 # 5. Configurar Eje X (Horarios)
@@ -80,7 +80,7 @@ legend_elements = [
 fig.legend(handles=legend_elements, loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=6, frameon=False, fontsize=8, columnspacing=1)
 
 # 8. Título / Marca de agua
-plt.text(0.01, 1.05, "Figura H.3. Porcentaje de personas que vieron la televisiÃ³n por hora en Ciudad de MÃ©xico\n(DemostraciÃ³n con datos nacionales parciales)", 
+plt.text(0.01, 1.05, "Figura H.3. Porcentaje de personas que vieron la televisión por hora en Ciudad de México\n(Demostración con datos nacionales parciales)", 
          transform=ax.transAxes, fontsize=11, fontweight='bold', color='#333333', va='bottom')
 
 # Guardar la imagen final

@@ -14,29 +14,29 @@ file_path = PROJECT_ROOT / "datos" / "E.5" / "Base de datos_Cuarta Encuesta 2023
 # Cargar datos
 df = pd.read_excel(file_path)
 
-size_col = 'ClasificaciÃ³n de la empresa por su tamaÃ±o'
-factor_col = 'Factor de ExpansiÃ³n Final'
+size_col = 'Clasificación de la empresa por su tamaño'
+factor_col = 'Factor de Expansión Final'
 
 # Mapeo de columnas para Internet Fijo
 internet_cols = {
-    'MÃ¡s gente conoce la empresa': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Gracias al Internet, ahora mÃ¡s gente conoce la empresa o negocio.',
-    'EstÃ¡n mÃ¡s cerca de sus clientes': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? El Internet permite que la empresa o negocio estÃ© mÃ¡s cerca de sus consumidores.',
-    'Hay mÃ¡s ventas/clientes': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Gracias a la conexiÃ³n a Internet de la empresa o negocio ahora hay mÃ¡s ventas/clientes',
-    'DisminuciÃ³n de costos por proveedores': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? La conexiÃ³n a Internet ha permitido disminuir los costos al poder encontrar mÃ¡s y mejores proveedores',
-    'Desarrollar nuevos productos': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Contar con Internet ha permitido a la empresa o negocio desarrollar nuevos productos o servicios.',
-    'Entrega mÃ¡s rÃ¡pida o menos costosa': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? El Internet de la empresa o negocio ha permitido que la entrega de productos o servicios sea mÃ¡s rÃ¡pida o menos costosa.',
-    'Empleados hacen mÃ¡s en mismo tiempo': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? El Internet de la empresa ha permitido que los empleados hagan mÃ¡s en el mismo tiempo.'
+    'Más gente conoce la empresa': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Gracias al Internet, ahora más gente conoce la empresa o negocio.',
+    'Están más cerca de sus clientes': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? El Internet permite que la empresa o negocio esté más cerca de sus consumidores.',
+    'Hay más ventas/clientes': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Gracias a la conexión a Internet de la empresa o negocio ahora hay más ventas/clientes',
+    'Disminución de costos por proveedores': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? La conexión a Internet ha permitido disminuir los costos al poder encontrar más y mejores proveedores',
+    'Desarrollar nuevos productos': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Contar con Internet ha permitido a la empresa o negocio desarrollar nuevos productos o servicios.',
+    'Entrega más rápida o menos costosa': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? El Internet de la empresa o negocio ha permitido que la entrega de productos o servicios sea más rápida o menos costosa.',
+    'Empleados hacen más en mismo tiempo': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? El Internet de la empresa ha permitido que los empleados hagan más en el mismo tiempo.'
 }
 
 # Mapeo de columnas para Telefonía Fija
 telefonia_cols = {
-    'MÃ¡s gente conoce la empresa': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Gracias a la lÃ­nea telefÃ³nica fija, ahora mÃ¡s gente conoce la empresa o negocio.',
-    'EstÃ¡n mÃ¡s cerca de sus clientes': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? La lÃ­nea telefÃ³nica fija permite que la empresa o negocio estÃ© mÃ¡s cerca de sus consumidores.',
-    'Hay mÃ¡s ventas/clientes': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Gracias a la lÃ­nea telefÃ³nica fija de la empresa o negocio ahora hay mÃ¡s ventas / Clientes.',
-    'DisminuciÃ³n de costos por proveedores': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? La lÃ­nea telefÃ³nica fija ha permitido disminuir los costos al poder encontrar mÃ¡s y mejores proveedores.',
-    'Desarrollar nuevos productos': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? Contar con una lÃ­nea telefÃ³nica fija ha permitido a la empresa o negocio desarrollar nuevos productos o servicios.',
-    'Entrega mÃ¡s rÃ¡pida o menos costosa': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? La lÃ­nea telefÃ³nica de la empresa o negocio ha permitido que la entrega de productos o servicios sea mÃ¡s rÃ¡pida o menos costosa.',
-    'Empleados hacen mÃ¡s en mismo tiempo': 'En una escala del 0 al 10, donde 0 es â€œtotalmente en desacuerdoâ€ y 10 es â€œtotalmente de acuerdoâ€, Â¿quÃ© tan de acuerdo estÃ¡ con las siguientes frases? La lÃ­nea telefÃ³nica fija de la empresa o negocio ha permitido que los empleados hagan mÃ¡s en el mismo tiempo.'
+    'Más gente conoce la empresa': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Gracias a la línea telefónica fija, ahora más gente conoce la empresa o negocio.',
+    'Están más cerca de sus clientes': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? La línea telefónica fija permite que la empresa o negocio esté más cerca de sus consumidores.',
+    'Hay más ventas/clientes': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Gracias a la línea telefónica fija de la empresa o negocio ahora hay más ventas / Clientes.',
+    'Disminución de costos por proveedores': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? La línea telefónica fija ha permitido disminuir los costos al poder encontrar más y mejores proveedores.',
+    'Desarrollar nuevos productos': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? Contar con una línea telefónica fija ha permitido a la empresa o negocio desarrollar nuevos productos o servicios.',
+    'Entrega más rápida o menos costosa': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? La línea telefónica de la empresa o negocio ha permitido que la entrega de productos o servicios sea más rápida o menos costosa.',
+    'Empleados hacen más en mismo tiempo': 'En una escala del 0 al 10, donde 0 es “totalmente en desacuerdo” y 10 es “totalmente de acuerdo”, ¿qué tan de acuerdo está con las siguientes frases? La línea telefónica fija de la empresa o negocio ha permitido que los empleados hagan más en el mismo tiempo.'
 }
 
 # Función para promedio ponderado excluyendo Ns/Nc
@@ -51,14 +51,14 @@ def promedio_ponderado(df_subset, col_name):
     return suma_ponderada / peso_total
 
 beneficios = list(internet_cols.keys())
-sizes = ['Micro', 'PequeÃ±a', 'Mediana']
+sizes = ['Micro', 'Pequeña', 'Mediana']
 
 datos_int = {s: [promedio_ponderado(df[df[size_col] == s], internet_cols[b]) for b in beneficios] for s in sizes}
 datos_tel = {s: [promedio_ponderado(df[df[size_col] == s], telefonia_cols[b]) for b in beneficios] for s in sizes}
 
 # 2. GENERACI N DE LA GRÁFICA
 
-colores = {'Micro': '#f19a9b', 'PequeÃ±a': '#297b93', 'Mediana': '#ea5b60'}
+colores = {'Micro': '#f19a9b', 'Pequeña': '#297b93', 'Mediana': '#ea5b60'}
 
 # Invertir el orden para que coincida visualmente de arriba hacia abajo
 beneficios.reverse()
@@ -74,16 +74,16 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
 
 # Gráfico 1: Internet Fijo
 ax1.barh(y + alto_barra, datos_int['Micro'], alto_barra, label='Micro', color=colores['Micro'])
-ax1.barh(y, datos_int['PequeÃ±a'], alto_barra, label='PequeÃ±a', color=colores['PequeÃ±a'])
+ax1.barh(y, datos_int['Pequeña'], alto_barra, label='Pequeña', color=colores['Pequeña'])
 ax1.barh(y - alto_barra, datos_int['Mediana'], alto_barra, label='Mediana', color=colores['Mediana'])
 ax1.set_title('Internet Fijo', fontsize=14, pad=15)
 ax1.set_xlim(0, 10)
 
 # Gráfico 2: Telefonía Fija
 ax2.barh(y + alto_barra, datos_tel['Micro'], alto_barra, label='Micro', color=colores['Micro'])
-ax2.barh(y, datos_tel['PequeÃ±a'], alto_barra, label='PequeÃ±a', color=colores['PequeÃ±a'])
+ax2.barh(y, datos_tel['Pequeña'], alto_barra, label='Pequeña', color=colores['Pequeña'])
 ax2.barh(y - alto_barra, datos_tel['Mediana'], alto_barra, label='Mediana', color=colores['Mediana'])
-ax2.set_title('TelefonÃ­a Fija', fontsize=14, pad=15)
+ax2.set_title('Telefonía Fija', fontsize=14, pad=15)
 ax2.set_xlim(0, 10)
 
 # Etiquetas de texto en las barras
@@ -107,11 +107,11 @@ for ax in [ax1, ax2]:
 ax1.set_yticks(y)
 ax1.set_yticklabels(beneficios, fontsize=11)
 
-fig.suptitle('PercepciÃ³n sobre los beneficios de contar con servicios fijos (Escala 0 al 10)', fontsize=16)
+fig.suptitle('Figura E.5. Percepción sobre los beneficios de contar con servicios fijos', fontsize=14, fontweight='bold', y=1.02)
 handles, labels = ax1.get_legend_handles_labels()
 fig.legend(handles, labels, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.05), frameon=False, fontsize=12)
 
 plt.tight_layout()
 # Guardar salida
 plt.savefig('grafica_beneficios_promedio.png', dpi=300, bbox_inches='tight')
-print("Â¡CÃ¡lculo finalizado y grÃ¡fica guardada exitosamente como 'grafica_beneficios_promedio.png'!")
+print("¡Cálculo finalizado y Gráfica guardada exitosamente como 'grafica_beneficios_promedio.png'!")

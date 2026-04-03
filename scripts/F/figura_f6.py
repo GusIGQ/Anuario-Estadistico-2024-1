@@ -32,7 +32,7 @@ absolutos_mujeres = df.iloc[idx_mujeres+1 : idx_mujeres+14, 1].astype(float)
 # Extraer y limpiar las etiquetas (quitar los numeritos finales y ajustar el texto largo)
 etiquetas_raw = df.iloc[idx_hombres+1 : idx_hombres+14, 0].astype(str)
 etiquetas_limpias = [re.sub(r'\d+$', '', lbl).strip() for lbl in etiquetas_raw]
-etiquetas_limpias = [textwrap.fill(lbl, width=38) for lbl in etiquetas_limpias] # Para que no queden muy largas en la grÃ¡fica
+etiquetas_limpias = [textwrap.fill(lbl, width=38) for lbl in etiquetas_limpias] # Para que no queden muy largas en la Gráfica
 
 # 3. CÁLCULO DE PORCENTAJES
 pct_hombres = (absolutos_hombres.values / total_hombres) * 100
@@ -66,7 +66,7 @@ ax.set_yticks(y)
 ax.set_yticklabels(df_res['Situacion'], fontsize=10, color='#666666')
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
-ax.spines['left'].set_visible(False) # Ocultamos la lÃ­nea izquierda para que sea mÃ¡s limpio
+ax.spines['left'].set_visible(False) # Ocultamos la línea izquierda para que sea más limpio
 ax.spines['bottom'].set_color('#cccccc')
 
 # Etiquetas con los porcentajes exactos en la punta de cada barra
@@ -74,17 +74,18 @@ ax.bar_label(bars_h, fmt='%.1f%%', padding=5, color='#404040', fontsize=9, fontw
 ax.bar_label(bars_m, fmt='%.1f%%', padding=5, color='#404040', fontsize=9, fontweight='bold')
 
 # Título y Leyenda
-plt.title('DistribuciÃ³n porcentual de las situaciones de ciberacoso experimentadas\nen los Ãºltimos 12 meses, por sexo', 
+plt.title('Distribución porcentual de las situaciones de ciberacoso experimentadas\nen los últimos 12 meses, por sexo', 
           fontsize=14, fontweight='bold', color='#404040', pad=20)
 ax.legend(loc='lower right', frameon=False, fontsize=11)
 
 # Ajustar márgenes, guardar y mostrar
+fig.suptitle('Figura F.6. Distribución porcentual de las situaciones de ciberacoso experimentadas por sexo', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f6.png", dpi=300, bbox_inches='tight')
 
-print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÃ“N ---")
+print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÓN ---")
 print(df_res.sort_values(by='Mujeres', ascending=False).to_string(index=False))
-print("\nÂ¡GrÃ¡fica generada con Ã©xito como 'figura_f6.png'!")
+print("\n¡Gráfica generada con éxito como 'figura_f6.png'!")
 
 plt.show()

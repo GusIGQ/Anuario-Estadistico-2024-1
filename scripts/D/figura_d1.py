@@ -1,8 +1,8 @@
 ﻿"""
-Figura D.1 â€” Disponibilidad de las TIC en los hogares (2010-2023)
+Figura D.1 — Disponibilidad de las TIC en los hogares (2010-2023)
 Fuente:
-  - 2001-2014: INEGI MODUTIH  â†’ 27_2023_hnal110.xlsx  (Computadora, Radio, TelefonÃ­a)
-                               â†’ 30_2023_hnal130.xlsx  (TV digital / analÃ³gico)
+  - 2001-2014: INEGI MODUTIH  â†’ 27_2023_hnal110.xlsx  (Computadora, Radio, Telefonía)
+                               â†’ 30_2023_hnal130.xlsx  (TV digital / analógico)
   - 2015-2023: INEGI ENDUTIH  â†’ mismos archivos
 """
 
@@ -36,7 +36,7 @@ def leer_archivo27(path):
             data[anio] = {
                 'computadora': row[2],   # % Computadora
                 'radio':       row[12],  # % Radio
-                'telefonia':   row[10],  # % TelefonÃ­a (cel + fija combinada)
+                'telefonia':   row[10],  # % Telefonía (cel + fija combinada)
             }
     return data
 
@@ -51,11 +51,11 @@ def leer_archivo30(path):
         if len(anio_str) == 4:
             anio = int(anio_str)
             solo_dig = row[4] or 0   # Solo digital %
-            solo_ana = row[6] or 0   # Solo analÃ³gico %
+            solo_ana = row[6] or 0   # Solo analógico %
             ambos    = row[8] or 0   # Ambos tipos %
             data[anio] = {
                 'tv_digital':   solo_dig + ambos,   # hogares con al menos 1 digital
-                'tv_analogico': solo_ana + ambos,   # hogares con al menos 1 analÃ³gico
+                'tv_analogico': solo_ana + ambos,   # hogares con al menos 1 analógico
             }
     return data
 
@@ -86,11 +86,11 @@ ax.set_facecolor('#F7F7F7')
 lw = 2.2
 ms = 5
 
-l1, = ax.plot(years, cel,   color=COLOR_CEL,   lw=lw, marker='o', ms=ms, label='TelÃ©fono celular')
+l1, = ax.plot(years, cel,   color=COLOR_CEL,   lw=lw, marker='o', ms=ms, label='Teléfono celular')
 l2, = ax.plot(years, tvdig, color=COLOR_TVDIG,  lw=lw, marker='o', ms=ms, label='Televisor digital')
-l3, = ax.plot(years, comp,  color=COLOR_COMP,   lw=lw, marker='o', ms=ms, label='Equipo de cÃ³mputo')
+l3, = ax.plot(years, comp,  color=COLOR_COMP,   lw=lw, marker='o', ms=ms, label='Equipo de cómputo')
 l4, = ax.plot(years, radio, color=COLOR_RADIO,  lw=lw, marker='o', ms=ms, label='Aparatos de radio')
-l5, = ax.plot(years, tvana, color=COLOR_TVANA,  lw=lw, marker='o', ms=ms, label='Televisor analÃ³gico')
+l5, = ax.plot(years, tvana, color=COLOR_TVANA,  lw=lw, marker='o', ms=ms, label='Televisor analógico')
 
 # Etiquetas en cada punto
 def etiquetar(series, color, offsets=None):

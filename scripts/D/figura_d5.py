@@ -1,30 +1,30 @@
 ﻿"""
-Figura D.5 â€” Â¿CÃ³mo aprendiÃ³ a buscar informaciÃ³n o usar el Internet?
+Figura D.5 — ¿Cómo aprendió a buscar información o usar el Internet?
              (Porcentaje de personas usuarias de Internet)
 
-Fuente : IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de
+Fuente : IFT, con información de la Encuesta de Confianza en el Servicio de
          Internet (ECSI) 2024.
 Archivo: baseconfianzadigital__1_.csv
-         (descargable desde la secciÃ³n "Encuestas a Usuarios" en
+         (descargable desde la sección "Encuestas a Usuarios" en
           https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml)
 Salida : output/Figura_D5.png
 
-MetodologÃ­a
+Metodología
 -----------
 Universo  : Personas usuarias de Internet (rescate_internet == 1).
-Factor    : fac_per  (factor de expansiÃ³n de personas â‰¥ 18 aÃ±os).
-Variables : apren_uso_int_1  (P13_1) â€“ Por su cuenta (Sin ayuda)
-            apren_uso_int_2  (P13_2) â€“ CapacitaciÃ³n en el trabajo
-            apren_uso_int_3  (P13_3) â€“ Curso en la escuela
-            apren_uso_int_4  (P13_4) â€“ Curso en centro comunitario
-            apren_uso_int_5  (P13_5) â€“ Curso particular
-            apren_uso_int_6  (P13_6) â€“ Amigos o familiares
-            apren_uso_int_8  (P13_8) â€“ Otros
-            apren_uso_int_9  (P13_9) â€“ NS/NR
-FÃ³rmula   : % = SUM(fac_per | var == 1) / SUM(fac_per) Ã— 100
+Factor    : fac_per  (factor de expansión de personas â‰¥ 18 años).
+Variables : apren_uso_int_1  (P13_1) – Por su cuenta (Sin ayuda)
+            apren_uso_int_2  (P13_2) – Capacitación en el trabajo
+            apren_uso_int_3  (P13_3) – Curso en la escuela
+            apren_uso_int_4  (P13_4) – Curso en centro comunitario
+            apren_uso_int_5  (P13_5) – Curso particular
+            apren_uso_int_6  (P13_6) – Amigos o familiares
+            apren_uso_int_8  (P13_8) – Otros
+            apren_uso_int_9  (P13_9) – NS/NR
+Fórmula   : % = SUM(fac_per | var == 1) / SUM(fac_per) × 100
 
-Nota      : Respuesta mÃºltiple â€” los porcentajes no suman 100 %.
-            Los porcentajes consideran el diseÃ±o muestral de la encuesta.
+Nota      : Respuesta múltiple — los porcentajes no suman 100 %.
+            Los porcentajes consideran el diseño muestral de la encuesta.
 """
 
 import os
@@ -52,7 +52,7 @@ usuarios = df[df["rescate_internet"] == 1].copy()
 # 3. Variables en el orden del Anuario
 VARS = {
     "apren_uso_int_1": "Por su cuenta",
-    "apren_uso_int_2": "CapacitaciÃ³n en\nel trabajo",
+    "apren_uso_int_2": "Capacitación en\nel trabajo",
     "apren_uso_int_3": "Curso en la escuela",
     "apren_uso_int_4": "Curso en\ncentro comunitario",
     "apren_uso_int_5": "Curso particular",
@@ -82,8 +82,8 @@ x         = np.arange(n_cat)
 # Colores: barra destacada (Por su cuenta) en rojo-salmón,
 # resto en azul oscuro / azul medio, igual que el Anuario
 COLORES = [
-    "#E8937A",  # Por su cuenta          â†’ salmÃ³n/rojo (barra mÃ¡s alta)
-    "#E8937A",  # CapacitaciÃ³n trabajo   â†’ salmÃ³n
+    "#E8937A",  # Por su cuenta          â†’ salmón/rojo (barra más alta)
+    "#E8937A",  # Capacitación trabajo   â†’ salmón
     "#1F4E6B",  # Curso escuela          â†’ azul oscuro
     "#A8D5DC",  # Curso centro comunit.  â†’ azul claro
     "#A8D5DC",  # Curso particular       â†’ azul claro
@@ -125,15 +125,15 @@ ax.tick_params(axis="x", bottom=False)
 
 # 8. Título y notas
 ax.set_title(
-    "Figura D.5. Â¿CÃ³mo aprendiÃ³ a buscar informaciÃ³n o usar el Internet?\n"
+    "Figura D.5. ¿Cómo aprendió a buscar información o usar el Internet?\n"
     "(Porcentaje de personas usuarias de Internet)",
     fontsize=11, fontweight="bold", color="#1F4E6B",
     pad=14, loc="left"
 )
 
 nota = (
-    "Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
-    "Nota: Los porcentajes reportados consideran el diseÃ±o muestral de la encuesta."
+    "Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
+    "Nota: Los porcentajes reportados consideran el diseño muestral de la encuesta."
 )
 fig.text(0.01, -0.02, nota, fontsize=7.5, color="#555555", ha="left", va="top")
 

@@ -1,9 +1,9 @@
-﻿# - - coding: utf-8 - -
+# - - coding: utf-8 - -
 """
-Figura A.7 â€” Porcentaje de hogares con servicios de telecomunicaciones
+Figura A.7 — Porcentaje de hogares con servicios de telecomunicaciones
 fijas por decil de ingreso
 
-GrÃ¡fica de barras horizontales agrupadas con dos mÃ©tricas:
+Gráfica de barras horizontales agrupadas con dos métricas:
   1. % Hogares con telecomunicaciones fijas
   2. % Hogares que disponen y gastan en telecomunicaciones fijas
 
@@ -23,8 +23,8 @@ import matplotlib.ticker as mticker
 
 # 1. CARGA DE MICRODATOS ENIGH 2022
 
-BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'A.7', 'microdatos')
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'figuras')
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'A.7-A.8-A.9-A.10', 'microdatos')
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 print("Cargando concentradohogar...")
@@ -147,7 +147,7 @@ for bar in bars2:
             ha='left', va='center', fontsize=9, color='#555555', fontweight='bold')
 
 # Título de la Gráfica
-fig.text(0.04, 0.94, 'â–  ', fontsize=12, color='#F2998A', fontweight='bold', transform=fig.transFigure)
+fig.text(0.04, 0.94, '■ ', fontsize=12, color='#F2998A', fontweight='bold', transform=fig.transFigure)
 fig.text(0.06, 0.94, 'Figura A.7. ', fontsize=12, color='#333333', fontweight='bold', transform=fig.transFigure)
 fig.text(0.14, 0.94, 'Porcentaje de hogares con servicios de telecomunicaciones fijas por decil de ingreso',
          fontsize=12, color='#555555', transform=fig.transFigure)

@@ -1,8 +1,8 @@
 ﻿"""
-Figura B.11 â€” Accesos del Servicio Fijo de Internet (2000-2023)
-Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.
+Figura B.11 — Accesos del Servicio Fijo de Internet (2000-2023)
+Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.
 CSV: TD_ACC_INTER_HIS_ITE_VA.csv
-Columna: A_TOTAL_E | Filtro: MES==12 | OperaciÃ³n: SUM por aÃ±o
+Columna: A_TOTAL_E | Filtro: MES==12 | Operación: SUM por año
 """
 
 import pandas as pd
@@ -48,16 +48,16 @@ fig, ax = plt.subplots(figsize=(14, 6))
 fig.patch.set_facecolor("white")
 ax.set_facecolor("white")
 
-aÃ±os   = data["anio"].values
+años   = data["anio"].values
 valores = data["accesos"].values
 
-ax.fill_between(aÃ±os, valores, alpha=0.18, color=COLOR_FILL)
-ax.plot(aÃ±os, valores, color=COLOR_LINE, linewidth=2.2, zorder=3)
-ax.scatter(aÃ±os, valores, color=COLOR_LINE, s=28, zorder=4)
+ax.fill_between(años, valores, alpha=0.18, color=COLOR_FILL)
+ax.plot(años, valores, color=COLOR_LINE, linewidth=2.2, zorder=3)
+ax.scatter(años, valores, color=COLOR_LINE, s=28, zorder=4)
 
 # Etiquetas solo en extremos
 for anio, val in [(2000, valores[0]), (2023, valores[-1])]:
-    idx = list(aÃ±os).index(anio)
+    idx = list(años).index(anio)
     offset = -1_200_000 if anio == 2000 else 800_000
     ax.annotate(
         f"{val:,.0f}",
@@ -70,8 +70,8 @@ for anio, val in [(2000, valores[0]), (2023, valores[-1])]:
 # Ejes
 ax.set_xlim(1999.3, 2023.7)
 ax.set_ylim(-500_000, 31_000_000)
-ax.set_xticks(aÃ±os)
-ax.set_xticklabels([str(a) for a in aÃ±os], rotation=0, fontsize=8.5)
+ax.set_xticks(años)
+ax.set_xticklabels([str(a) for a in años], rotation=0, fontsize=8.5)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
 ax.yaxis.set_major_locator(mticker.MultipleLocator(5_000_000))
 ax.tick_params(axis="both", which="both", length=0, labelcolor="#444")
@@ -91,7 +91,7 @@ ax.set_title(
 )
 fig.text(
     0.01, -0.04,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.",
+    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.",
     fontsize=7.5, color="#666", style="italic"
 )
 

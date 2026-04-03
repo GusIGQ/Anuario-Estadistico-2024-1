@@ -17,7 +17,7 @@ ruta_2023 = PROJECT_ROOT / "datos" / "E.8" / "Base de datos_Cuarta Encuesta 2023
 try:
     # Cargar datos
     df = pd.read_excel(ruta_2023, engine='openpyxl')
-    print("Â¡Base de datos 2023 cargada exitosamente!")
+    print("¡Base de datos 2023 cargada exitosamente!")
 except Exception as e:
     print(f"Error al cargar el archivo Excel: {e}")
     exit()
@@ -36,12 +36,12 @@ def calcular_pct_ponderado(df_filtro, col_val, col_peso):
     peso_total = df_valido[col_peso].sum()
     return (peso_si / peso_total) * 100 if peso_total > 0 else 0
 
-categorias = ['General', 'Micro', 'PequeÃ±a', 'Mediana']
+categorias = ['General', 'Micro', 'Pequeña', 'Mediana']
 
 # Los 4 beneficios a evaluar con sus palabras clave para encontrar la columna en el Excel
 beneficios_config = [
-    {"titulo": "El contacto con los clientes\nes mÃ¡s rÃ¡pido", "clave": "contacto con los clientes"},
-    {"titulo": "La solicitud de pedidos\nes mÃ¡s Ã¡gil", "clave": "solicitud de pedidos"},
+    {"titulo": "El contacto con los clientes\nes más rápido", "clave": "contacto con los clientes"},
+    {"titulo": "La solicitud de pedidos\nes más ágil", "clave": "solicitud de pedidos"},
     {"titulo": "Mayor competitividad\nen el mercado", "clave": "competitividad"},
     {"titulo": "Facilita el control\nde ventas", "clave": "control de ventas"}
 ]
@@ -56,7 +56,7 @@ for ben in beneficios_config:
     cols_encontradas = [c for c in df.columns if 'beneficios de contar con una aplicaci' in c.lower() and ben['clave'].lower() in c.lower()]
 
     if not cols_encontradas:
-        print(f"ERROR: No se encontrÃ³ la columna para: {titulo}")
+        print(f"ERROR: No se encontró la columna para: {titulo}")
         continue
 
     col_exacta = cols_encontradas[0]
@@ -74,7 +74,7 @@ for ben in beneficios_config:
 
     resultados[titulo] = lista_pcts
 
-print("CÃ¡lculos listos. Dibujando grÃ¡fica...")
+print("Cálculos listos. Dibujando Gráfica...")
 
 # 3. GENERACI N DE LA GRÁFICA (2x2)
 
@@ -86,7 +86,7 @@ fig.patch.set_facecolor('#F8FBFA')
 color_barras = '#2B7B94'
 
 x = np.arange(len(categorias))
-width = 0.5 # Barras un poco mÃ¡s anchas al ser un solo aÃ±o
+width = 0.5 # Barras un poco más anchas al ser un solo año
 
 axes_planos = axes.flatten()
 
@@ -122,10 +122,11 @@ for i, ax in enumerate(axes_planos):
 # 4. EXPORTACI N
 
 # Texto descriptivo inferior calcado del PDF
-footer_text = 'Fuente: IFT con informaciÃ³n de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeÃ±as y medianas empresas).' \
-              '\nNota: Respuesta espontÃ¡nea y mÃºltiple no suma 100%.'
+footer_text = 'Fuente: IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeñas y medianas empresas).' \
+              '\nNota: Respuesta espontánea y múltiple no suma 100%.'
 fig.text(0.05, 0.02, footer_text, fontsize=10, color='#555555', ha='left')
 
+fig.suptitle('Figura E.8. Actividades de las MiPymes en Internet', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout(rect=[0.02, 0.05, 0.98, 0.95])
 
 # Definir la ruta de salida
@@ -137,4 +138,4 @@ os.makedirs(ruta_salida_dir, exist_ok=True)
 # Guardar salida
 plt.savefig(ruta_completa, facecolor=fig.get_facecolor(), bbox_inches='tight')
 
-print(f"Â¡GrÃ¡fica exportada exitosamente en: {ruta_completa}!")
+print(f"¡Gráfica exportada exitosamente en: {ruta_completa}!")

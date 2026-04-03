@@ -1,6 +1,6 @@
 ﻿"""
-Figura A.10 â€” Gasto promedio y porcentaje de gasto en Servicios de
-Telecomunicaciones MÃ³viles de los hogares por decil de ingreso
+Figura A.10 — Gasto promedio y porcentaje de gasto en Servicios de
+Telecomunicaciones Móviles de los hogares por decil de ingreso
 
 Barras verticales con gradiente (gasto promedio mensual, eje derecho) +
 puntos con etiqueta (% gasto respecto al ingreso, eje izquierdo).
@@ -8,13 +8,13 @@ puntos con etiqueta (% gasto respecto al ingreso, eje izquierdo).
 Fuente: IFT con datos de la ENIGH 2022, del INEGI.
 Datos disponibles en: https://www.inegi.org.mx/programas/enigh/nc/2022/.
 
-MetodologÃ­a:
+Metodología:
   - Deciles construidos sobre ingreso corriente total (ing_cor) de concentradohogar.
-  - Gasto en mÃ³viles: clave E002 (celular) de gastoshogar + gastospersona
+  - Gasto en móviles: clave E002 (celular) de gastoshogar + gastospersona
     (gasto_tri + gas_nm_tri).
   - Promedios para hogares que disponen y gastan (tienen el servicio Y comunica > 0).
   - Gasto mensual = gasto_tri / 3.
-  - % gasto = gasto_mensual / (ing_cor / 3) Ã— 100.
+  - % gasto = gasto_mensual / (ing_cor / 3) × 100.
 """
 
 import os
@@ -30,7 +30,7 @@ import matplotlib.ticker as mticker
 import matplotlib.colors as mcolors
 
 # 1. Carga de microdatos ENIGH 2022
-BASE = os.path.join(os.path.dirname(__file__), "..", "..", 'datos', 'A.7', 'microdatos')
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'A.7-A.8-A.9-A.10', 'microdatos')
 
 # Cargar datos
 concentrado = pd.read_csv(
@@ -171,13 +171,13 @@ ax2.spines['bottom'].set_color('#CCCCCC')
 ax2.spines['right'].set_color('#CCCCCC')
 
 # 5. Título
-fig.text(0.02, 0.96, 'â–  ', fontsize=12, color='#7B2D8E', fontweight='bold',
+fig.text(0.02, 0.96, '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
          transform=fig.transFigure, va='top')
-fig.text(0.04, 0.965, 'Figura A.10.  ', fontsize=12, color='#333333',
+fig.text(0.04, 0.965, 'Figura A.10. ', fontsize=12, color='#333333',
          fontweight='bold', transform=fig.transFigure, va='top')
 fig.text(0.12, 0.965,
          'Gasto promedio y porcentaje de gasto en Servicios de Telecomunicaciones '
-         'MÃ³viles de los hogares por decil de ingreso',
+         'Móviles de los hogares por decil de ingreso',
          fontsize=12, color='#333333', transform=fig.transFigure, va='top')
 
 # 6. Notas al pie
@@ -185,9 +185,9 @@ note = ('Fuente: IFT con datos de la ENIGH 2022, del INEGI. '
         'Datos disponibles en: https://www.inegi.org.mx/programas/enigh/nc/2022/.')
 note2 = ('Notas: El gasto e ingreso utilizados para los porcentajes son el '
          'promedio para los hogares de cada decil de ingreso que disponen del '
-         'servicio y gastan en Ã©l. Las cifras de ingresos y gastos fueron\n'
-         'ajustadas con base a la inflaciÃ³n para reflejar su valor real en '
-         'tÃ©rminos comparativos.')
+         'servicio y gastan en él. Las cifras de ingresos y gastos fueron\n'
+         'ajustadas con base a la inflación para reflejar su valor real en '
+         'términos comparativos.')
 fig.text(0.02, 0.015, note, fontsize=7.5, color='#555555',
          fontweight='bold', transform=fig.transFigure, va='bottom')
 fig.text(0.02, -0.02, note2, fontsize=7.5, color='#555555',
@@ -199,5 +199,5 @@ output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Fig
 # Guardar salida
 fig.savefig(output_path, dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print(f"GrÃ¡fica guardada en: {output_path}")
+print(f"Gráfica guardada en: {output_path}")
 plt.close(fig)

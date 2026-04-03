@@ -1,11 +1,11 @@
-﻿"""
-Figuras C.3 y C.4 â€” v5 FINAL
-Hallazgo: Estrategia B + internet (FAC_HOGAR, P7_1==1) es la mÃ¡s cercana.
+"""
+Figuras C.3 y C.4 — v5 FINAL
+Hallazgo: Estrategia B + internet (FAC_HOGAR, P7_1==1) es la más cercana.
   Nacional: 79.3% (obj 78.0%, +1.3pp)
   Urbano:   83.6% (obj 82.0%, +1.6pp)
   Rural:    63.3% (obj 63.0%, +0.3pp)
 
-Discrepancia de ~1-2pp es normal (versiÃ³n de datos anterior al Anuario).
+Discrepancia de ~1-2pp es normal (versión de datos anterior al Anuario).
 Este script confirma los valores y genera la figura.
 """
 
@@ -58,7 +58,7 @@ for label, filtro in [
     no_usa = round(100 - usa, 1)
     resultados[label] = (usa, no_usa)
 
-print("\nâ”€â”€ Valores calculados vs Anuario â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
+print("\n── Valores calculados vs Anuario ────────────────────────────")
 objetivo = {"Nacional": (78, 22), "Urbano": (82, 18), "Rural": (63, 37)}
 for label, (usa, no_usa) in resultados.items():
     obj_usa, obj_no = objetivo[label]
@@ -77,7 +77,7 @@ VALS_GRAFICOS = {
 
 # GENERAR FIGURA C.3 pastel nacional
 
-COLOR_USA    = "#C0392B"   # rojo salmÃ³n (servicios mÃ³viles)
+COLOR_USA    = "#C0392B"   # rojo salmón (servicios móviles)
 COLOR_NO_USA = "#2C3E50"   # azul marino (no usan)
 COLOR_FONDO  = "#F5F5F0"
 
@@ -104,14 +104,14 @@ ax_c3.text(0.55, 0.65, f"{no_usa_nac}%",
            ha="center", va="center", fontsize=18, fontweight="bold",
            color="white")
 
-ax_c3.set_title("Figura C.3. Porcentaje del uso de los servicios\n"
-                "mÃ³viles de telecomunicaciones\n"
-                "PoblaciÃ³n de 6 aÃ±os o mÃ¡s",
+ax_c3.set_title("Figura C.4. Porcentaje del uso de los servicios\n"
+                "móviles de telecomunicaciones\n"
+                "Población de 6 años o más",
                 fontsize=9, pad=12, color="#333333")
 
 leg = [
-    mpatches.Patch(color=COLOR_USA,    label=f"Hacen uso de servicios mÃ³viles ({usa_nac}%)"),
-    mpatches.Patch(color=COLOR_NO_USA, label=f"No hacen uso de servicios mÃ³viles ({no_usa_nac}%)"),
+    mpatches.Patch(color=COLOR_USA,    label=f"Hacen uso de servicios móviles ({usa_nac}%)"),
+    mpatches.Patch(color=COLOR_NO_USA, label=f"No hacen uso de servicios móviles ({no_usa_nac}%)"),
 ]
 ax_c3.legend(handles=leg, loc="lower center", bbox_to_anchor=(0.5, -0.12),
              fontsize=7.5, frameon=False)
@@ -123,10 +123,16 @@ ax_c3.text(0.5, -0.07,
            ha="center", va="top")
 
 plt.tight_layout()
-out_c3 = os.path.join(OUTPUT_DIR, "Figura_C3.png")
-# Guardar salida
-plt.savefig(out_c3, dpi=150, bbox_inches="tight", facecolor=COLOR_FONDO)
-print(f"\nFigura C.3 guardada: {out_c3}")
+# Guardar gráfica en formatos PNG y SVG
+out_c3_png = os.path.join(OUTPUT_DIR, "Figura_C3.png")
+out_c3_svg = os.path.join(OUTPUT_DIR, "Figura_C3.svg")
+plt.rcParams['svg.fonttype'] = 'none'
+
+plt.savefig(out_c3_png, dpi=300, bbox_inches="tight", facecolor=COLOR_FONDO, edgecolor='none')
+print(f"\nFigura C.3 guardada en versión PNG de alta resolución: {out_c3_png}")
+
+plt.savefig(out_c3_svg, format='svg', bbox_inches="tight", facecolor=COLOR_FONDO, edgecolor='none')
+print(f"Figura C.3 guardada en versión vectorial SVG editable: {out_c3_svg}")
 plt.close()
 
 # GENERAR FIGURA C.4 dos pasteles (urbano / rural)
@@ -140,8 +146,8 @@ datos_c4 = [
 ]
 
 subtitulos = [
-    "Porcentaje de la poblaciÃ³n de 6\naÃ±os o mÃ¡s en zonas urbanas\nque usan servicios mÃ³viles de\nTelecomunicaciones",
-    "Porcentaje de la poblaciÃ³n de 6\naÃ±os o mÃ¡s en zonas rurales\nque usan servicios mÃ³viles de\nTelecomunicaciones",
+    "Porcentaje de la población de 6\naños o más en zonas urbanas\nque usan servicios móviles de\nTelecomunicaciones",
+    "Porcentaje de la población de 6\naños o más en zonas rurales\nque usan servicios móviles de\nTelecomunicaciones",
 ]
 
 for ax, (label, usa, no_usa), subtit in zip(axes, datos_c4, subtitulos):
@@ -165,14 +171,14 @@ for ax, (label, usa, no_usa), subtit in zip(axes, datos_c4, subtitulos):
     ax.set_title(subtit, fontsize=9, pad=10, color="#333333")
 
     leg = [
-        mpatches.Patch(color=COLOR_USA,    label=f"Hacen uso de servicios mÃ³viles ({usa}%)"),
-        mpatches.Patch(color=COLOR_NO_USA, label=f"No hacen uso de servicios mÃ³viles ({no_usa}%)"),
+        mpatches.Patch(color=COLOR_USA,    label=f"Hacen uso de servicios móviles ({usa}%)"),
+        mpatches.Patch(color=COLOR_NO_USA, label=f"No hacen uso de servicios móviles ({no_usa}%)"),
     ]
     ax.legend(handles=leg, loc="lower center", bbox_to_anchor=(0.5, -0.14),
               fontsize=7.5, frameon=False)
 
-fig_c4.suptitle("Figura C.4. Porcentaje del uso de los servicios mÃ³viles de "
-                "telecomunicaciones por zona geogrÃ¡fica",
+fig_c4.suptitle("Figura C.4. Porcentaje del uso de los servicios móviles de"
+                "telecomunicaciones por zona geoGráfica",
                 fontsize=10, y=1.01, color="#333333")
 
 fig_c4.text(0.5, -0.04,
@@ -181,26 +187,33 @@ fig_c4.text(0.5, -0.04,
             ha="center", fontsize=6.5, color="#666666")
 
 plt.tight_layout()
-out_c4 = os.path.join(OUTPUT_DIR, "Figura_C4.png")
-plt.savefig(out_c4, dpi=150, bbox_inches="tight", facecolor=COLOR_FONDO)
-print(f"Figura C.4 guardada: {out_c4}")
+# Guardar gráfica en formatos PNG y SVG
+out_c4_png = os.path.join(OUTPUT_DIR, "Figura_C4.png")
+out_c4_svg = os.path.join(OUTPUT_DIR, "Figura_C4.svg")
+plt.rcParams['svg.fonttype'] = 'none'
+
+plt.savefig(out_c4_png, dpi=300, bbox_inches="tight", facecolor=COLOR_FONDO, edgecolor='none')
+print(f"Figura C.4 guardada en versión PNG de alta resolución: {out_c4_png}")
+
+plt.savefig(out_c4_svg, format='svg', bbox_inches="tight", facecolor=COLOR_FONDO, edgecolor='none')
+print(f"Figura C.4 guardada en versión vectorial SVG editable: {out_c4_svg}")
 plt.close()
 
 # Resumen de trazabilidad
-print("\nâ”€â”€ RESUMEN DE TRAZABILIDAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
+print("\n── RESUMEN DE TRAZABILIDAD ──────────────────────────────────")
 print("Fuente:    ENDUTIH 2023, INEGI (datos abiertos)")
 print("Archivo:   tr_endutih_usuarios_anual_2023.csv")
 print("Factor:    FAC_HOGAR (desde tr_endutih_residentes_anual_2023.csv)")
-print("Universo:  personas de 6 aÃ±os o mÃ¡s")
-print("Variable:  P7_1 == '1' (usÃ³ internet en Ãºltimos 3 meses)")
-print("Ãmbito:    DOMINIO == 'U' (urbano) / 'R' (rural)")
+print("Universo:  personas de 6 años o más")
+print("Variable:  P7_1 == '1' (usó internet en últimos 3 meses)")
+print("Ámbito:    DOMINIO == 'U' (urbano) / 'R' (rural)")
 print()
 print("Valores calculados vs publicados en el Anuario IFT 2024:")
 for label, (usa, no_usa) in resultados.items():
     obj_usa, _ = objetivo[label]
     print(f"  {label:10s}: calculado {usa:.1f}%  |  Anuario {obj_usa}%  |  diff {usa-obj_usa:+.1f}pp")
 print()
-print("Nota: discrepancia de 1-2pp atribuible a versiÃ³n de microdatos")
-print("anterior a la publicaciÃ³n del Anuario (patrÃ³n documentado en")
+print("Nota: discrepancia de 1-2pp atribuible a versión de microdatos")
+print("anterior a la publicación del Anuario (patrón documentado en")
 print("todas las figuras con fuente ENDUTIH/BIT de este proyecto).")
 print("Los valores graficados usan los del Anuario.")

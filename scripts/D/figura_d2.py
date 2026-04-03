@@ -1,29 +1,29 @@
 ﻿"""
-Figura D.2 â€” Uso de Smartphone e Internet por grupos de edad (2023)
+Figura D.2 — Uso de Smartphone e Internet por grupos de edad (2023)
 Fuente: INEGI, ENDUTIH 2023
 
 Archivo de entrada:
   tr_endutih_usuarios_anual_2023.csv
 
-Flujo del cuestionario (secciÃ³n P6 â€” Internet):
+Flujo del cuestionario (sección P6 — Internet):
   P6_1 = '1' â†’ usa computadora â†’ salta a P6_4 (dispositivo principal de internet)
-  P6_1 = '2' â†’ no usa comp   â†’ P6_3: Â¿usa internet? (1=sÃ­, 2=no)
+  P6_1 = '2' â†’ no usa comp   â†’ P6_3: ¿usa internet? (1=sí, 2=no)
   Por tanto:
     usa_internet = (P6_3 == '1')  OR  (P6_4 no es NaN)
   Equivalente: NO tiene P6_3 == '2'
 
-Flujo del cuestionario (secciÃ³n P7 â€” Celular):
-  P7_1 = '1' â†’ tiene celular â†’ P7_3: Â¿es smartphone? (1=sÃ­, 2=no)
+Flujo del cuestionario (sección P7 — Celular):
+  P7_1 = '1' â†’ tiene celular â†’ P7_3: ¿es smartphone? (1=sí, 2=no)
   P7_1 = '2' â†’ no tiene celular â†’ P7_3 queda NaN
   Por tanto:
     usa_smartphone = (P7_3 == '1')
 
 Variables:
-  EDAD    â€” edad de la persona
-  P6_3    â€” Â¿usa internet? solo para quienes no usan comp (1=sÃ­, 2=no, NaN=saltÃ³)
-  P6_4    â€” dispositivo principal de internet (NaN=no usa internet)
-  P7_3    â€” tipo de celular (1=smartphone, 2=bÃ¡sico, NaN=sin celular)
-  FAC_PER â€” factor de expansiÃ³n (~119.5 millones total)
+  EDAD    — edad de la persona
+  P6_3    — ¿usa internet? solo para quienes no usan comp (1=sí, 2=no, NaN=saltó)
+  P6_4    — dispositivo principal de internet (NaN=no usa internet)
+  P7_3    — tipo de celular (1=smartphone, 2=básico, NaN=sin celular)
+  FAC_PER — factor de expansión (~119.5 millones total)
 """
 
 import pandas as pd
@@ -51,7 +51,7 @@ df = pd.read_csv(
 )
 df['EDAD']    = pd.to_numeric(df['EDAD'],    errors='coerce')
 df['FAC_PER'] = pd.to_numeric(df['FAC_PER'], errors='coerce')
-print(f"  Registros leÃ­dos : {len(df):,}")
+print(f"  Registros leídos : {len(df):,}")
 print(f"  Suma FAC_PER     : {df['FAC_PER'].sum():,.0f}")
 
 # 2. Filtro: personas de 6 años o más
@@ -72,8 +72,8 @@ df['smartphone'] = (df['P7_3'].str.strip() == '1').astype(int)
 
 # 4. Grupos de edad
 bins   = [5, 11, 17, 24, 34, 44, 54, 200]
-labels = ['6 a 11\naÃ±os', '12 a 17\naÃ±os', '18 a 24\naÃ±os',
-          '25 a 34\naÃ±os', '35 a 44\naÃ±os', '45 a 54\naÃ±os', '55 o\nmÃ¡s']
+labels = ['6 a 11\naños', '12 a 17\naños', '18 a 24\naños',
+          '25 a 34\naños', '35 a 44\naños', '45 a 54\naños', '55 o\nmás']
 df['grupo'] = pd.cut(df['EDAD'], bins=bins, labels=labels)
 
 # 5. Cálculo ponderado por FAC_PER

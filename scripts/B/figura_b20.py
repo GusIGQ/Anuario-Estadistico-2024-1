@@ -68,14 +68,14 @@ ax.axhline(y=0, color=COLOR_BORDE, linewidth=1.2)
 
 # 9. Título y fuente
 ax.set_title(
-    'Figura B.20. Accesos del Servicio de TelevisiÃ³n Restringida\n'
+    'Figura B.20. Accesos del Servicio de Televisión Restringida\n'
     'por cada 100 hogares (1998-2023)',
     fontsize=11, color=COLOR_LABEL, fontweight='bold', pad=12)
 
 fig.text(
     0.01, -0.04,
     'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones '
-    'a diciembre de cada aÃ±o, del CONAPO y el INEGI.',
+    'a diciembre de cada año, del CONAPO y el INEGI.',
     fontsize=7.5, color='#666', style='italic')
 
 # 10. Estética general

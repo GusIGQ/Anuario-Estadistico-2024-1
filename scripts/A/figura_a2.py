@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -24,7 +24,7 @@ df['pct_radio'] = (df['radio'] / df['total']) * 100
 # Colors
 color_tel = '#29618C' # Telecomunicaciones (dark blue)
 color_tel_bot = '#1D4E72' # Darker at bottom
-color_rad = '#ADE5E7' # RadiodifusiÃ³n (light green/blue)
+color_rad = '#ADE5E7' # Radiodifusión (light green/blue)
 color_rad_bot = '#8BC6CA' # Darker at bottom
 
 # Crear grafica
@@ -61,8 +61,8 @@ for i, row in df.iterrows():
     ax.add_patch(circ)
 
     # Callouts
-    val_tel_pct = f"{int(round(p_tel))}%"
-    val_rad_pct = f"{int(round(p_rad))}%"
+    val_tel_pct = f"{p_tel:.1f}%"
+    val_rad_pct = f"{p_rad:.1f}%"
 
     # Left callout for telecom
     ax.annotate(val_tel_pct, 
@@ -82,7 +82,7 @@ for i, row in df.iterrows():
 
     # Total over the bar
     total_val = row['total']
-    ax.text(x[i], 103, f"{int(round(total_val)):,}",
+    ax.text(x[i], 103, f"{total_val:,.0f}",
             ha='center', va='bottom', fontsize=8, color='#AAAAAA', fontweight='bold', zorder=4)
 
 # Custom X axis
@@ -118,23 +118,23 @@ for spine in ax.spines.values():
 ax.set_yticks([])
 
 # Title
-fig.text(0.04, 0.94, 'â–  ', fontsize=12, color='#EDA396', fontweight='bold', va='top')
+fig.text(0.04, 0.94, '■ ', fontsize=12, color='#EDA396', fontweight='bold', va='top')
 fig.text(0.06, 0.94, 'Figura A.2. ', fontsize=13, color='#555577', fontweight='bold', va='top')
-fig.text(0.12, 0.94, 'Empleo en los sectores de telecomunicaciones y radiodifusiÃ³n', 
+fig.text(0.12, 0.94, 'Empleo en los sectores de telecomunicaciones y radiodifusión', 
          fontsize=13, color='#777799', va='top')
 
 # Legend
-fig.text(0.40, 0.15, 'â–  ', fontsize=14, color=color_tel, fontweight='bold', va='center')
+fig.text(0.40, 0.15, '■ ', fontsize=14, color=color_tel, fontweight='bold', va='center')
 fig.text(0.42, 0.15, 'Telecomunicaciones', fontsize=11, color='#444455', fontweight='bold', va='center')
-fig.text(0.55, 0.15, 'â–  ', fontsize=14, color=color_rad, fontweight='bold', va='center')
-fig.text(0.57, 0.15, 'RadiodifusiÃ³n', fontsize=11, color='#444455', fontweight='bold', va='center')
+fig.text(0.55, 0.15, '■ ', fontsize=14, color=color_rad, fontweight='bold', va='center')
+fig.text(0.57, 0.15, 'Radiodifusión', fontsize=11, color='#444455', fontweight='bold', va='center')
 
 # Note
-note1 = "Fuente: IFT con datos de la Encuesta Nacional de OcupaciÃ³n y Empleo (ENOE) del INEGI, con cifras a junio 2024.\nDatos disponibles en https://www.inegi.org.mx/programas/enoe/15ymas/default.html#Microdatos\nNotas: Para el aÃ±o 2020 se considera la informaciÃ³n al primer y cuarto trimestre."
+note1 = "Fuente: IFT con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) del INEGI, con cifras a junio 2024.\nDatos disponibles en https://www.inegi.org.mx/programas/enoe/15ymas/default.html#Microdatos\nNotas: Para el año 2020 se considera la información al primer y cuarto trimestre."
 fig.text(0.04, 0.03, note1, fontsize=9, color='#777777', va='bottom', linespacing=1.5)
 
 # Y-axis label
-fig.text(0.03, 0.5, "POBLACIÃ“N OCUPADA EN TYR Y DISTRIBUCIÃ“N POR SECTOR", 
+fig.text(0.03, 0.5, "POBLACIÓN OCUPADA EN TYR Y DISTRIBUCIÓN POR SECTOR", 
          rotation=90, va='center', ha='center', fontsize=9, color='#888888', fontweight='bold')
 
 plt.subplots_adjust(bottom=0.25, left=0.08, right=0.95, top=0.88)

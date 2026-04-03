@@ -1,10 +1,10 @@
 ﻿"""
-Figura B.10 (BAF) â€” Ãndice Herfindahl-Hirschman. ConcentraciÃ³n de mercado
+Figura B.10 (BAF) — Índice Herfindahl-Hirschman. Concentración de mercado
 del Servicio Fijo de Acceso a Internet (2013-2023)
-Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.
-Nota: IHH estimado con respecto al nÃºmero de accesos del servicio fijo de internet.
+Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.
+Nota: IHH estimado con respecto al número de accesos del servicio fijo de internet.
 CSV: TD_IHH_BAF_ITE_VA.csv
-Columna: IHH_BAF_E | Filtro: MES==12 | AÃ±os: 2013-2023
+Columna: IHH_BAF_E | Filtro: MES==12 | años: 2013-2023
 """
 
 import pandas as pd
@@ -48,12 +48,12 @@ fig, ax = plt.subplots(figsize=(10, 7))
 fig.patch.set_facecolor("white")
 ax.set_facecolor("white")
 
-aÃ±os    = data["anio"].values
+años    = data["anio"].values
 valores = data["ihh"].values
 
 # Barras horizontales
 bars = ax.barh(
-    [str(a) for a in aÃ±os],
+    [str(a) for a in años],
     valores,
     color=COLOR_BAR,
     height=0.65,
@@ -85,14 +85,14 @@ ax.text(
 
 # Título y fuente
 ax.set_title(
-    "Ãndice Herfindahl-Hirschman (IHH).\nConcentraciÃ³n de mercado del Servicio Fijo de Internet (2013-2023)",
+    "Índice Herfindahl-Hirschman (IHH).\nConcentración de mercado del Servicio Fijo de Internet (2013-2023)",
     fontsize=11, fontweight="bold", color=COLOR_LABEL,
     loc="left", pad=12
 )
 fig.text(
     0.01, -0.02,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n"
-    "Nota: IHH estimado con respecto al nÃºmero de accesos del servicio fijo de internet.",
+    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
+    "Nota: IHH estimado con respecto al número de accesos del servicio fijo de internet.",
     fontsize=7.5, color="#666", style="italic"
 )
 

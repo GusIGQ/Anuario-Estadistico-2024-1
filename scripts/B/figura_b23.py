@@ -1,5 +1,5 @@
 ﻿"""
-Figura B.23 â€” TecnologÃ­as de conexiÃ³n del Servicio de TelevisiÃ³n Restringida por segmento
+Figura B.23 — Tecnologías de conexión del Servicio de Televisión Restringida por segmento
 Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de 2023.
 Archivo: TD_ACC_TVRES_ITE_VA.CSV
 """
@@ -38,7 +38,7 @@ TECNOS_INTERES = ["Cable", "Direct-to-home (DTH)", "IPTV Terrestre"]
 
 # Agrupar por tecnología
 grp = df.groupby("TECNO_ACCESO_TV")[["A_RESIDENCIAL_E", "A_NO_RESIDENCIAL_E"]].sum()
-print("\n--- Todas las tecnologÃ­as en dic 2023 ---")
+print("\n--- Todas las tecnologías en dic 2023 ---")
 print(grp)
 
 # Totales por segmento
@@ -118,7 +118,7 @@ fig.patch.set_facecolor("#f5f5f5")
 make_pie(ax1, pct_res,   COLORS_RES,   "Residencial",    int(total_res),   "Residencial")
 make_pie(ax2, pct_nores, COLORS_NORES, "No Residencial", int(total_nores), "No Residencial")
 
-fig.suptitle("Figura B.23. TecnologÃ­as de conexiÃ³n del Servicio de TelevisiÃ³n\nRestringida por segmento",
+fig.suptitle("Figura B.23. Tecnologías de conexión del Servicio de Televisión\nRestringida por segmento",
              fontsize=13, fontweight="bold", y=1.01)
 
 note = ("Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de 2023.\n"

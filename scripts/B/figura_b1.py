@@ -1,5 +1,5 @@
 ﻿"""
-Figura B.1 â€” DistribuciÃ³n de los Servicios Fijos con respecto del total de hogares a nivel nacional
+Figura B.1 — Distribución de los Servicios Fijos con respecto del total de hogares a nivel nacional
 Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.
 Datos: https://www.inegi.org.mx/programas/endutih/2023/#microdatos
 
@@ -8,17 +8,17 @@ Archivos requeridos:
   - FD_ENDUTIH2023.xlsx   (descriptor de archivos, referencia de variables)
 
 Variables usadas:
-  P4_4    : Â¿Disponen de conexiÃ³n a internet en el hogar?    (1=SÃ­, 2=No)
-  P4_5    : Â¿La conexiÃ³n es fija, mÃ³vil o ambas?             (1=Solo fija, 2=Solo mÃ³vil, 3=Ambas, 9=No sabe)
-  P5_1    : Â¿Disponen de servicio de televisiÃ³n de paga?     (1=SÃ­, 2=No)
-  P5_5    : Â¿Disponen de lÃ­nea telefÃ³nica fija?              (1=SÃ­, 2=No)
-  FAC_HOG : Factor de expansiÃ³n del hogar
+  P4_4    : ¿Disponen de conexión a internet en el hogar?    (1=Sí, 2=No)
+  P4_5    : ¿La conexión es fija, móvil o ambas?             (1=Solo fija, 2=Solo móvil, 3=Ambas, 9=No sabe)
+  P5_1    : ¿Disponen de servicio de televisión de paga?     (1=Sí, 2=No)
+  P5_5    : ¿Disponen de línea telefónica fija?              (1=Sí, 2=No)
+  FAC_HOG : Factor de expansión del hogar
 
-Nota metodolÃ³gica:
-  Los microdatos pÃºblicos producen diferencias de 1-4 pp respecto al Anuario IFT 2024
+Nota metodológica:
+  Los microdatos públicos producen diferencias de 1-4 pp respecto al Anuario IFT 2024
   (ej. Tres servicios: 19.4% calculado vs 21% publicado). Se usan los valores del
-  Anuario para la grÃ¡fica final. La discrepancia se atribuye a revisiones de FAC_HOG
-  posteriores a la publicaciÃ³n.
+  Anuario para la Gráfica final. La discrepancia se atribuye a revisiones de FAC_HOG
+  posteriores a la publicación.
 """
 
 import matplotlib
@@ -78,10 +78,10 @@ pct_uno     = 25
 pct_ninguno = 20
 
 # Desglose Un servicio
-un_srv = {'Solo\nInternet': 18, 'Solo\nTV Rest.': 6, 'Solo\nTelefonÃ­a': 1}
+un_srv = {'Solo\nInternet': 18, 'Solo\nTV Rest.': 6, 'Solo\nTelefonía': 1}
 
 # Desglose Dos servicios
-dos_srv = {'Internet +\nTelefonÃ­a': 20, 'TV +\nInternet': 13, 'TV +\nTelefonÃ­a': 1}
+dos_srv = {'Internet +\nTelefonía': 20, 'TV +\nInternet': 13, 'TV +\nTelefonía': 1}
 
 # Paleta
 C_TRES    = '#1a3a5c'
@@ -96,7 +96,7 @@ fig = plt.figure(figsize=(16, 9), facecolor='white')
 fig.text(0.04, 0.96, 'B. SERVICIOS FIJOS DE TELECOMUNICACIONES',
          fontsize=13, fontweight='bold', color='#1a3a5c', va='top')
 fig.text(0.04, 0.91,
-         'Figura B.1.  DistribuciÃ³n de los Servicios Fijos con respecto del total de hogares a nivel nacional',
+         'Figura B.1. Distribución de los Servicios Fijos con respecto del total de hogares a nivel nacional',
          fontsize=9.5, color='#1a3a5c', va='top', style='italic')
 
 # Pastel principal
@@ -126,14 +126,14 @@ for lbl, pct, (lx, ly), (px, py) in etiquetas:
                 fontsize=15, color='white', fontweight='bold')
 
 # Total en el centro
-ax_pie.text(0,  0.07, 'Total de hogares en MÃ©xico:', ha='center',
+ax_pie.text(0,  0.07, 'Total de hogares en México:', ha='center',
             fontsize=7.5, color='#1a3a5c')
 ax_pie.text(0, -0.07, f'{TOTAL_HOG:,}', ha='center',
             fontsize=11, color='#1a3a5c', fontweight='bold')
 
 # Anotación Tres servicios
 ax_pie.annotate(
-    '(TelefonÃ­a Fija +\nTV Restringida\n+ Internet)',
+    '(Telefonía Fija +\nTV Restringida\n+ Internet)',
     xy=(0.60, 0.80), xycoords='axes fraction',
     fontsize=7.5, color='#1a3a5c', ha='center',
     bbox=dict(boxstyle='round,pad=0.35', fc='white', ec='#1a3a5c', lw=0.8),

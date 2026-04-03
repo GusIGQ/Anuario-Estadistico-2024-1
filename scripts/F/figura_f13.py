@@ -8,24 +8,24 @@ enable_plot_data_logging()
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 import numpy as np
 
-print("Cargando base de datos de TelefonÃ­a MÃ³vil...")
+print("Cargando base de datos de Telefonía Móvil...")
 # 1. Cargar la base de Telefonía Móvil
 df_movil = pd.read_excel(PROJECT_ROOT / "datos" / "F.13" / "Tercera Encuesta 2023_Tel M\u00f3vil.xlsx")
 
 # 2. Definir factor de expansión y filtro de usuario
-w_col = 'Calibrador (post-estratificaciÃ³n) final que considera distribuciÃ³n de lÃ­neas telefÃ³nicas mÃ³viles por entidad federativa y poblaciÃ³n por grupos de edad 5 (redondeos corregidos)'
+w_col = 'Calibrador (post-estratificación) final que considera distribución de líneas telefónicas móviles por entidad federativa y población por grupos de edad 5 (redondeos corregidos)'
 df_movil[w_col] = pd.to_numeric(df_movil[w_col], errors='coerce')
 
-user_col = 'Â¿Es usted\xa0el usuario habitual de esta lÃ­nea de telÃ©fono mÃ³vil o celular?'
-df_filtered = df_movil[df_movil[user_col].astype(str).str.strip().str.lower() == 'sÃ­'].copy()
+user_col = '¿Es usted\xa0el usuario habitual de esta línea de teléfono móvil o celular?'
+df_filtered = df_movil[df_movil[user_col].astype(str).str.strip().str.lower() == 'sí'].copy()
 
 # 3. Pesos totales divididos por género (Hombre/Mujer)
-w_hombres = df_filtered[df_filtered['GÃ©nero'] == 'Hombre'][w_col].sum()
-w_mujeres = df_filtered[df_filtered['GÃ©nero'] == 'Mujer'][w_col].sum()
+w_hombres = df_filtered[df_filtered['Género'] == 'Hombre'][w_col].sum()
+w_mujeres = df_filtered[df_filtered['Género'] == 'Mujer'][w_col].sum()
 
 # 4. Mapeo de categorías con los nombres del PDF y su orden de aparición
 label_mapping = {
-    'Menores de edad': 'NiÃ±os, niÃ±as y\nadolescentes',
+    'Menores de edad': 'Niños, niñas y\nadolescentes',
     'Adultos mayores / Personas de la tercera edad': 'Personas adultas\nmayores',
     'Mujeres': 'Mujeres',
     'Parientes (familiares)': 'Parientes\n(familiares)',
@@ -35,7 +35,7 @@ label_mapping = {
 }
 
 pdf_order = [
-    'NiÃ±os, niÃ±as y\nadolescentes',
+    'Niños, niñas y\nadolescentes',
     'Personas adultas\nmayores',
     'Mujeres',
     'Parientes\n(familiares)',
@@ -56,12 +56,12 @@ for col in violencia_cols:
             label = label_mapping[categoria]
 
             # Filtramos los que respondieron Sí a esta categoría
-            mask_si = df_filtered[col].apply(lambda x: str(x).strip().lower() == 'sÃ­')
+            mask_si = df_filtered[col].apply(lambda x: str(x).strip().lower() == 'sí')
             df_si = df_filtered[mask_si]
 
             # Sumamos los pesos segmentando por género
-            w_si_h = df_si[df_si['GÃ©nero'] == 'Hombre'][w_col].sum()
-            w_si_m = df_si[df_si['GÃ©nero'] == 'Mujer'][w_col].sum()
+            w_si_h = df_si[df_si['Género'] == 'Hombre'][w_col].sum()
+            w_si_m = df_si[df_si['Género'] == 'Mujer'][w_col].sum()
 
             # Calculamos los porcentajes (Suma parcial / Suma total del género)
             results_h[label] = (w_si_h / w_hombres) * 100
@@ -108,10 +108,11 @@ ax.spines['left'].set_visible(False)
 ax.get_xaxis().set_ticks([])
 ax.tick_params(axis='y', length=0)
 
-plt.title('Personas usuarias con mayor riesgo de ser vÃ­ctimas de violencia\ndigital a travÃ©s del telÃ©fono mÃ³vil. Por sexo', 
+plt.title('Personas usuarias con mayor riesgo de ser víctimas de violencia\ndigital a través del teléfono móvil. Por sexo', 
           fontsize=14, fontweight='bold', pad=20)
+fig.suptitle('Figura F.13. Gasto mensual promedio en telefonía móvil por nivel socioeconómico', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 
 # 9. Guardar la figura
 plt.savefig(PROJECT_ROOT / "output" / "figura_f13.png", dpi=300)
-print("Â¡GrÃ¡fica F.13 generada exitosamente!")
+print("¡Gráfica F.13 generada exitosamente!")

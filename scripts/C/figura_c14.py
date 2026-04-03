@@ -1,11 +1,11 @@
 ﻿"""
-Figura C.14 â€” TrÃ¡fico del servicio mÃ³vil de acceso a Internet (2015-2023)
+Figura C.14 — Tráfico del servicio móvil de acceso a Internet (2015-2023)
 Fuente: IFT con datos de los operadores de telecomunicaciones.
 CSV: TD_TRAF_INTMOVIL_ITE_VA.csv
 
-METODOLOGÃA:
-- Se suman TODOS los meses de cada aÃ±o (el trÃ¡fico es acumulado anual, no snapshot)
-- El denominador de los porcentajes es TOTAL_TB_E (incluye trÃ¡fico no especificado)
+METODOLOGÍA:
+- Se suman TODOS los meses de cada año (el tráfico es acumulado anual, no snapshot)
+- El denominador de los porcentajes es TOTAL_TB_E (incluye tráfico no especificado)
 - El orden de apilado es: 2G (abajo), 3G (medio), 4G (arriba)
 """
 
@@ -52,8 +52,8 @@ pct_3g = g['PCT_3G'].tolist()
 pct_4g = g['PCT_4G'].tolist()
 
 # 3. COLORES (fieles al Anuario IFT)
-COLOR_2G   = '#D94F3D'   # rojo-salmÃ³n oscuro (franja pequeÃ±a, base)
-COLOR_3G   = '#F0A896'   # salmÃ³n claro (franja media)
+COLOR_2G   = '#D94F3D'   # rojo-salmón oscuro (franja pequeña, base)
+COLOR_3G   = '#F0A896'   # salmón claro (franja media)
 COLOR_4G   = '#2E3B7A'   # azul marino (franja dominante)
 COLOR_TEXT = '#1E2A5E'
 
@@ -115,20 +115,20 @@ ax.grid(False)
 
 # 8. LEYENDA
 patches = [
-    mpatches.Patch(color=COLOR_2G, label='TrÃ¡fico 2G'),
-    mpatches.Patch(color=COLOR_3G, label='TrÃ¡fico 3G'),
-    mpatches.Patch(color=COLOR_4G, label='TrÃ¡fico 4G'),
+    mpatches.Patch(color=COLOR_2G, label='Tráfico 2G'),
+    mpatches.Patch(color=COLOR_3G, label='Tráfico 3G'),
+    mpatches.Patch(color=COLOR_4G, label='Tráfico 4G'),
 ]
 ax.legend(handles=patches, loc='lower center', frameon=False,
           fontsize=9.5, ncol=3, bbox_to_anchor=(0.5, -0.1))
 
 # 9. TÍTULO Y FUENTE
 fig.text(0.04, 0.97,
-         'Figura C.14. TrÃ¡fico del servicio mÃ³vil de acceso a Internet (2015-2023)',
+         'Figura C.14. Tráfico del servicio móvil de acceso a Internet (2015-2023)',
          ha='left', va='top', fontsize=11, fontweight='bold', color=COLOR_TEXT)
 fig.text(0.04, -0.03,
          'Fuente: IFT con datos de los operadores de telecomunicaciones. '
-         'Para cada aÃ±o los datos se presentan acumulados al mes de diciembre.',
+         'Para cada año los datos se presentan acumulados al mes de diciembre.',
          ha='left', va='bottom', fontsize=7.5, color='gray')
 
 plt.tight_layout(rect=[0, 0.04, 1, 0.96])
@@ -140,7 +140,7 @@ plt.savefig('output/Figura_C14.png', dpi=150, bbox_inches='tight',
 print("âœ…  Guardada: output/Figura_C14.png")
 
 # 10. VERIFICACI N EN CONSOLA
-print("\nâ”€â”€ Valores calculados vs Anuario â”€â”€")
+print("\n── Valores calculados vs Anuario ──")
 anuario_total = {2015:270026, 2016:623944, 2017:1212063, 2018:2092039,
                  2019:3965441, 2020:5282622, 2021:6314845, 2022:7712771, 2023:8750075}
 anuario_pct   = {
@@ -148,7 +148,7 @@ anuario_pct   = {
     2018:(0.3,32.8,66.9), 2019:(0.2,23.3,76.5), 2020:(0.1,18.8,81.0),
     2021:(0.1,14.6,84.6), 2022:(0.1,11.3,85.5), 2023:(0.1,9.3,83.5),
 }
-print(f"{'AÃ±o':>4} | {'Total CSV':>12} | {'Total ANU':>12} | {'2G csv/anu':>12} | {'3G csv/anu':>12} | {'4G csv/anu':>12}")
+print(f"{'año':>4} | {'Total CSV':>12} | {'Total ANU':>12} | {'2G csv/anu':>12} | {'3G csv/anu':>12} | {'4G csv/anu':>12}")
 print("-" * 75)
 for i, a in enumerate(anios):
     a2, a3, a4 = anuario_pct[a]

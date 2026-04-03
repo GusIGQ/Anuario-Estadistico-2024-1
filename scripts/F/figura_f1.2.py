@@ -33,15 +33,15 @@ tot_h = usuarios_sexo.get(1, 1)
 
 # 4. Mapeo actividades
 actividades = {
-    'PelÃ­culas, series y otros\naudiovisuales gratuitos\n(YouTube)':           'P7_13_3',
-    'Escuchar mÃºsica gratis\n(Spotify, Google music,\netcÃ©tera)':              'P7_13_4',
-    'PelÃ­culas, series y otros\naudiovisuales de pago\n(Netflix, OTT, etc.)': 'P7_13_2',
-    'Leer periÃ³dicos,\nrevistas o libros':                                     'P7_13_1',
+    'Películas, series y otros\naudiovisuales gratuitos\n(YouTube)':           'P7_13_3',
+    'Escuchar música gratis\n(Spotify, Google music,\netcétera)':              'P7_13_4',
+    'Películas, series y otros\naudiovisuales de pago\n(Netflix, OTT, etc.)': 'P7_13_2',
+    'Leer periódicos,\nrevistas o libros':                                     'P7_13_1',
     'Compras\npor Internet':                                                   'P7_21',
-    'InteracciÃ³n con\nel gobierno':                                            'GOB',
-    'Jugar en lÃ­nea':                                                          'P7_13_5',
+    'Interacción con\nel gobierno':                                            'GOB',
+    'Jugar en línea':                                                          'P7_13_5',
     'Pagos por Internet':                                                      'P7_28',
-    'Uso de la banca\nelectrÃ³nica':                                            'P7_33',
+    'Uso de la banca\nelectrónica':                                            'P7_33',
     'TV en web (canales\nabiertos por Internet)':                              'P7_13_7',
     'Ventas por Internet':                                                     'P7_19',
     'Radio AM y FM':                                                           'P7_18_1',
@@ -57,15 +57,15 @@ for nombre, col in actividades.items():
 data = pd.DataFrame(rows)
 
 # 5. Figura
-COLOR_M  = '#E8734A'   # naranja/salmÃ³n â€” mujeres
-COLOR_H  = '#3A7DBF'   # azul â€” hombres
+COLOR_M  = '#E8734A'   # naranja/salmón — mujeres
+COLOR_H  = '#3A7DBF'   # azul — hombres
 COLOR_BG = '#F5F7FA'
 COLOR_CARD = '#FFFFFF'
 
 # Crear grafica
 fig = plt.figure(figsize=(20, 14), facecolor=COLOR_BG)
-fig.suptitle(
-    'Figura F.1. Actividades realizadas en Internet',
+fig.suptitle('Figura F.1.2. Actividades realizadas en Internet', fontsize=14, fontweight='bold', y=1.02)
+    'Figura F.1.2. Actividades realizadas en Internet',
     fontsize=16, fontweight='bold', color='#1A1A2E', y=0.97
 )
 
@@ -82,13 +82,13 @@ ax_header.text(0.50, 0.80, 'Usuarios de Internet',
 # Mujeres
 ax_header.text(0.28, 0.55, f'{tot_m:,.0f}',
                ha='center', va='center', fontsize=18, fontweight='bold', color=COLOR_M)
-ax_header.text(0.28, 0.18, 'Mujeres\n(81% del total de mujeres â‰¥6 aÃ±os)',
+ax_header.text(0.28, 0.18, 'Mujeres\n(81% del total de mujeres â‰¥6 años)',
                ha='center', va='center', fontsize=9, color='#555555')
 
 # Hombres
 ax_header.text(0.72, 0.55, f'{tot_h:,.0f}',
                ha='center', va='center', fontsize=18, fontweight='bold', color=COLOR_H)
-ax_header.text(0.72, 0.18, 'Hombres\n(81% del total de hombres â‰¥6 aÃ±os)',
+ax_header.text(0.72, 0.18, 'Hombres\n(81% del total de hombres â‰¥6 años)',
                ha='center', va='center', fontsize=9, color='#555555')
 
 # Separador
@@ -176,7 +176,7 @@ fig.text(
     0.05, 0.01,
     'Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.\n'
     'Nota: Los porcentajes se calculan respecto del total de usuarios de Internet de cada sexo. '
-    'Usuarios = personas de 6 aÃ±os o mÃ¡s.',
+    'Usuarios = personas de 6 años o más.',
     fontsize=7, color='#777777', va='bottom'
 )
 

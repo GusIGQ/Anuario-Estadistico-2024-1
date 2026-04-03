@@ -1,9 +1,9 @@
 ﻿"""
-Figura C.16 â€” Herfindahl-Hirschman (IHH). ConcentraciÃ³n de mercado
-              del servicio mÃ³vil de acceso a Internet (2013-2023)
+Figura C.16 — Herfindahl-Hirschman (IHH). Concentración de mercado
+              del servicio móvil de acceso a Internet (2013-2023)
 Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones
-        a diciembre de cada aÃ±o.
-Nota: IHH estimado con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de
+        a diciembre de cada año.
+Nota: IHH estimado con respecto al número de líneas del servicio móvil de
       acceso a Internet.
 
 Archivo de entrada: TD_IHH_INTMOVIL_ITE_VA.csv
@@ -25,7 +25,7 @@ import os, sys
 # 1. LECTURA
 CSV_PATH = PROJECT_ROOT / "datos" / "C.16" / "TD_IHH_INTMOVIL_ITE_VA.csv"
 if not os.path.exists(CSV_PATH):
-    print(f"ERROR: No se encontrÃ³ {CSV_PATH}")
+    print(f"ERROR: No se encontró {CSV_PATH}")
     sys.exit(1)
 
 # Cargar datos
@@ -43,13 +43,13 @@ df_dic = df_dic.sort_values("ANIO").reset_index(drop=True)
 anios = df_dic["ANIO"].tolist()
 ihh   = df_dic["IHH"].tolist()
 
-print("â”€â”€ Valores calculados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
-print(f"{'AÃ±o':>4}  {'IHH':>6}")
+print("── Valores calculados ─────────────────────────────────────")
+print(f"{'año':>4}  {'IHH':>6}")
 for a, v in zip(anios, ihh):
     print(f"{a:>4}  {v:>6,.0f}")
 
 # 4. GRÁFICA: barras horizontales
-COLOR_BARRA = "#1A6B8A"   # azul petrÃ³leo (igual al Anuario)
+COLOR_BARRA = "#1A6B8A"   # azul petróleo (igual al Anuario)
 COLOR_TEXTO = "#333333"
 
 # Crear grafica
@@ -91,14 +91,14 @@ ax.tick_params(axis="y", left=False)
 # 7. TÍTULO Y FUENTE
 fig.text(
     0.07, 0.97,
-    "â–   Figura C.16.  Herfindahl-Hirschman (IHH). ConcentraciÃ³n de mercado\n"
-    "    del servicio mÃ³vil de acceso a Internet (2013-2023)",
+    "Figura C.16. Herfindahl-Hirschman (IHH). Concentración de mercado\n"
+    "    del servicio móvil de acceso a Internet (2013-2023)",
     fontsize=11, fontweight="bold", color="#2D3270", va="top"
 )
 fig.text(
     0.07, 0.025,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n"
-    "Nota: Herfindahl-Hirschman (IHH) estimado con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de acceso a Internet.",
+    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
+    "Nota: Herfindahl-Hirschman (IHH) estimado con respecto al número de líneas del servicio móvil de acceso a Internet.",
     fontsize=7.8, color="#555555"
 )
 

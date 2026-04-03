@@ -1,12 +1,12 @@
-﻿"""
+"""
 
-Figura A.1 - Producto Interno Bruto (PIB) y contribuciÃ³n del PIB
-de los subsectores de telecomunicaciones y radiodifusiÃ³n.
+Figura A.1 - Producto Interno Bruto (PIB) y contribución del PIB
+de los subsectores de telecomunicaciones y radiodifusión.
 
-Reproduce la grÃ¡fica exacta del Anuario EstadÃ­stico 2024 del IFT.
+Reproduce la Gráfica exacta del Anuario Estadístico 2024 del IFT.
 - Datos TRIMESTRALES de 2013-I a 2024-II
 - Barras: PIB nacional en miles de millones de pesos (precios de 2018)
-- LÃ­nea: ParticipaciÃ³n TyR = (517 Telecomunicaciones + 515 Radio y TV) / PIB
+- Línea: Participación TyR = (517 Telecomunicaciones + 515 Radio y TV) / PIB
 
 Fuente: INEGI / IFT con datos a junio de 2024.
 
@@ -34,7 +34,7 @@ df = pd.read_excel(path, sheet_name='Tabulado', header=None)
 # Filas clave (bloque 1: Millones de pesos a precios de 2018 )
 ROW_PIB = 7          # Producto interno bruto
 ROW_TELECOM = 155    # 517 - Telecomunicaciones
-ROW_RADIO_TV = 154   # 515 - Radio y televisiÃ³n
+ROW_RADIO_TV = 154   # 515 - Radio y televisión
 
 # 2. Extraer datos trimestrales 2013-2024
 # Cada año ocupa 7 columnas: T1, T2, T3, T4, 6 Meses, 9 Meses, Anual
@@ -90,7 +90,7 @@ x = np.arange(n)
 
 # --- Barras con gradiente vertical (oscuro arriba, claro abajo) ---
 # Colores del gradiente IFT (púrpura oscuro azul claro)
-color_top = np.array(mcolors.to_rgb('#2B1055'))     # PÃºrpura oscuro
+color_top = np.array(mcolors.to_rgb('#2B1055'))     # Púrpura oscuro
 color_bot = np.array(mcolors.to_rgb('#7597C9'))     # Azul claro
 bar_width = 0.72
 
@@ -154,7 +154,7 @@ ax2.plot(x, pct_vals, color='#6B6B6B', linewidth=2, zorder=4,
          marker='o', markersize=5, markerfacecolor='#8B78A8',
          markeredgecolor='white', markeredgewidth=1.2)
 
-ax2.set_ylabel('Porcentaje de participaciÃ³n de los subsectores de las TyR',
+ax2.set_ylabel('Porcentaje de Participación de los subsectores de las TyR',
                fontsize=10, fontweight='bold', color='#333333',
                rotation=270, labelpad=22)
 ax2.set_ylim(0, 1.8)
@@ -178,14 +178,14 @@ for i, (_, row) in enumerate(qdf.iterrows()):
 
 # --- Título ---
 fig.text(0.02, 0.96,
-         'â–  ', fontsize=12, color='#7B2D8E', fontweight='bold',
+         '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
          transform=fig.transFigure, va='top')
 fig.text(0.04, 0.965,
-         'Figura A.1.  ', fontsize=12, color='#333333', fontweight='bold',
+         'Figura A.1. ', fontsize=12, color='#333333', fontweight='bold',
          transform=fig.transFigure, va='top')
 fig.text(0.115, 0.965,
-         'Producto Interno Bruto (PIB) y contribuciÃ³n del PIB de los subsectores '
-         'de telecomunicaciones y radiodifusiÃ³n',
+         'Producto Interno Bruto (PIB) y contribución del PIB de los subsectores '
+         'de telecomunicaciones y radiodifusión',
          fontsize=12, color='#333333',
          transform=fig.transFigure, va='top')
 
@@ -195,7 +195,7 @@ bar_patch = mpatches.Patch(facecolor='#3D2070', edgecolor='none',
 line_patch = plt.Line2D([0], [0], color='#6B6B6B', marker='o',
                         markersize=6, markerfacecolor='#8B78A8',
                         markeredgecolor='white', linewidth=2,
-                        label='ParticipaciÃ³n TyR')
+                        label='Participación TyR')
 ax1.legend(handles=[bar_patch, line_patch], loc='lower center',
            bbox_to_anchor=(0.5, -0.16), ncol=2, fontsize=10,
            frameon=False, handlelength=2.5)
@@ -203,10 +203,10 @@ ax1.legend(handles=[bar_patch, line_patch], loc='lower center',
 # --- Notas al pie ---
 note1 = ('Fuente: IFT con datos del INEGI a junio de 2024. '
          'Datos disponibles en: https://www.inegi.org.mx/temas/pib/.')
-note2 = ('Notas: PIB a precios constantes de 2018. La participaciÃ³n de los '
-         'subsectores de TyR corresponde a la contribuciÃ³n del sector 51 '
-         '(InformaciÃ³n en medios masivos) de acuerdo con el Sistema de\n'
-         'ClasificaciÃ³n Industrial de AmÃ©rica del Norte, MÃ©xico SCIAN 2023.')
+note2 = ('Notas: PIB a precios constantes de 2018. La Participación de los '
+         'subsectores de TyR corresponde a la contribución del sector 51 '
+         '(información en medios masivos) de acuerdo con el Sistema de\n'
+         'Clasificación Industrial de  América del Norte, México SCIAN 2023.')
 fig.text(0.02, 0.01, note1, fontsize=7.5, color='#555555',
          transform=fig.transFigure, va='bottom')
 fig.text(0.02, -0.025, note2, fontsize=7.5, color='#555555',
@@ -226,10 +226,23 @@ ax1.grid(axis='y', alpha=0.25, color='#999999', zorder=0)
 
 fig.subplots_adjust(left=0.07, right=0.93, top=0.92, bottom=0.15)
 
-# Guardar
-output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Figura_A1.png')
-# Guardar salida
-fig.savefig(output_path, dpi=200, bbox_inches='tight',
-            facecolor='white', edgecolor='none')
-print(f"\nGrÃ¡fica guardada en: {output_path}")
+# Guardar gráfica en formatos PNG y SVG
+output_dir = os.path.join(os.path.dirname(__file__), "..", "..", 'output')
+os.makedirs(output_dir, exist_ok=True)
+output_png = os.path.join(output_dir, 'Figura_A1.png')
+output_svg = os.path.join(output_dir, 'Figura_A1.svg')
+
+# Configuraciones para un SVG profesional y editable
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG (alta resolución)
+fig.savefig(output_png, dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none', transparent=False)
+print(f"\nGráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG (vectorial escalable)
+fig.savefig(output_svg, format='svg', bbox_inches='tight',
+            facecolor='white', edgecolor='none', transparent=False)
+print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")
+
 plt.close(fig)

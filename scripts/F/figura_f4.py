@@ -52,7 +52,7 @@ df_final['Mujeres (%)'] = (df_final['Mujeres_Ciberacoso'] / total_mujeres * 100)
 # Ordenar alfabéticamente para igualar el PDF original
 df_final = df_final.sort_values('Entidad').reset_index(drop=True)
 
-print("Datos calculados con Ã©xito. Generando grÃ¡fica...")
+print("Datos calculados con éxito. Generando Gráfica...")
 
 # FASE 2: DIBUJO Y DISE O DE LA GRÁFICA
 
@@ -103,9 +103,10 @@ ax.set_axisbelow(True)
 ax.legend(loc='upper left', bbox_to_anchor=(0.15, 0.95), frameon=False, ncol=2, fontsize=10)
 
 # 9. Guardar y mostrar
+fig.suptitle('Figura F.4. Ingreso promedio de trabajadores en telecomunicaciones y radiodifusión', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 nombre_salida = PROJECT_ROOT / "output" / "Figura_F4.png"
 # Guardar salida
 plt.savefig(nombre_salida, dpi=300, bbox_inches='tight')
 
-print(f"Â¡Terminado! GrÃ¡fica guardada exitosamente como '{nombre_salida}' en tu carpeta actual.")
+print(f"¡Terminado! Gráfica guardada exitosamente como '{nombre_salida}' en tu carpeta actual.")

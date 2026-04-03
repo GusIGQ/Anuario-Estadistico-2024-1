@@ -1,6 +1,6 @@
 ﻿"""
-Figura B.14 â€” Accesos del Servicio Fijo de Acceso a Internet No Residencial
-por cada 100 unidades econÃ³micas por entidad federativa.
+Figura B.14 — Accesos del Servicio Fijo de Acceso a Internet No Residencial
+por cada 100 unidades económicas por entidad federativa.
 
 Fuente datos: TD_PENETRACIONES_BAF_ITE_VA.csv (BIT IFT)
 Nota: Datos disponibles corresponden a dic 2024 (proxy de dic 2023).
@@ -8,7 +8,7 @@ Nota: Datos disponibles corresponden a dic 2024 (proxy de dic 2023).
       Chiapas=23, Oaxaca=20, Tlaxcala=20. Nacional: 47 accesos por cada 100 UE.
       Este archivo contiene P_BAF_E que corresponde al indicador residencial/general;
       para el segmento no residencial exacto se requiere el archivo TD_ACC_BAFXC_ITE_VA.csv
-      combinado con DENUE. Los valores de dic 2024 son proxy vÃ¡lido para rangos de color.
+      combinado con DENUE. Los valores de dic 2024 son proxy válido para rangos de color.
 """
 
 import pandas as pd
@@ -29,7 +29,7 @@ data = dict(zip(df['ENTIDAD'], df['P_BAF_E']))
 
 # 2. RANGOS Y COLORES (Anuario B.14)
 COLORS = ['#c5e8f7', '#5bafd6', '#2e6fa3', '#f4a58a', '#c0392b']
-LABELS = ['Menos de 28', '28 a 43', '44 a 59', '60 a 75', 'MÃ¡s de 75']
+LABELS = ['Menos de 28', '28 a 43', '44 a 59', '60 a 75', 'Más de 75']
 BREAKS = [0, 28, 44, 60, 76, 9999]
 
 def get_color(val):
@@ -42,7 +42,7 @@ def get_color(val):
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 GEOJSON_PATH = os.path.join(BASE_DIR, 'datos', 'mexico.json')
 if not os.path.exists(GEOJSON_PATH):
-    print("Descargando mapa de MÃ©xico...")
+    print("Descargando mapa de México...")
     urllib.request.urlretrieve(
         'https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json',
         GEOJSON_PATH
@@ -54,11 +54,11 @@ with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
 # Mapeo de nombres del GeoJSON a los datos
 NAME_MAPPING = {
     'Veracruz':   'Veracruz de Ignacio de la Llave',
-    'MichoacÃ¡n':  'Michoacan de Ocampo',
+    'Michoacán':  'Michoacan de Ocampo',
     'Coahuila':   'Coahuila de Zaragoza',
-    'MÃ©xico':     'Mexico.',
-    'QuerÃ©taro':  'Queretaro',
-    'YucatÃ¡n':    'Yucatan',
+    'México':     'Mexico.',
+    'Querétaro':  'Queretaro',
+    'Yucatán':    'Yucatan',
 }
 
 # 4. GRAFICAR
@@ -97,7 +97,7 @@ patches = [mpatches.Patch(facecolor=COLORS[i], edgecolor='none',
                            label=LABELS[i]) for i in range(5)]
 legend = ax.legend(
     handles=patches,
-    title='Accesos del servicio fijo de acceso\na Internet No Residencial por cada\n100 unidades econÃ³micas:',
+    title='Accesos del servicio fijo de acceso\na Internet No Residencial por cada\n100 unidades económicas:',
     loc='lower left',
     bbox_to_anchor=(0.01, 0.03),
     fontsize=10,
@@ -122,8 +122,8 @@ ax.text(0.80, 0.62, 'Tasa de crecimiento\nanual de 4.4%',
 
 # 7. TÍTULO Y PIE
 ax.set_title(
-    'Figura B.14.  Accesos del Servicio Fijo de Internet No Residencial\n'
-    'por cada 100 unidades econÃ³micas por entidad federativa',
+    'Figura B.14. Accesos del Servicio Fijo de Internet No Residencial\n'
+    'por cada 100 unidades económicas por entidad federativa',
     color='#2c3e50', fontsize=14, fontweight='bold', pad=12)
 
 fig.text(

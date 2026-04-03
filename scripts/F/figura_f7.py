@@ -53,7 +53,7 @@ bars1 = ax1.barh(y, pct_hombres, height, color=color_hombres, edgecolor='none')
 ax1.set_title('Hombres', fontsize=16, fontweight='bold', color='#404040', pad=20)
 ax1.set_yticks(y)
 ax1.set_yticklabels(etiquetas_limpias, fontsize=10, color='#404040')
-ax1.set_xlim(0, 105) # LÃ­mite hasta 100%
+ax1.set_xlim(0, 105) # Límite hasta 100%
 
 # Estilo limpio
 ax1.spines['top'].set_visible(False)
@@ -79,10 +79,11 @@ ax2.spines['left'].set_visible(False)
 ax2.bar_label(bars2, fmt='%.1f%%', padding=5, color='#404040', fontweight='bold', fontsize=10)
 
 # Ajustes finales y guardado
+fig.suptitle('Figura F.7. Medidas de seguridad empleadas por los usuarios de Internet', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.1) # Reducir espacio entre las dos grÃ¡ficas
+plt.subplots_adjust(wspace=0.1) # Reducir espacio entre las dos Gráficas
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f7.png", dpi=300, bbox_inches='tight')
 
-print("\nÂ¡GrÃ¡fica generada con Ã©xito como 'grafica_medidas_seguridad.png'!")
+print("\n¡Gráfica generada con éxito como 'grafica_medidas_seguridad.png'!")
 plt.show()

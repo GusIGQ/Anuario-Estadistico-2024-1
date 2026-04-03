@@ -1,18 +1,18 @@
 ﻿"""
-Figura A.9 â€” Porcentaje de hogares con Servicios de Telecomunicaciones MÃ³viles
+Figura A.9 — Porcentaje de hogares con Servicios de Telecomunicaciones Móviles
 por decil de ingreso
 
 Barras horizontales pareadas:
-  - Rosa/salmÃ³n: % Hogares que disponen y gastan en telecomunicaciones mÃ³viles
-  - Azul oscuro: % Hogares con telecomunicaciones mÃ³viles
+  - Rosa/salmón: % Hogares que disponen y gastan en telecomunicaciones móviles
+  - Azul oscuro: % Hogares con telecomunicaciones móviles
 
 Fuente: IFT con datos de la ENIGH 2022, del INEGI.
 Datos disponibles en: https://www.inegi.org.mx/programas/enigh/nc/2022/.
 
-MetodologÃ­a:
+Metodología:
   - Deciles construidos sobre ingreso corriente total (ing_cor) de concentradohogar,
-    ponderados por factor de expansiÃ³n.
-  - "Con telecomunicaciones mÃ³viles": hogares con celular=1 (hogares.csv).
+    ponderados por factor de expansión.
+  - "Con telecomunicaciones móviles": hogares con celular=1 (hogares.csv).
   - "Disponen y gastan": lo anterior AND comunica > 0 en concentradohogar.
 """
 
@@ -28,7 +28,7 @@ enable_plot_data_logging()
 import matplotlib.ticker as mticker
 
 # 1. Carga de microdatos ENIGH 2022
-BASE = os.path.join(os.path.dirname(__file__), "..", "..", 'datos', 'A.7', 'microdatos')
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'A.7-A.8-A.9-A.10', 'microdatos')
 
 # Cargar datos
 concentrado = pd.read_csv(
@@ -77,18 +77,18 @@ y_pos = np.arange(len(deciles))
 bar_height = 0.38
 
 # Colores estilo IFT
-COLOR_DISPONEN = '#E8A8A0'    # Rosa/salmÃ³n
+COLOR_DISPONEN = '#E8A8A0'    # Rosa/salmón
 COLOR_CON_TELECOM = '#4A6FA5' # Azul
 
 # Barras: % Hogares con telecomunicaciones móviles (barra inferior)
 bars_con = ax.barh(y_pos - bar_height / 2, pct_con_telecom, height=bar_height,
                    color=COLOR_CON_TELECOM, edgecolor='none', zorder=2,
-                   label='%Hogares con telecomunicaciones mÃ³viles')
+                   label='%Hogares con telecomunicaciones móviles')
 
 # Barras: % Hogares que disponen y gastan (barra superior)
 bars_dg = ax.barh(y_pos + bar_height / 2, pct_disponen_gastan, height=bar_height,
                   color=COLOR_DISPONEN, edgecolor='none', zorder=2,
-                  label='%Hogares que disponen y gastan en telecomunicaciones mÃ³viles')
+                  label='%Hogares que disponen y gastan en telecomunicaciones móviles')
 
 # 3. Anotaciones de valor
 for i in range(len(deciles)):
@@ -123,12 +123,12 @@ ax.spines['bottom'].set_color('#CCCCCC')
 ax.spines['left'].set_color('#CCCCCC')
 
 # 5. Título
-fig.text(0.02, 0.96, 'â–  ', fontsize=12, color='#7B2D8E', fontweight='bold',
+fig.text(0.02, 0.96, '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
          transform=fig.transFigure, va='top')
-fig.text(0.04, 0.965, 'Figura A.9.  ', fontsize=12, color='#333333',
+fig.text(0.04, 0.965, 'Figura A.9. ', fontsize=12, color='#333333',
          fontweight='bold', transform=fig.transFigure, va='top')
 fig.text(0.115, 0.965,
-         'Porcentaje de hogares con Servicios de Telecomunicaciones MÃ³viles '
+         'Porcentaje de hogares con Servicios de Telecomunicaciones Móviles '
          'por decil de ingreso',
          fontsize=12, color='#333333', transform=fig.transFigure, va='top')
 
@@ -148,5 +148,5 @@ output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Fig
 # Guardar salida
 fig.savefig(output_path, dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print(f"GrÃ¡fica guardada en: {output_path}")
+print(f"Gráfica guardada en: {output_path}")
 plt.close(fig)

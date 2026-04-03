@@ -147,7 +147,7 @@ def make_chart(df: pd.DataFrame, output_png: Path) -> None:
     for spine in ax.spines.values():
         spine.set_visible(False)
 
-    fig.text(0.03, 0.952, "Figura A.6.", fontsize=16, fontweight="bold", color=text_color)
+    fig.text(0.03, 0.952, "Figura A.6. ", fontsize=16, fontweight="bold", color=text_color)
     fig.text(
         0.145,
         0.952,

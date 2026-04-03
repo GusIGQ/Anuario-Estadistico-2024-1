@@ -1,7 +1,8 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
+import os
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
@@ -14,9 +15,9 @@ df = pd.read_csv(PROJECT_ROOT / "datos" / "H.2" / "TD_CONSUMO_GENERO_VA.csv", en
 
 # Corregir problemas de codificación de texto y estandarizar nombres como en el PDF
 df['GENERO'] = df['GENERO'].replace({
-    'PelÃƒ\xadculas': 'PelÃ­culas',
-    'ReligiÃƒÂ³n': 'ReligiÃ³n',
-    'Comicos': 'CÃ³micos',
+    'PelÃƒ\xadculas': 'Películas',
+    'ReligiÃƒÂ³n': 'Religión',
+    'Comicos': 'Cómicos',
     'Dramatizado unitario': 'Dramatizado\nunitario',
     'Reality Show': 'Reality\nShow',
     'Talk Show': 'Talk\nShow'
@@ -35,7 +36,7 @@ fig, ax1 = plt.subplots(figsize=(16, 5), facecolor='white')
 x = np.arange(len(df['GENERO']))
 width = 0.35
 color_rating = '#3E3466'  # Morado oscuro original (Rating Total)
-color_horas = '#FFA08A'   # Durazno/SalmÃ³n original (Puntos de horas)
+color_horas = '#FFA08A'   # Durazno/Salmón original (Puntos de horas)
 
 # 3. Eje Principal Izquierdo: Gráfica de Barras para Rating (%)
 bars = ax1.bar(x, df['RATING_PCT'], width, color=color_rating, zorder=3)
@@ -48,7 +49,7 @@ ax1.tick_params(axis='y', labelsize=8, colors='#555555')
 # 4. Eje Secundario Derecho: Gráfica de Puntos para Horas de programación
 ax2 = ax1.twinx()
 dots = ax2.scatter(x, df['HORAS_PROGRAMACION'], color=color_horas, s=150, zorder=4, alpha=0.9)
-ax2.set_ylabel('Horas de programaciÃ³n (#)', fontsize=9, fontstyle='italic', color='#555555', rotation=-90, labelpad=15)
+ax2.set_ylabel('Horas de programación (#)', fontsize=9, fontstyle='italic', color='#555555', rotation=-90, labelpad=15)
 ax2.set_ylim(0, 21600)
 ax2.set_yticks(np.arange(0, 21601, 2400))
 ax2.tick_params(axis='y', labelsize=8, colors='#555555')
@@ -71,15 +72,30 @@ from matplotlib.lines import Line2D
 
 legend_elements = [
     mpatches.Rectangle((0,0), 1, 1, color=color_rating, label='Rating Total personas'),
-    Line2D([0], [0], marker='o', color='w', markerfacecolor=color_horas, markersize=10, label='Horas de programaciÃ³n')
+    Line2D([0], [0], marker='o', color='w', markerfacecolor=color_horas, markersize=10, label='Horas de programación')
 ]
 
 fig.legend(handles=legend_elements, loc='lower center', bbox_to_anchor=(0.5, -0.1), ncol=2, frameon=False, fontsize=9)
 
-plt.text(0.12, -0.05, "Horas dedicadas y rating\npromedio por gÃ©nero en\ncanales nacionales", 
+plt.text(0.12, -0.05, "Horas dedicadas y rating\npromedio por género en\ncanales nacionales", 
          transform=fig.transFigure, fontsize=10, ha='center', va='center',
          bbox=dict(boxstyle="round,pad=1.2", facecolor='#F9F9F9', edgecolor='#E0E0E0', alpha=0.8))
 
 plt.subplots_adjust(bottom=0.15)
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "figura_h2.png", dpi=300, bbox_inches='tight')
+fig.suptitle('Figura H.2. Horas dedicadas y rating promedio por género en canales nacionales', fontsize=14, fontweight='bold', y=1.02)
+
+# Guardar gráfica en formatos PNG y SVG
+output_dir = PROJECT_ROOT / "output"
+os.makedirs(output_dir, exist_ok=True)
+output_png = output_dir / "figura_h2.png"
+output_svg = output_dir / "figura_h2.svg"
+
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG (alta resolución)
+plt.savefig(output_png, dpi=300, bbox_inches='tight', edgecolor='none')
+print(f"\nGráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG (vectorial escalable)
+plt.savefig(output_svg, format='svg', bbox_inches='tight', edgecolor='none')
+print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")

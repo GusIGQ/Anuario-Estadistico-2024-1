@@ -28,7 +28,7 @@ pct_mujeres = (absolutos_mujeres / total_mujeres) * 100
 pct_hombres = (absolutos_hombres / total_hombres) * 100
 
 # Etiquetas para la gráfica (con salto de línea para que se vean bien)
-edades = ['De 12 a\n19 aÃ±os', 'De 20 a\n29 aÃ±os', 'De 30 a\n39 aÃ±os', 'De 40 a\n49 aÃ±os', 'De 50 a\n59 aÃ±os', 'De 60 aÃ±os\ny mÃ¡s']
+edades = ['De 12 a\n19 años', 'De 20 a\n29 años', 'De 30 a\n39 años', 'De 40 a\n49 años', 'De 50 a\n59 años', 'De 60 años\ny más']
 
 # 2. CREAR LA GRÁFICA ESTILO ANUARIO IFT
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), sharey=True)
@@ -68,8 +68,9 @@ ax2.set_yticks([])
 ax2.bar_label(bars2, fmt='%.1f%%', padding=5, color='#404040', fontweight='bold', fontsize=10)
 
 # Ajustar diseño y guardar
+fig.suptitle('Figura F.5. Distribución porcentual de personas que vivieron ciberacoso por grupo de edad y sexo', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f5.png", dpi=300, bbox_inches='tight')
-print("Â¡CÃ¡lculos completados al 100% de precisiÃ³n y grÃ¡fica generada con Ã©xito!")
+print("¡Cálculos completados al 100% de precisión y Gráfica generada con éxito!")
 plt.show()

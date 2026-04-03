@@ -66,7 +66,7 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_color('#cccccc')
-ax.set_xticks([]) # Ocultar los nÃºmeros del eje X
+ax.set_xticks([]) # Ocultar los números del eje X
 
 # Etiquetas con el porcentaje exacto al final de cada barra
 ax.bar_label(bars, fmt='%.1f%%', padding=5, color='#404040', fontweight='bold', fontsize=10)
@@ -76,14 +76,15 @@ plt.title('Medidas tomadas contra el ciberacoso experimentado',
           fontsize=16, fontweight='bold', color='#404040', pad=20)
 
 # Ajustar márgenes y guardar
+fig.suptitle('Figura F.9. Acciones de los usuarios de Internet que vivieron ciberacoso', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f9.png", dpi=300, bbox_inches='tight')
 
 # Mostrar los datos extraídos en consola (Ordenados de mayor a menor para leerlos fácil)
-print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÃ“N ---")
+print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÓN ---")
 for index, row in df_res.sort_values(by='Porcentaje', ascending=False).iterrows():
     print(f"{row['Medida'].replace(chr(10), ' ')}: {row['Porcentaje']:.1f}%")
 
-print("\nÂ¡GrÃ¡fica generada con Ã©xito como 'figura_f9.png'!")
+print("\n¡Gráfica generada con éxito como 'figura_f9.png'!")
 plt.show()

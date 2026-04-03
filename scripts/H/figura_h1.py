@@ -1,7 +1,8 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
+import os
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
@@ -88,13 +89,28 @@ ax.spines['bottom'].set_color('#dddddd')
 ax.tick_params(axis='y', length=0) # Quitar marcas (ticks) del eje Y
 
 # Etiquetas
-plt.ylabel('ProporciÃ³n de televisores encendidos (%)', labelpad=15, fontsize=10, color='#444444')
+plt.ylabel('Proporción de televisores encendidos (%)', labelpad=15, fontsize=10, color='#444444')
 plt.xlabel('Horario', labelpad=15, fontsize=10, color='#444444')
 
 # Configurar leyenda
 plt.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=3, frameon=False, fontsize=9.5, columnspacing=1.5)
 
+plt.suptitle('Figura H.1. Proporción de televisores encendidos y personas viendo TV por hora', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.25) # Dar espacio a la leyenda inferior
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "figura_h1.png", dpi=300, bbox_inches='tight')
+
+# Guardar gráfica en formatos PNG y SVG
+output_dir = PROJECT_ROOT / "output"
+os.makedirs(output_dir, exist_ok=True)
+output_png = output_dir / "figura_h1.png"
+output_svg = output_dir / "figura_h1.svg"
+
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG (alta resolución)
+plt.savefig(output_png, dpi=300, bbox_inches='tight', edgecolor='none')
+print(f"\nGráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG (vectorial escalable)
+plt.savefig(output_svg, format='svg', bbox_inches='tight', edgecolor='none')
+print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")

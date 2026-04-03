@@ -1,6 +1,6 @@
 ﻿"""
-Figura B.24 â€” ParticipaciÃ³n de mercado del Servicio de TelevisiÃ³n Restringida (2014-2023)
-Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada aÃ±o.
+Figura B.24 — Participación de mercado del Servicio de Televisión Restringida (2014-2023)
+Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.
 Archivo: TD_MARKET_SHARE_TVRES_ITE_VA.CSV
 """
 
@@ -71,7 +71,7 @@ COLORS = {
     "Megacable-MCM"  : "#1a5276",   # azul oscuro
     "Dish-MVS"       : "#2e4057",   # azul marino
     "Grupo Salinas"  : "#5dade2",   # azul medio
-    "Stargroup"      : "#f0a500",   # naranja/Ã¡mbar
+    "Stargroup"      : "#f0a500",   # naranja/ámbar
     "Otros"          : "#e74c3c",   # rojo
 }
 
@@ -86,7 +86,7 @@ x     = np.arange(len(anos))
 width = 0.55
 
 # Verificación de valores clave vs Anuario
-print("\n=== VerificaciÃ³n vs Anuario (Grupo Televisa) ===")
+print("\n=== Verificación vs Anuario (Grupo Televisa) ===")
 for a, v in pivot["Grupo Televisa"].items():
     print(f"  {a}: {v:.1f}%")
 
@@ -118,7 +118,7 @@ ax.set_yticks([])
 ax.spines[["top", "right", "left"]].set_visible(False)
 ax.yaxis.set_visible(False)
 ax.set_title(
-    "Figura B.24. ParticipaciÃ³n de mercado del Servicio de\nTelevisiÃ³n Restringida (2014-2023)",
+    "Figura B.24. Participación de mercado del Servicio de\nTelevisión Restringida (2014-2023)",
     fontsize=13, fontweight="bold", loc="left", pad=12
 )
 
@@ -128,8 +128,8 @@ ax.legend(handles=handles, loc="lower center",
           bbox_to_anchor=(0.5, -0.12), ncol=6, fontsize=9,
           frameon=False)
 
-note = ("Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n"
-        "Nota: ParticipaciÃ³n de mercado calculada con respecto al nÃºmero de accesos del servicio televisiÃ³n restringida.")
+note = ("Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
+        "Nota: Participación de mercado calculada con respecto al número de accesos del servicio televisión restringida.")
 fig.text(0.01, -0.04, note, fontsize=7.5, color="#555555")
 
 plt.tight_layout()

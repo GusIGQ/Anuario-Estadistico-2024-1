@@ -1,5 +1,5 @@
 ﻿"""
-Figura D.4 â€” Uso de dispositivos inteligentes conectados a Internet
+Figura D.4 — Uso de dispositivos inteligentes conectados a Internet
 Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.
 https://www.inegi.org.mx/programas/endutih/2023/
 
@@ -10,18 +10,18 @@ Variables usadas (pregunta 9.1 del cuestionario):
   P9_1_1  â†’ Bocina o asistente del hogar
   P9_1_2  â†’ Sistemas de videovigilancia
   P9_1_3  â†’ Puertas o ventanas con cerrado digital
-  P9_1_4  â†’ Dispositivos de ahorro de energÃ­a elÃ©ctrica
+  P9_1_4  â†’ Dispositivos de ahorro de energía eléctrica
   P9_1_5  â†’ Luces o interruptores
-  P9_1_6  â†’ ConexiÃ³n elÃ©ctrica (soquet o enchufes)
-  P9_1_7  â†’ ElectrodomÃ©sticos
+  P9_1_6  â†’ Conexión eléctrica (soquet o enchufes)
+  P9_1_7  â†’ Electrodomésticos
   P9_1_8  â†’ Dispositivos de entretenimiento (Smart TV, DVD, Blu-ray)
-  P9_1_9  â†’ AutomÃ³vil o camioneta
+  P9_1_9  â†’ Automóvil o camioneta
   P9_1_10 â†’ Otros dispositivos
-  FAC_PER â†’ Factor de expansiÃ³n de persona
+  FAC_PER â†’ Factor de expansión de persona
 
 Denominador clave:
   El 100% NO es la totalidad de usuarios de internet,
-  sino Ãºnicamente las personas que usan AL MENOS UN
+  sino únicamente las personas que usan AL MENOS UN
   dispositivo IoT (P9_1_1 a P9_1_10 con valor '1').
 """
 
@@ -46,12 +46,12 @@ SALIDA   = Path(PROJECT_ROOT / "output" / "Figura_D4.png")
 
 # 1. LEER DATOS
 
-print("Leyendo datosâ€¦")
+print("Leyendo datos…")
 # Cargar datos
 df = pd.read_csv(RUTA_CSV, low_memory=False)
 df["FAC_PER"] = pd.to_numeric(df["FAC_PER"], errors="coerce")
 print(f"  Registros totales : {len(df):>10,}")
-print(f"  PoblaciÃ³n ponderada: {df['FAC_PER'].sum():>15,.0f}")
+print(f"  Población ponderada: {df['FAC_PER'].sum():>15,.0f}")
 
 # 2. DEFINIR VARIABLES Y ORDEN (igual que el Anuario)
 
@@ -66,11 +66,11 @@ ORDEN = [
     ("P9_1_1",  "Bocina o\nasistente del\nhogar"),
     ("P9_1_2",  "Sistemas de\nvideovigilancia"),
     ("P9_1_5",  "Luces o\ninterruptores"),
-    ("P9_1_7",  "Electro-\ndomÃ©sticos"),
-    ("P9_1_6",  "ConexiÃ³n\nelÃ©ctrica"),
+    ("P9_1_7",  "Electro-\ndomésticos"),
+    ("P9_1_6",  "Conexión\neléctrica"),
     ("P9_1_3",  "Puertas o\nventanas con\ncerrado digital"),
-    ("P9_1_9",  "AutomÃ³vil\no camioneta"),
-    ("P9_1_4",  "Dispositivos\nde ahorro de\nenergÃ­a elÃ©ctrica"),
+    ("P9_1_9",  "Automóvil\no camioneta"),
+    ("P9_1_4",  "Dispositivos\nde ahorro de\nenergía eléctrica"),
     ("P9_1_10", "Otros\ndispositivos"),
 ]
 
@@ -96,7 +96,7 @@ ESPERADOS = {
 }
 
 variables, etiquetas, porcentajes = [], [], []
-print("=== VALIDACIÃ“N vs ANUARIO ===")
+print("=== VALIDACIÓN vs ANUARIO ===")
 for var, etiq in ORDEN:
     mascara = df[var].astype(str).str.strip() == "1"
     pct     = df.loc[mascara, "FAC_PER"].sum() / total_iot * 100
@@ -110,8 +110,8 @@ for var, etiq in ORDEN:
 
 # 5. GRAFICAR
 
-COLOR_ALTO = "#C0392B"   # rojo fuerte  â€” barras â‰¥ 10 %
-COLOR_BAJO = "#E8A89C"   # rojo claro   â€” barras <  10 %
+COLOR_ALTO = "#C0392B"   # rojo fuerte  — barras â‰¥ 10 %
+COLOR_BAJO = "#E8A89C"   # rojo claro   — barras <  10 %
 
 colores = [COLOR_ALTO if p >= 10 else COLOR_BAJO for p in porcentajes]
 

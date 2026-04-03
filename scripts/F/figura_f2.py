@@ -33,7 +33,7 @@ labels = ['Mujeres', 'Hombres']
 sizes_radio = [radio_mujeres, radio_hombres]
 # Colores intentando replicar la infografía
 colors_radio = ['#2b6a9c', '#332b57'] 
-explode = (0.05, 0) # SeparaciÃ³n ligera de la rebanada
+explode = (0.05, 0) # Separación ligera de la rebanada
 
 _, texts_r, autotexts_r = ax1.pie(
     sizes_radio, 
@@ -49,7 +49,7 @@ for text in autotexts_r:
     text.set_color('white') 
     text.set_fontsize(16)
 
-ax1.set_title(f'RadiodifusiÃ³n\nTotal de personas empleadas: {int(total_radio):,}', 
+ax1.set_title(f'Radiodifusión\nTotal de personas empleadas: {int(total_radio):,}', 
               fontsize=14, weight='bold', pad=20)
 
 # --- Gráfica 2: Telecomunicaciones ---
@@ -73,6 +73,7 @@ ax2.set_title(f'Telecomunicaciones\nTotal de personas empleadas: {int(total_tele
               fontsize=14, weight='bold', pad=20)
 
 # Ajustar y guardar
+fig.suptitle('Figura F.2. Empleo en los sectores de telecomunicaciones y radiodifusión por sexo', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f2.png", dpi=300, bbox_inches='tight')

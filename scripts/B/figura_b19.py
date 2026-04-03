@@ -1,22 +1,22 @@
 ﻿"""
-Figura B.19 â€” Accesos del Servicio de TelevisiÃ³n Restringida (1998â€“2023)
+Figura B.19 — Accesos del Servicio de Televisión Restringida (1998–2023)
 =========================================================================
 Fuente : IFT con datos proporcionados por los operadores de
-         telecomunicaciones a diciembre de cada aÃ±o.
+         telecomunicaciones a diciembre de cada año.
 Archivo: TD_ACC_TVRES_HIS_ITE_VA.csv
-         Descargable desde la secciÃ³n "Servicio de TelevisiÃ³n Restringida" en
+         Descargable desde la sección "Servicio de Televisión Restringida" en
          https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml
 Salida : output/Figura_B19.png
 
-MetodologÃ­a
+Metodología
 -----------
-1. Leer el CSV histÃ³rico de accesos de TV restringida.
-2. Filtrar solo el mes de diciembre (MES == 12) de cada aÃ±o.
-3. Agrupar por aÃ±o y sumar accesos de todos los operadores (A_TOTAL_E).
-4. Filtrar el rango 1998â€“2023.
-5. Graficar lÃ­nea con Ã¡rea sombreada y etiquetas en los extremos (1998 y 2023).
+1. Leer el CSV histórico de accesos de TV restringida.
+2. Filtrar solo el mes de diciembre (MES == 12) de cada año.
+3. Agrupar por año y sumar accesos de todos los operadores (A_TOTAL_E).
+4. Filtrar el rango 1998–2023.
+5. Graficar línea con área sombreada y etiquetas en los extremos (1998 y 2023).
 
-FÃ³rmula
+Fórmula
 -------
 accesos_anio = SUM(A_TOTAL_E)  para MES == 12, agrupado por ANIO
 
@@ -120,7 +120,7 @@ ax.spines["bottom"].set_color("#CCCCCC")
 
 # Títulos y nota al pie
 ax.set_title(
-    "Figura B.19. Accesos del Servicio de TelevisiÃ³n Restringida (1998-2023)",
+    "Figura B.19. Accesos del Servicio de Televisión Restringida (1998-2023)",
     fontsize=11, fontweight="bold", color=COLOR_TEXTO,
     loc="left", pad=12
 )
@@ -128,7 +128,7 @@ ax.set_title(
 fig.text(
     0.01, -0.04,
     "Fuente: IFT con datos proporcionados por los operadores de "
-    "telecomunicaciones a diciembre de cada aÃ±o.",
+    "telecomunicaciones a diciembre de cada año.",
     fontsize=7.5, color="#555555", style="italic"
 )
 

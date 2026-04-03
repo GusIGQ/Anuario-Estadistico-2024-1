@@ -41,11 +41,11 @@ x      = np.arange(n)
 w      = 0.55
 
 # Colores (mismo orden visual de la gráfica original)
-C_V1 = "#7EC8C8"   # azul claro  â€” 256 Kbpsâ€“1.99 Mbps
-C_V2 = "#B0D8E8"   # azul pÃ¡lido â€” 2â€“9.99 Mbps
-C_V3 = "#1B3A6B"   # azul oscuro â€” 10â€“100 Mbps
-C_V4 = "#F4956A"   # salmÃ³n      â€” >100 Mbps
-C_NS = "#E84040"   # rojo        â€” Sin informaciÃ³n
+C_V1 = "#7EC8C8"   # azul claro  — 256 Kbps–1.99 Mbps
+C_V2 = "#B0D8E8"   # azul pálido — 2–9.99 Mbps
+C_V3 = "#1B3A6B"   # azul oscuro — 10–100 Mbps
+C_V4 = "#F4956A"   # salmón      — >100 Mbps
+C_NS = "#E84040"   # rojo        — Sin información
 
 # Figura
 fig, ax = plt.subplots(figsize=(16, 8))
@@ -110,7 +110,7 @@ fig.text(0.50, 0.87,
 
 # Título
 fig.text(0.02, 0.97,
-         "â— Figura B.15. DistribuciÃ³n de los accesos del Servicio Fijo de Internet "
+         "Figura B.15. Distribución de los accesos del Servicio Fijo de Internet"
          "por rangos de velocidad (2013-2023)",
          fontsize=10, fontweight="bold", color="#1B3A6B", va="top")
 
@@ -120,7 +120,7 @@ patches = [
     mpatches.Patch(color=C_V2, label="2 Mbps y 9.99 Mbps"),
     mpatches.Patch(color=C_V3, label="10 Mbps y 100 Mbps"),
     mpatches.Patch(color=C_V4, label="Mayores a 100 Mbps"),
-    mpatches.Patch(color=C_NS, label="Sin informaciÃ³n de velocidad"),
+    mpatches.Patch(color=C_NS, label="Sin información de velocidad"),
 ]
 ax.legend(handles=patches, loc="upper center",
           bbox_to_anchor=(0.5, -0.08), ncol=5,
@@ -128,7 +128,7 @@ ax.legend(handles=patches, loc="upper center",
 
 # Fuente
 fig.text(0.02, 0.01,
-         "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada aÃ±o.",
+         "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.",
          fontsize=8, color="#666666")
 
 plt.tight_layout(rect=[0, 0.04, 1, 0.85])
@@ -136,7 +136,7 @@ plt.tight_layout(rect=[0, 0.04, 1, 0.85])
 plt.savefig(OUTPUT, dpi=150, bbox_inches="tight", facecolor="white")
 plt.close()
 print(f"Figura guardada en: {OUTPUT}")
-print(f"\nVerificaciÃ³n 2023:")
+print(f"\nVerificación 2023:")
 for col, label_str, anuario in [
     ("v1","256K-2M","5%"), ("v2","2M-10M","0.01%"),
     ("v3","10M-100M","65%"), ("v4",">100M","25%"), ("ns","Sin info","4.5%")

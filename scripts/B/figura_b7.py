@@ -1,10 +1,10 @@
 ﻿"""
-Figura B.7 â€” LÃ­neas del Servicio Fijo de TelefonÃ­a No Residencial
-por cada 100 unidades econÃ³micas por entidad federativa.
+Figura B.7 — Líneas del Servicio Fijo de Telefonía No Residencial
+por cada 100 unidades económicas por entidad federativa.
 
 Fuente datos: TD_PENETRACIONES_TELFIJA_ITE_VA.csv (BIT IFT)
 Nota: Datos disponibles corresponden a dic 2024 (proxy de dic 2023).
-      Para CDMX y Nuevo LeÃ³n la diferencia es mayor (~174 y ~181 unidades),
+      Para CDMX y Nuevo León la diferencia es mayor (~174 y ~181 unidades),
       pero los rangos de color no se ven afectados.
 """
 
@@ -24,7 +24,7 @@ data = dict(zip(df['ENTIDAD'], df['P_NRES_H_TELFIJA_E']))
 
 # 2. RANGOS Y COLORES (Anuario B.7)
 COLORS = ['#c5e8f7', '#5bafd6', '#2e6fa3', '#f4a58a', '#c0392b']
-LABELS = ['Menos de 38', '39 a 60', '61 a 97', '98 a 114', 'MÃ¡s de 114']
+LABELS = ['Menos de 38', '39 a 60', '61 a 97', '98 a 114', 'Más de 114']
 BREAKS = [0, 38, 61, 98, 115, 9999]
 
 def get_color(val):
@@ -40,7 +40,7 @@ import json
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 GEOJSON_PATH = os.path.join(BASE_DIR, 'datos', 'mexico.json')
 if not os.path.exists(GEOJSON_PATH):
-    print("Descargando mapa de MÃ©xico...")
+    print("Descargando mapa de México...")
     urllib.request.urlretrieve('https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json', GEOJSON_PATH)
 
 with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
@@ -49,7 +49,7 @@ with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
 # Mapeo de nombres del GeoJSON a los datos
 NAME_MAPPING = {
     'Veracruz': 'Veracruz de Ignacio de la Llave',
-    'MichoacÃ¡n': 'MichoacÃ¡n de Ocampo',
+    'Michoacán': 'Michoacán de Ocampo',
     'Coahuila': 'Coahuila de Zaragoza',
 }
 
@@ -82,7 +82,7 @@ for feature in mexico_geojson['features']:
 
 ax.set_xlim(-118.5, -86.0)
 ax.set_ylim(14.0, 33.5)
-ax.set_aspect(1.1)  # Ajuste de proyecciÃ³n Mercator aproximada
+ax.set_aspect(1.1)  # Ajuste de proyección Mercator aproximada
 ax.axis('off')
 
 # 5. LEYENDA
@@ -90,7 +90,7 @@ patches = [mpatches.Patch(facecolor=COLORS[i], edgecolor='none',
                            label=LABELS[i]) for i in range(5)]
 legend = ax.legend(
     handles=patches,
-    title='LÃ­neas del servicio fijo de TelefonÃ­a\nNo Residencial por cada 100\nunidades econÃ³micas:',
+    title='Líneas del servicio fijo de Telefonía\nNo Residencial por cada 100\nunidades económicas:',
     loc='lower left',
     bbox_to_anchor=(0.01, 0.03),
     fontsize=10,
@@ -115,8 +115,8 @@ ax.text(0.80, 0.62, 'Tasa de crecimiento\nanual de 13.3%',
 
 # 7. TÍTULO Y PIE
 ax.set_title(
-    'Figura B.7.  LÃ­neas del Servicio Fijo de TelefonÃ­a No Residencial\n'
-    'por cada 100 unidades econÃ³micas por entidad federativa',
+    'Figura B.7. Líneas del Servicio Fijo de Telefonía No Residencial\n'
+    'por cada 100 unidades económicas por entidad federativa',
     color='#2c3e50', fontsize=14, fontweight='bold', pad=12)
 
 fig.text(

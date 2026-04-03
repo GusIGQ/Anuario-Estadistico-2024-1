@@ -23,11 +23,11 @@ df = df[(df['MES'] == 12) & (df['ANIO'].between(2013, 2023))]
 # 3. Mapeo a 4 grupos
 # AT&T absorbió NEXTEL (2015) e IUSACELL-UNEF N (2015)
 def mapear_grupo(nombre):
-    if nombre == 'AMÃ‰RICA MÃ“VIL':
-        return 'AmÃ©rica MÃ³vil'
-    elif nombre == 'TELEFÃ“NICA':
-        return 'TelefÃ³nica'
-    elif nombre in ('AT&T', 'IUSACELL-UNEFÃ“N', 'NEXTEL'):
+    if nombre == 'América Móvil':
+        return ' América Móvil'
+    elif nombre == 'TELEFÓNICA':
+        return 'Telefónica'
+    elif nombre in ('AT&T', 'IUSACELL-UNEFÓN', 'NEXTEL'):
         return 'AT&T'
     else:
         return 'Otros'
@@ -40,24 +40,24 @@ pivot = (df.groupby(['ANIO', 'GRUPO_FIGURA'])['MARKET_SHARE']
            .unstack(fill_value=0))
 
 # Orden de columnas orden visual de abajo hacia arriba
-orden = ['AmÃ©rica MÃ³vil', 'TelefÃ³nica', 'AT&T', 'Otros']
+orden = [' América Móvil', 'Telefónica', 'AT&T', 'Otros']
 pivot = pivot.reindex(columns=orden, fill_value=0)
 
 years = pivot.index.tolist()
 
 # 5. Verificación contra Anuario
-print("VerificaciÃ³n valores clave:")
-print(f"2013 AmÃ©rica MÃ³vil : {pivot.loc[2013,'AmÃ©rica MÃ³vil']:.2f}%  (Anuario: 68.86%)")
-print(f"2023 AmÃ©rica MÃ³vil : {pivot.loc[2023,'AmÃ©rica MÃ³vil']:.2f}%  (Anuario: 57.31%)")
+print("Verificación valores clave:")
+print(f"2013  América Móvil : {pivot.loc[2013,' América Móvil']:.2f}%  (Anuario: 68.86%)")
+print(f"2023  América Móvil : {pivot.loc[2023,' América Móvil']:.2f}%  (Anuario: 57.31%)")
 print(f"2023 AT&T          : {pivot.loc[2023,'AT&T']:.2f}%  (Anuario: 15.56%)")
-print(f"2023 TelefÃ³nica    : {pivot.loc[2023,'TelefÃ³nica']:.2f}%  (Anuario: 15.09%)")
+print(f"2023 Telefónica    : {pivot.loc[2023,'Telefónica']:.2f}%  (Anuario: 15.09%)")
 print(f"2023 Otros         : {pivot.loc[2023,'Otros']:.2f}%  (Anuario: 11.99%)")
 print()
 
 # 6. Colores (igual al Anuario)
 colores = {
-    'AmÃ©rica MÃ³vil': '#e84040',   # rojo
-    'TelefÃ³nica':    '#f4a460',   # salmÃ³n/naranja
+    ' América Móvil': '#e84040',   # rojo
+    'Telefónica':    '#f4a460',   # salmón/naranja
     'AT&T':          '#1f3864',   # azul marino oscuro
     'Otros':         '#a8d4e6',   # azul claro
 }
@@ -105,12 +105,12 @@ ax.legend(handles, orden, loc='lower center',
 
 # 10. Título y fuente
 fig.text(0.06, 0.97,
-         'â–  Figura C.9.  ParticipaciÃ³n de mercado del servicio mÃ³vil de telefonÃ­a (2013-2023)',
+         'Figura C.9. Participación de mercado del servicio móvil de telefonía (2013-2023)',
          fontsize=11, fontweight='bold', color='#1f4e79', va='top')
 
 fig.text(0.06, 0.02,
-         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n'
-         'Nota: ParticipaciÃ³n de mercado calculada con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de telefonÃ­a.',
+         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n'
+         'Nota: Participación de mercado calculada con respecto al número de líneas del servicio móvil de telefonía.',
          fontsize=7.5, color='#555')
 
 plt.tight_layout(rect=[0, 0.06, 1, 0.95])

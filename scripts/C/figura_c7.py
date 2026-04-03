@@ -1,5 +1,5 @@
 ﻿"""
-Figura C.7 â€” LÃ­neas del servicio mÃ³vil de telefonÃ­a
+Figura C.7 — Líneas del servicio móvil de telefonía
      por cada 100 habitantes por entidad federativa (2023)
 =========================================================
 Fuente : IFT con datos de los operadores de telecomunicaciones
@@ -44,38 +44,38 @@ valores_anuario = {
     'Colima':                      119,
     'Chiapas':                      81,
     'Chihuahua':                   115,
-    'Ciudad de MÃ©xico':            127,
+    'Ciudad de México':            127,
     'Durango':                     117,
     'Guanajuato':                  111,
     'Guerrero':                    103,
     'Hidalgo':                     118,
     'Jalisco':                     119,
-    'MÃ©xico':                      120,
-    'MichoacÃ¡n de Ocampo':         113,
+    'México':                      120,
+    'Michoacán de Ocampo':         113,
     'Morelos':                     118,
     'Nayarit':                     114,
-    'Nuevo LeÃ³n':                  120,
+    'Nuevo León':                  120,
     'Oaxaca':                       96,
     'Puebla':                       98,
-    'QuerÃ©taro':                   116,
+    'Querétaro':                   116,
     'Quintana Roo':                117,
-    'San Luis PotosÃ­':             112,
+    'San Luis Potosí':             112,
     'Sinaloa':                     121,
     'Sonora':                      127,
     'Tabasco':                     117,
     'Tamaulipas':                  117,
     'Tlaxcala':                    119,
     'Veracruz de Ignacio de la Llave': 111,
-    'YucatÃ¡n':                     110,
+    'Yucatán':                     110,
     'Zacatecas':                   111,
 }
 
 df['valor_final'] = df['ENTIDAD'].map(valores_anuario).fillna(df['T_TELMOVIL_E'])
 
 # Validación
-print("\nâ”€â”€ ValidaciÃ³n vs Anuario â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
+print("\n── Validación vs Anuario ──────────────────────────")
 checks = {
-    'Ciudad de MÃ©xico': 127, 'Baja California Sur': 123,
+    'Ciudad de México': 127, 'Baja California Sur': 123,
     'Jalisco': 119, 'Puebla': 98, 'Oaxaca': 96, 'Chiapas': 81
 }
 for estado, esp in checks.items():
@@ -83,7 +83,7 @@ for estado, esp in checks.items():
     if len(calc):
         ok = 'âœ…' if int(calc[0]) == esp else f'âš  esperado {esp}'
         print(f"  {estado:35s}: {int(calc[0])}  {ok}")
-print("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n")
+print("────────────────────────────────────────────────────\n")
 
 # 2. Cargar GeoJSON
 gdf = gpd.read_file(GEOJSON)
@@ -116,8 +116,8 @@ RANGOS = [
     (0,   105, '#A8D5E2', 'Menos de 104'),   # azul claro
     (105, 109, '#2E6B9E', '105 a 108'),       # azul medio
     (109, 113, '#1B3A6B', '109 a 112'),       # azul marino oscuro
-    (113, 117, '#F4A07A', '113 a 116'),       # salmÃ³n
-    (117, 999, '#D94F3D', 'MÃ¡s de 117'),      # rojo
+    (113, 117, '#F4A07A', '113 a 116'),       # salmón
+    (117, 999, '#D94F3D', 'Más de 117'),      # rojo
 ]
 
 def asignar_color(val):
@@ -139,7 +139,7 @@ merged.plot(ax=ax, color=merged['color'], edgecolor='white', linewidth=0.6)
 
 # 6. Título
 ax.set_title(
-    'Figura C.7. LÃ­neas del servicio mÃ³vil de telefonÃ­a\n'
+    'Figura C.7. Líneas del servicio móvil de telefonía\n'
     'por cada 100 habitantes por entidad federativa',
     fontsize=12, fontweight='bold', color='#1B2A6B', loc='left', pad=10
 )
@@ -151,7 +151,7 @@ parches = [
 ]
 ax.legend(
     handles=parches,
-    title='LÃ­neas por cada\n100 habitantes',
+    title='Líneas por cada\n100 habitantes',
     title_fontsize=8.5, fontsize=8.5,
     loc='lower left', frameon=True, framealpha=0.95,
     edgecolor='#CCCCCC'
@@ -160,7 +160,7 @@ ax.legend(
 # 8. Cuadro badge nacional
 ax.text(
     0.78, 0.80,
-    'LÃ­neas del servicio mÃ³vil de\ntelefonÃ­a por cada 100 habitantes:\n\n110',
+    'Líneas del servicio móvil de\ntelefonía por cada 100 habitantes:\n\n110',
     transform=ax.transAxes,
     fontsize=10, color='#1B2A6B',
     ha='center', va='center',

@@ -1,14 +1,14 @@
 ﻿"""
-Figura A.5 â€” InversiÃ³n Extranjera Directa (IED) en telecomunicaciones
+Figura A.5 — Inversión Extranjera Directa (IED) en telecomunicaciones
 
-GrÃ¡fica de barras horizontales:
-  - Barra larga (azul claro): IED total de MÃ©xico (millones de dÃ³lares)
-  - Barra corta (pÃºrpura oscuro): IED en Telecomunicaciones (sector 517 SCIAN)
+Gráfica de barras horizontales:
+  - Barra larga (azul claro): IED total de México (millones de dólares)
+  - Barra corta (púrpura oscuro): IED en Telecomunicaciones (sector 517 SCIAN)
 
 Datos actualizados al 3er trimestre de 2025.
-PerÃ­odo: 2013-2024 (2024 acumulado a junio).
+Período: 2013-2024 (2024 acumulado a junio).
 
-Fuente: SecretarÃ­a de EconomÃ­a â€“ Registro Nacional de Inversiones Extranjeras.
+Fuente: Secretaría de Economía – Registro Nacional de Inversiones Extranjeras.
 """
 
 import os
@@ -29,7 +29,7 @@ base = os.path.join(os.path.dirname(__file__), "..", "..", 'datos', 'A.5')
 wb1 = openpyxl.load_workbook(
     os.path.join(base, 'Datos_originales_y_actualizacion__1_.xlsx'),
     data_only=True)
-ws1 = wb1['Preliminares y actualizaciÃ³n']
+ws1 = wb1['Preliminares y actualización']
 
 total_ied = {}
 for r in range(3, ws1.max_row + 1):
@@ -75,7 +75,7 @@ ied_mexico = np.array([total_ied[y] for y in years])
 ied_telecom = np.array([telecom_ied[y] for y in years])
 
 # Imprimir tabla de verificación
-print(f"{'AÃ±o':<6} {'IED MÃ©xico':>14} {'IED Telecom':>14}")
+print(f"{'Año':<6} {'IED México':>14} {'IED Telecom':>14}")
 print("-" * 36)
 for i, yr in enumerate(years):
     print(f"{yr:<6} {ied_mexico[i]:>14,.2f} {ied_telecom[i]:>14,.2f}")
@@ -91,17 +91,17 @@ bar_height = 0.38
 
 # Colores estilo IFT
 COLOR_MEXICO = '#A8C8E8'     # Azul claro
-COLOR_TELECOM = '#2B1055'    # PÃºrpura oscuro
+COLOR_TELECOM = '#2B1055'    # Púrpura oscuro
 
 # Barras: IED México (barra larga, azul claro)
 bars_mx = ax.barh(y_pos + bar_height / 2, ied_mexico, height=bar_height,
                   color=COLOR_MEXICO, edgecolor='none', zorder=2,
-                  label='InversiÃ³n Extranjera Directa de MÃ©xico')
+                  label='Inversión Extranjera Directa de México')
 
 # Barras: IED Telecom (barra corta, púrpura oscuro)
 bars_tc = ax.barh(y_pos - bar_height / 2, ied_telecom, height=bar_height,
                   color=COLOR_TELECOM, edgecolor='none', zorder=2,
-                  label='InversiÃ³n Extranjera Directa en Telecomunicaciones')
+                  label='Inversión Extranjera Directa en Telecomunicaciones')
 
 # 4. Anotaciones de valor
 for i, yr in enumerate(years):
@@ -130,9 +130,9 @@ ax.set_yticks(y_pos)
 ax.set_yticklabels(years, fontsize=10, fontweight='bold', color='#333333')
 ax.invert_yaxis()  # 2024 arriba, 2013 abajo
 
-ax.set_xlabel('Millones de dÃ³lares', fontsize=11, fontweight='bold',
+ax.set_xlabel('Millones de dólares', fontsize=11, fontweight='bold',
               color='#333333', labelpad=10)
-ax.set_ylabel('AÃ‘O', fontsize=11, fontweight='bold',
+ax.set_ylabel('AÑO', fontsize=11, fontweight='bold',
               color='#333333', labelpad=10)
 
 # Rango del eje X
@@ -155,12 +155,12 @@ ax.spines['bottom'].set_color('#CCCCCC')
 ax.spines['left'].set_color('#CCCCCC')
 
 # 6. Título
-fig.text(0.02, 0.96, 'â–  ', fontsize=12, color='#7B2D8E', fontweight='bold',
+fig.text(0.02, 0.96, '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
          transform=fig.transFigure, va='top')
-fig.text(0.04, 0.965, 'Figura A.5.  ', fontsize=12, color='#333333',
+fig.text(0.04, 0.965, 'Figura A.5. ', fontsize=12, color='#333333',
          fontweight='bold', transform=fig.transFigure, va='top')
 fig.text(0.115, 0.965,
-         'InversiÃ³n Extranjera Directa (IED) en telecomunicaciones',
+         'Inversión Extranjera Directa (IED) en telecomunicaciones',
          fontsize=12, color='#333333', transform=fig.transFigure, va='top')
 
 # 7. Leyenda
@@ -169,18 +169,18 @@ ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.14), ncol=2,
 
 # 8. Notas al pie
 note_fuente = (
-    'Fuente: IFT con datos de la SecretarÃ­a de EconomÃ­a (datos actualizados '
+    'Fuente: IFT con datos de la Secretaría de Economía (datos actualizados '
     'al 3er trimestre de 2025). Datos disponibles en:\n'
     'https://www.gob.mx/se/acciones-y-programas/'
     'competitividad-y-normatividad-inversion-extranjera-directa?state=published.')
 note_notas = (
-    'Notas: Cifras en millones de dÃ³lares de Estados Unidos de AmÃ©rica '
-    '(dÃ³lares corrientes de cada aÃ±o). La informaciÃ³n mostrada se refiere a '
-    'la Rama 5151 TransmisiÃ³n de programas de radio y televisiÃ³n,\n'
-    'Subsector 517 Telecomunicaciones del Sistema de ClasificaciÃ³n Industrial '
-    'de AmÃ©rica del Norte (SCIAN). Los datos de 2024 corresponden a la '
-    'inversiÃ³n acumulada al mes de junio. Para los demÃ¡s aÃ±os\n'
-    'se presenta la inversiÃ³n acumulada al mes de diciembre.')
+    'Notas: Cifras en millones de dólares de Estados Unidos de América '
+    '(dólares corrientes de cada año). La información mostrada se refiere a '
+    'la Rama 5151 Transmisión de programas de radio y televisión,\n'
+    'Subsector 517 Telecomunicaciones del Sistema de Clasificación Industrial '
+    'de América del Norte (SCIAN). Los datos de 2024 corresponden a la '
+    'inversión acumulada al mes de junio. Para los demás años\n'
+    'se presenta la inversión acumulada al mes de diciembre.')
 
 fig.text(0.02, 0.02, note_fuente, fontsize=7.5, color='#555555',
          fontweight='bold', transform=fig.transFigure, va='bottom',
@@ -194,5 +194,5 @@ output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Fig
 # Guardar salida
 fig.savefig(output_path, dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print(f"\nGrÃ¡fica guardada en: {output_path}")
+print(f"\nGráfica guardada en: {output_path}")
 plt.close(fig)

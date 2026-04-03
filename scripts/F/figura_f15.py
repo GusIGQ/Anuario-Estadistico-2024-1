@@ -13,34 +13,34 @@ print("Cargando la base de datos de Internet Fijo...")
 df = pd.read_excel(PROJECT_ROOT / "datos" / "F.15" / "Tercera Encuesta 2023_Int&TV.xlsx")
 
 # 2. Factor de expansión
-w_col = 'Factor de ExpansiÃ³n Final Normalizado que considera calibraciÃ³n (post-estratificaciÃ³n) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
+w_col = 'Factor de Expansión Final Normalizado que considera calibración (post-estratificación) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
 df[w_col] = pd.to_numeric(df[w_col], errors='coerce')
 
 # 3. Filtrar Usuarios de Internet Fijo
-col_internet = 'De la siguiente lista de servicios, Â¿podrÃ­a decirme cuÃ¡les tiene contratados o cuenta con ellos en su hogar? ConexiÃ³n a Internet fijo en su hogar (incluye conexiÃ³n Wi-Fi)'
-df_internet = df[df[col_internet] == 'SÃ­'].copy()
+col_internet = 'De la siguiente lista de servicios, ¿podría decirme cuáles tiene contratados o cuenta con ellos en su hogar? Conexión a Internet fijo en su hogar (incluye conexión Wi-Fi)'
+df_internet = df[df[col_internet] == 'Sí'].copy()
 
 # 4. Suma de Pesos Poblacionales Totales y por Sexo
 total_w = df_internet[w_col].sum()
-w_hombres = df_internet[df_internet['GÃ©nero'] == 'Hombre'][w_col].sum()
-w_mujeres = df_internet[df_internet['GÃ©nero'] == 'Mujer'][w_col].sum()
+w_hombres = df_internet[df_internet['Género'] == 'Hombre'][w_col].sum()
+w_mujeres = df_internet[df_internet['Género'] == 'Mujer'][w_col].sum()
 
 # 5. Mapeo de columnas con el texto exacto a mostrar en la gráfica
 label_mapping = {
-    'Evitar compartir informaciÃ³n personal': 'Evitar compartir\ninformaciÃ³n\npersonal',
-    'Evitar compartir contraseÃ±as de sus dispositivos y/o aplicaciones': 'Evitar compartir\ncontraseÃ±as de sus\ndispositivos y\naplicaciones',
+    'Evitar compartir información personal': 'Evitar compartir\ninformación\npersonal',
+    'Evitar compartir contraseñas de sus dispositivos y/o aplicaciones': 'Evitar compartir\ncontraseñas de sus\ndispositivos y\naplicaciones',
     'Revisar un perfil antes de aceptarlo': 'Revisar un perfil\nantes de aceptarlo',
-    'Ser mÃ¡s precavido al abrir links o archivos recibidos': 'Ser mÃ¡s precavido (a)\nal abrir links\no archivos recibidos',
-    'Evitar subir informaciÃ³n donde sea fÃ¡cil ubicarle a usted o a su familia (ubicaciÃ³n, fotos y/o videos)': 'Evitar subir informaciÃ³n\ndonde sea fÃ¡cil ubicarte\na usted o a su familia\n(ubicaciÃ³n, fotos y/o\nvideos)',
+    'Ser más precavido al abrir links o archivos recibidos': 'Ser más precavido (a)\nal abrir links\no archivos recibidos',
+    'Evitar subir información donde sea fácil ubicarle a usted o a su familia (ubicación, fotos y/o videos)': 'Evitar subir información\ndonde sea fácil ubicarte\na usted o a su familia\n(ubicación, fotos y/o\nvideos)',
     'Redes sociales privadas solo para familiares y/o amistades': 'Redes sociales\nprivadas solo para\nfamiliares y/o\namistades',
     'Publicar fotos y/o videos con restricciones para no recibir acoso y evitar comentarios': 'Publicar fotos y/o\nvideos con restricciones\npara no recibir\nacoso y evitar\ncomentarios',
-    'Cuestionarse sobre el contenido que publicarÃ¡': 'Cuestionarse sobre\nel contenido que\npublicarÃ¡',
+    'Cuestionarse sobre el contenido que publicará': 'Cuestionarse sobre\nel contenido que\npublicará',
     'Evitar ser muy activo en redes sociales (Limitar publicaciones y/o no interactuar en redes sociales)': 'Evitar ser muy activo (a)\nen redes sociales\n(limitar publicaciones y\nno interactuar en\nredes sociales)',
     'Comentar con otras personas sobre lo que sucede y ve en redes sociales': 'Comentar con\notras personas\nsobre lo que\nsucede y ves en\nredes sociales'
 }
 
 # Solo seleccionamos las columnas de esta batería de preguntas
-cols_acciones = [col for col in df.columns if 'Â¿CuÃ¡les de las siguientes acciones realiza para protegerse o prevenir' in col]
+cols_acciones = [col for col in df.columns if '¿Cuáles de las siguientes acciones realiza para protegerse o prevenir' in col]
 
 # Limpiamos respuestas de Ninguna , Otro y Ns/Nc que no aparecen en la gráfica
 cols_acciones = [c for c in cols_acciones if 'Ninguna' not in c and 'Otro' not in c and 'Ns/Nc' not in c]
@@ -55,13 +55,13 @@ for col in cols_acciones:
         labels.append(label_mapping[name_raw])
 
         # Filtramos quiénes contestaron Sí a esta acción específica
-        mask_si = df_internet[col].apply(lambda x: str(x).strip().lower() == 'sÃ­')
+        mask_si = df_internet[col].apply(lambda x: str(x).strip().lower() == 'sí')
         df_si = df_internet[mask_si]
 
         # Ponderadores
         w_si_total = df_si[w_col].sum()
-        w_si_hom = df_si[df_si['GÃ©nero'] == 'Hombre'][w_col].sum()
-        w_si_muj = df_si[df_si['GÃ©nero'] == 'Mujer'][w_col].sum()
+        w_si_hom = df_si[df_si['Género'] == 'Hombre'][w_col].sum()
+        w_si_muj = df_si[df_si['Género'] == 'Mujer'][w_col].sum()
 
         # Porcentajes matemáticos exactos
         results_gen.append((w_si_total / total_w) * 100)
@@ -82,7 +82,7 @@ rects3 = ax.bar(x + width, results_hom, width, label='Hombres', color='#c2185b')
 # 8. Diseño y Tipografía
 ax.set_ylabel('Porcentaje', fontsize=11)
 ax.set_xticks(x)
-ax.set_xticklabels(labels, rotation=90, ha='center', fontsize=9) # Rotamos a 90Â° para que quepan
+ax.set_xticklabels(labels, rotation=90, ha='center', fontsize=9) # Rotamos a 90° para que quepan
 ax.set_ylim(0, 110) # Damos margen hasta 110 para que quepan los textos sobre las barras
 
 # Eje Y en formato de Porcentaje
@@ -111,11 +111,12 @@ ax.spines['right'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.tick_params(axis='y', length=0)
 
-plt.title('Acciones realizadas por las personas usuarias para protegerse o prevenir la\nviolencia digital a travÃ©s de Internet (por sexo)', 
+plt.title('Acciones realizadas por las personas usuarias para protegerse o prevenir la\nviolencia digital a través de Internet (por sexo)', 
           fontsize=14, fontweight='bold', pad=20)
 
 # Ajustar espacio inferior debido a las etiquetas largas
 plt.subplots_adjust(bottom=0.45) 
 # Guardar salida
+fig.suptitle('Figura F.15. Acciones para proteger o prevenir violencia digital', fontsize=14, fontweight='bold', y=1.02)
 plt.savefig(PROJECT_ROOT / "output" / "figura_f15.png", dpi=300, bbox_inches='tight')
-print("Â¡GrÃ¡fica F.15 lista!")
+print("¡Gráfica F.15 lista!")

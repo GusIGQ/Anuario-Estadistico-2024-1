@@ -22,12 +22,12 @@ df = pd.read_csv(INPUT, encoding="cp1252")
 # Normalizar nombre duplicado
 df["TECNO_ACCESO_INTERNET"] = df["TECNO_ACCESO_INTERNET"].str.strip()
 df["TECNO_ACCESO_INTERNET"] = df["TECNO_ACCESO_INTERNET"].replace(
-    {"TecnologÃ­a MÃ³vil": "TecnologÃ­a mÃ³vil"}
+    {"Tecnología Móvil": "Tecnología móvil"}
 )
 
 # Filtros
-TECNO_PRINCIPALES = ["Fibra Ã³ptica", "Cable coaxial", "DSL",
-                     "TecnologÃ­a mÃ³vil", "Satelital"]
+TECNO_PRINCIPALES = ["Fibra óptica", "Cable coaxial", "DSL",
+                     "Tecnología móvil", "Satelital"]
 
 def get_totals(year, mes=12):
     d = df[(df["ANIO"] == year) & (df["MES"] == mes)]
@@ -55,10 +55,10 @@ tc_total_nores = (total_nores - nores22.sum()) / nores22.sum() * 100
 
 # Colores por tecnología
 COLORS = {
-    "Fibra Ã³ptica":    "#1B3A6B",   # azul oscuro
-    "Cable coaxial":   "#F4956A",   # salmÃ³n
+    "Fibra óptica":    "#1B3A6B",   # azul oscuro
+    "Cable coaxial":   "#F4956A",   # salmón
     "DSL":             "#7EC8C8",   # azul claro
-    "TecnologÃ­a mÃ³vil":"#B0D8E8",   # azul pÃ¡lido
+    "Tecnología móvil":"#B0D8E8",   # azul pálido
     "Satelital":       "#E8E8E8",   # gris claro
 }
 BAR_POS = "#1B3A6B"   # azul para tasas positivas
@@ -77,10 +77,10 @@ def draw_panel(ax_pie, ax_bar, totals, tc, total, tc_total, title):
 
     # Etiquetas radiales
     label_cfg = {
-        "Fibra Ã³ptica":     (0.55, 0.50, "white",  12, "bold"),
+        "Fibra óptica":     (0.55, 0.50, "white",  12, "bold"),
         "Cable coaxial":    (0.70, 0.10, "white",  11, "bold"),
         "DSL":              (0.75,-0.30, "#333333", 10, "bold"),
-        "TecnologÃ­a mÃ³vil": (0.85, 0.75, "#333333", 9,  "normal"),
+        "Tecnología móvil": (0.85, 0.75, "#333333", 9,  "normal"),
         "Satelital":        (0.88,-0.65, "#333333", 9,  "normal"),
     }
     for t, (rx, ry, fc, fs, fw) in label_cfg.items():
@@ -151,8 +151,8 @@ draw_panel(ax_pie_nr, ax_bar_nr, nores23, tc_nores, total_nores, tc_total_nores,
 
 # Título
 fig.text(0.02, 0.95,
-         "â— Figura B.16. DistribuciÃ³n de los accesos al servicio fijo de Internet "
-         "por tecnologÃ­a de conexiÃ³n y por segmento",
+         "Figura B.16. Distribución de los accesos al servicio fijo de Internet"
+         "por tecnología de conexión y por segmento",
          fontsize=10, fontweight="bold", color="#1B3A6B", va="top")
 
 # Fuente
@@ -166,13 +166,13 @@ plt.close()
 print(f"Figura guardada en: {OUTPUT}")
 
 # Verificación
-print("\nâ”€â”€ Residencial 2023 â”€â”€")
+print("\n── Residencial 2023 ──")
 for t in TECNO_PRINCIPALES:
     pct = res23[t] / total_res * 100
     print(f"  {t:25s}: {pct:5.1f}%   tc: {tc_res[t]:+.1f}%")
 print(f"  {'TOTAL':25s}: {total_res:,.0f}   tc: {tc_total_res:+.1f}%")
 
-print("\nâ”€â”€ No Residencial 2023 â”€â”€")
+print("\n── No Residencial 2023 ──")
 for t in TECNO_PRINCIPALES:
     pct = nores23[t] / total_nores * 100
     print(f"  {t:25s}: {pct:5.1f}%   tc: {tc_nores[t]:+.1f}%")

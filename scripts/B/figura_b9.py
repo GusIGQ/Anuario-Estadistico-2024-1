@@ -1,18 +1,18 @@
 ﻿"""
-Figura B.9 â€” ParticipaciÃ³n de mercado del Servicio Fijo de TelefonÃ­a (2013-2023)
+Figura B.9 — Participación de mercado del Servicio Fijo de Telefonía (2013-2023)
 Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones
-        a diciembre de cada aÃ±o.
+        a diciembre de cada año.
 Archivo: TD_MARKET_SHARE_TELFIJA_ITE_VA.csv
 Portal:  https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml
-         SecciÃ³n: Servicio Fijo de TelefonÃ­a
+         Sección: Servicio Fijo de Telefonía
 
-MetodologÃ­a:
+Metodología:
 - Filtrar MES == 12 (diciembre) y ANIO 2013-2023
 - Mapear operadores individuales a 7 grupos (como en la figura)
-- Los valores de MARKET_SHARE ya estÃ¡n precalculados en el CSV
+- Los valores de MARKET_SHARE ya están precalculados en el CSV
 - Para 2021: MAXCOM (0.37%) aparece bajo DISH-MVS en el CSV actual
   â†’ se mantiene en "Otros" (diferencia de redondeo vs Anuario)
-- Para 2023: pequeÃ±as diferencias (~0.3-1%) por revisiones posteriores
+- Para 2023: pequeñas diferencias (~0.3-1%) por revisiones posteriores
   de operadores (comportamiento documentado en el Anuario)
 """
 
@@ -42,12 +42,12 @@ df_dic = df[(df["MES"] == 12) & (df["ANIO"].between(2013, 2023))].copy()
 # Operadores con nombre explícito en la figura mapeo directo
 # El resto Otros
 mapeo = {
-    "AMÃ‰RICA MÃ“VIL":  "AmÃ©rica MÃ³vil",
+    "América Móvil":  " América Móvil",
     "GRUPO TELEVISA": "Grupo Televisa",
     "MEGACABLE-MCM":  "Megacable-MCM",
     "GRUPO SALINAS":  "Grupo Salinas",
     "AXTEL":          "Axtel",
-    "TELEFÃ“NICA":     "TelefÃ³nica",
+    "TELEFÓNICA":     "Telefónica",
 }
 df_dic["GRUPO_FIGURA"] = df_dic["GRUPO"].map(mapeo).fillna("Otros")
 
@@ -61,12 +61,12 @@ pivot = (
 
 # Orden de columnas igual que en la figura (de abajo a arriba en la barra)
 orden = [
-    "AmÃ©rica MÃ³vil",
+    " América Móvil",
     "Grupo Televisa",
     "Megacable-MCM",
     "Grupo Salinas",
     "Axtel",
-    "TelefÃ³nica",
+    "Telefónica",
     "Otros",
 ]
 pivot = pivot.reindex(columns=orden, fill_value=0)
@@ -75,13 +75,13 @@ years = pivot.index.tolist()
 
 # 5. COLORES (paleta del Anuario IFT)
 colores = {
-    "AmÃ©rica MÃ³vil":  "#1a3a5c",   # azul marino oscuro
+    " América Móvil":  "#1a3a5c",   # azul marino oscuro
     "Grupo Televisa": "#4a9fd4",   # azul claro
     "Megacable-MCM":  "#1b2a4a",   # azul muy oscuro
     "Grupo Salinas":  "#e8956a",   # naranja
     "Axtel":          "#d64c3e",   # rojo
-    "TelefÃ³nica":     "#5bbfb5",   # turquesa
-    "Otros":          "#7fc8e0",   # azul pÃ¡lido
+    "Telefónica":     "#5bbfb5",   # turquesa
+    "Otros":          "#7fc8e0",   # azul pálido
 }
 
 # 6. FIGURA
@@ -147,14 +147,14 @@ ax.legend(
 
 # 10. TÍTULO Y FUENTE
 ax.set_title(
-    "Figura B.9. ParticipaciÃ³n de mercado del Servicio Fijo de TelefonÃ­a (2013-2023)",
+    "Figura B.9. Participación de mercado del Servicio Fijo de Telefonía (2013-2023)",
     fontsize=12, fontweight="bold", loc="left", pad=14,
     color="#c0392b"
 )
 fig.text(
     0.01, -0.04,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n"
-    "Nota: ParticipaciÃ³n de mercado estimada con respecto al nÃºmero de lÃ­neas del servicio fijo de telefonÃ­a.",
+    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
+    "Nota: Participación de mercado estimada con respecto al número de líneas del servicio fijo de telefonía.",
     fontsize=7.5, color="#555555"
 )
 
@@ -163,12 +163,12 @@ plt.tight_layout(rect=[0, 0.04, 1, 1])
 plt.savefig("figura_B9.png", dpi=180, bbox_inches="tight",
             facecolor="white")
 plt.close()
-print("âœ… figura_B9.png generada")
+print("figura_B9.png generada")
 
 # 11. VERIFICACI N DE VALORES CLAVE
-print("\n=== VerificaciÃ³n vs Anuario (valores clave) ===")
+print("\n=== Verificación vs Anuario (valores clave) ===")
 checks = {
-    2013: ("AmÃ©rica MÃ³vil", 70.11),
+    2013: (" América Móvil", 70.11),
     2015: ("Grupo Televisa", 14.76),
     2019: ("Megacable-MCM", 11.17),
     2020: ("Grupo Salinas", 11.32),

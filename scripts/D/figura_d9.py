@@ -1,24 +1,24 @@
 ﻿"""
-Figura D.9 â€” Porcentaje de la poblaciÃ³n usuaria de Internet segÃºn nivel de seguridad
+Figura D.9 — Porcentaje de la población usuaria de Internet según nivel de seguridad
 que consideran tiene realizar diferentes actividades en Internet (por grupo de edad)
-SubtÃ­tulo mostrado: PercepciÃ³n de seguridad al realizar compras en Internet
+Subtítulo mostrado: Percepción de seguridad al realizar compras en Internet
 
-Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.
+Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.
 Archivo de entrada: baseconfianzadigital__3_.csv
 
 Variable principal : seg_comp  (pregunta 18.5c)
-Factor de expansiÃ³n: fac_per
+Factor de expansión: fac_per
 Filtro             : rescate_internet == 1  (usuarios de internet)
 Desglose           : edad_gpos (1=18-24, 2=25-34, 3=35-44, 4=45-54, 5=55+)
 
-Mapeo de categorÃ­as:
+Mapeo de categorías:
   1 â†’ Muy seguro
   2 â†’ Seguro
   3 â†’ Ni seguro / Ni inseguro
   4 â†’ Inseguro
   5 + 9 + NaN â†’ NS/NR
 
-FÃ³rmula:
+Fórmula:
   pct(cat, edad) = SUM(fac_per | cat & edad) / SUM(fac_per | rescate_internet==1 & edad) * 100
 
 Nota: NS/NR puede diferir ~0.3-1 pp del Anuario (misma discrepancia documentada en README).
@@ -49,7 +49,7 @@ users["cat"] = users["seg_comp"].map({1.0: 1, 2.0: 2, 3.0: 3, 4.0: 4, 5.0: 9, 9.
 users["cat"] = users["cat"].fillna(9).astype(int)
 
 AGE_CODES  = [1, 2, 3, 4, 5]
-AGE_LABELS = ["18 a 24 aÃ±os", "25 a 34 aÃ±os", "35 a 44 aÃ±os", "45 a 54 aÃ±os", "55 a mÃ¡s aÃ±os"]
+AGE_LABELS = ["18 a 24 años", "25 a 34 años", "35 a 44 años", "45 a 54 años", "55 a más años"]
 CAT_CODES  = [1, 2, 3, 4, 9]
 CAT_LABELS = ["Muy seguro", "Seguro", "Ni seguro/ Ni inseguro", "Inseguro", "NS/NR"]
 
@@ -74,7 +74,7 @@ for age, row in results.items():
 # Colores del Anuario IFT
 COLORS = {
     "Muy seguro":               "#A8D5E2",   # azul muy claro
-    "Seguro":                   "#E8856A",   # salmÃ³n / naranja
+    "Seguro":                   "#E8856A",   # salmón / naranja
     "Ni seguro/ Ni inseguro":   "#2C3E7A",   # azul marino oscuro
     "Inseguro":                 "#C0392B",   # rojo
     "NS/NR":                    "#1A2557",   # azul muy oscuro
@@ -134,14 +134,14 @@ ax.legend(
 
 # Título y notas
 ax.set_title(
-    "Figura D.9. Porcentaje de la poblaciÃ³n usuaria de Internet segÃºn nivel de seguridad\n"
+    "Figura D.9. Porcentaje de la población usuaria de Internet según nivel de seguridad\n"
     "que consideran tiene realizar diferentes actividades en Internet (por grupo de edad)",
     fontsize=12, fontweight="bold", color="#1A1A2E", pad=32, loc="left",
 )
 
 # Badge / callout Percepción de seguridad al realizar compras en Internet
 ax.annotate(
-    "PercepciÃ³n de seguridad al\nrealizar compras en Internet",
+    "Percepción de seguridad al\nrealizar compras en Internet",
     xy=(0.58, 0.90), xycoords="axes fraction",
     fontsize=9, ha="center", va="center",
     bbox=dict(boxstyle="round,pad=0.5", facecolor="#EAF4FB", edgecolor="#7EC8C8", linewidth=1.2),
@@ -149,9 +149,9 @@ ax.annotate(
 
 fig.text(
     0.01, -0.03,
-    "Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
-    "Nota: Respuesta mÃºltiple, por lo que la suma no da 100%. "
-    "Los resultados pueden presentar variaciones explicadas por el error teÃ³rico de cada encuesta.",
+    "Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
+    "Nota: Respuesta múltiple, por lo que la suma no da 100%. "
+    "Los resultados pueden presentar variaciones explicadas por el error teórico de cada encuesta.",
     fontsize=8, color="#666666",
 )
 

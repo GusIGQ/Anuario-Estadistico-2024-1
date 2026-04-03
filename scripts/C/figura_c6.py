@@ -77,7 +77,7 @@ poblacion_conapo = {
     2023: 129_875_000,
 }
 
-print("\nâ”€â”€ VerificaciÃ³n: cÃ¡lculo propio vs Anuario â”€â”€")
+print("\n── Verificación: cálculo propio vs Anuario ──")
 resultados = []
 for yr in range(1990, 2024):
     row = df_anual[df_anual['ANIO'] == yr]
@@ -109,7 +109,7 @@ ax.set_facecolor('white')
 COLOR = '#2E6FA3'
 
 ax.plot(anios, valores, color=COLOR, linewidth=2,
-        marker='o', markersize=4, label='LÃ­neas por cada 100 habitantes', zorder=5)
+        marker='o', markersize=4, label='Líneas por cada 100 habitantes', zorder=5)
 ax.fill_between(anios, valores, alpha=0.12, color=COLOR)
 
 # Etiquetas sobre cada punto
@@ -122,7 +122,7 @@ for yr, val in zip(anios, valores):
 # Ejes
 ax.set_ylim(0, 125)
 ax.set_yticks(range(0, 130, 20))
-ax.set_ylabel('LÃ­neas por cada 100 habitantes', fontsize=9)
+ax.set_ylabel('Líneas por cada 100 habitantes', fontsize=9)
 ax.set_xlim(1989, 2024)
 ax.set_xticks(range(1990, 2024))
 ax.set_xticklabels([str(y) for y in range(1990, 2024)], rotation=90, fontsize=7.5)
@@ -132,11 +132,11 @@ ax.spines[['top','right']].set_visible(False)
 ax.legend(loc='upper left', fontsize=8, frameon=False)
 
 ax.set_title(
-    'Figura C.6. LÃ­neas del servicio mÃ³vil de telefonÃ­a por cada 100 habitantes (1990-2023)',
+    'Figura C.6. Líneas del servicio móvil de telefonía por cada 100 habitantes (1990-2023)',
     fontsize=11, fontweight='bold', loc='left', pad=10)
 fig.text(0.01, -0.05,
     'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones '
-    'a diciembre de cada aÃ±o, del CONAPO, el INEGI y estimaciones propias.',
+    'a diciembre de cada año, del CONAPO, el INEGI y estimaciones propias.',
     fontsize=7, color='gray')
 
 plt.tight_layout()

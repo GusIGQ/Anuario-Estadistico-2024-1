@@ -20,7 +20,7 @@ try:
     # Usar openpyxl como motor para leer xlsx
     df_2022 = pd.read_excel(ruta_2022, engine='openpyxl')
     df_2023 = pd.read_excel(ruta_2023, engine='openpyxl')
-    print("Â¡Bases de datos cargadas exitosamente!")
+    print("¡Bases de datos cargadas exitosamente!")
 except Exception as e:
     print(f"Error fatal al cargar archivos Excel: {e}")
     exit()
@@ -28,16 +28,16 @@ except Exception as e:
 # 2. CONFIGURACI N Y FUNCIONES DE CÁLCULO
 
 # Categorías estándar para el eje X
-categorias = ['General', 'Micro', 'PequeÃ±a', 'Mediana']
+categorias = ['General', 'Micro', 'Pequeña', 'Mediana']
 
 # Configuración de los 6 dispositivos (Título en PDF y Palabra clave en Excel)
 configuracion_dispositivos = [
-    {"titulo": "TelÃ©fonos mÃ³viles inteligentes\n(Smartphones)", "clave": "Smartphone"},
+    {"titulo": "Teléfonos móviles inteligentes\n(Smartphones)", "clave": "Smartphone"},
     {"titulo": "Computadoras de escritorio", "clave": "escritorio"},
     {"titulo": "Terminal punto de venta fija,\npara celular (clip) o tableta", "clave": "Terminal"},
     {"titulo": "Laptop", "clave": "Laptop"},
-    {"titulo": "TelÃ©fonos mÃ³viles anÃ¡logos", "clave": "sin acceso"},
-    {"titulo": "Servidores de almacenamiento\nde informaciÃ³n", "clave": "Servidores"}
+    {"titulo": "Teléfonos móviles análogos", "clave": "sin acceso"},
+    {"titulo": "Servidores de almacenamiento\nde información", "clave": "Servidores"}
 ]
 
 # Función para calcular porcentaje ponderado
@@ -51,7 +51,7 @@ def calcular_pct_ponderado(df, col_val, col_peso):
     return (peso_si / peso_total) * 100 if peso_total > 0 else 0
 
 # --- PROCESO DE CÁLCULO DINÁMICO ---
-print("\nIniciando cÃ¡lculo de datos al vuelo...")
+print("\nIniciando cálculo de datos al vuelo...")
 
 # Estructura para guardar resultados: resultados Smartphone 2023 Gral, Micro, Peq, Med
 resultados = {} 
@@ -81,7 +81,7 @@ for df, anio in [(df_2022, 2022), (df_2023, 2023)]:
 
         resultados[titulo][anio] = lista_pcts
 
-print("Â¡CÃ¡lculos completados! Generando grÃ¡fica...")
+print("¡Cálculos completados! Generando Gráfica...")
 
 # 3. GENERACI N DE LA GRÁFICA MULTIPANEL
 
@@ -101,7 +101,7 @@ x = np.arange(len(categorias))
 width = 0.3  # Ancho de las barras
 
 # Título Principal
-fig.text(0.02, 0.94, 'â– ', fontsize=12, color='#E8604B', fontweight='bold', ha='left')
+fig.text(0.02, 0.94, '■', fontsize=12, color='#E8604B', fontweight='bold', ha='left')
 fig.text(0.03, 0.94, 'Figura E.7. Dispositivos que usan las MiPymes para realizar sus actividades (2022-2023)', 
          fontsize=14, fontweight='bold', color='#5D6778', ha='left')
 
@@ -161,7 +161,7 @@ for i, ax in enumerate(axes_planos):
     autolabel(rects2, ax)
 
     max_h = max(data_2022 + data_2023)
-    ax.set_ylim(0, max_h + 30) # Espacio para el tÃ­tulo y leyendas
+    ax.set_ylim(0, max_h + 30) # Espacio para el título y leyendas
 
     # Mini leyenda por panel
     patch_2022 = mpatches.Patch(color=c_2022, label='2022')
@@ -175,15 +175,15 @@ plt.subplots_adjust(wspace=0.15, hspace=0.45, top=0.85, bottom=0.2, left=0.03, r
 # Textos inferiores (Footer)
 footer_y = 0.08
 fig.text(0.02, footer_y, 'Fuente: ', fontsize=10, fontweight='bold', color='#3B4252', ha='left')
-fig.text(0.06, footer_y, 'IFT con informaciÃ³n de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeÃ±as y medianas empresas).', 
+fig.text(0.06, footer_y, 'IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeñas y medianas empresas).', 
          fontsize=10, color='#3B4252', ha='left')
 
-fig.text(0.02, footer_y - 0.025, 'Para mÃ¡s informaciÃ³n consultar: ', fontsize=10, color='#3B4252', ha='left')
+fig.text(0.02, footer_y - 0.025, 'Para más información consultar: ', fontsize=10, color='#3B4252', ha='left')
 fig.text(0.165, footer_y - 0.025, 'https://www.ift.org.mx/usuarios-y-audiencias/encuestas-trimestrales.', 
          fontsize=10, color='#3B4252', ha='left', style='italic')
 
 fig.text(0.02, footer_y - 0.05, 'Nota: ', fontsize=10, fontweight='bold', color='#3B4252', ha='left')
-fig.text(0.05, footer_y - 0.05, 'Respuesta mÃºltiple, por lo que la suma no da 100%. Es importante seÃ±alar que los resultados pueden presentar variaciones que pueden ser explicadas por el error teÃ³rico de cada encuesta.', 
+fig.text(0.05, footer_y - 0.05, 'Respuesta múltiple, por lo que la suma no da 100%. Es importante señalar que los resultados pueden presentar variaciones que pueden ser explicadas por el error teórico de cada encuesta.', 
          fontsize=10, color='#3B4252', ha='left')
 
 ruta_salida_dir = PROJECT_ROOT / "output"
@@ -192,4 +192,4 @@ ruta_completa = os.path.join(ruta_salida_dir, nombre_imagen)
 os.makedirs(ruta_salida_dir, exist_ok=True)
 # Guardar salida
 plt.savefig(ruta_completa, facecolor=fig.get_facecolor(), bbox_inches='tight', dpi=150)
-print(f"Â¡GrÃ¡fica completa y rÃ©plica exportada exitosamente en: {ruta_completa}!")
+print(f"¡Gráfica completa y réplica exportada exitosamente en: {ruta_completa}!")

@@ -1,7 +1,7 @@
-﻿# /usr/bin/env python3
+# /usr/bin/env python3
 # - - coding: utf-8 - -
 """
-Script para generar la Figura A.4: InversiÃ³n privada en Telecomunicaciones por tipo de inversiÃ³n
+Script para generar la Figura A.4: Inversión privada en Telecomunicaciones por tipo de inversión
 """
 
 import pandas as pd
@@ -23,14 +23,14 @@ except:
     try:
         locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
     except:
-        print("No se pudo configurar el locale espaÃ±ol")
+        print("No se pudo configurar el locale español")
 
 # Configurar matplotlib para español
 plt.rcParams['font.size'] = 10
 plt.rcParams['font.family'] = 'sans-serif'
 
 def clean_numeric_column(col):
-    """Limpia columnas numÃ©ricas que pueden tener comas y espacios"""
+    """Limpia columnas numéricas que pueden tener comas y espacios"""
     if pd.isna(col):
         return 0.0
     if isinstance(col, (int, float)):
@@ -48,7 +48,7 @@ def clean_numeric_column(col):
 
 def main():
     # Rutas de archivos
-    base_path = Path(__file__).parent.parent
+    base_path = Path(__file__).parent.parent.parent
     data_file = base_path / "datos" / "A.4" / "TD_INVERSION_TELECOM_ITE_VA.csv"
     output_dir = base_path / "output"
 
@@ -70,7 +70,7 @@ def main():
 
     print(f"Datos cargados: {len(df)} filas")
     print(f"Columnas: {list(df.columns)}")
-    print(f"AÃ±os disponibles: {sorted(df['ANIO'].unique())}")
+    print(f"años disponibles: {sorted(df['ANIO'].unique())}")
 
     # Usar los nombres exactos de las columnas con espacios
     investment_cols = [' INV_INFRA_E ', ' INV_ACT_NO_TANG_E  ', ' INV_OTRO_ACT_E ', ' INV_NO_ESP_E ', ' INV_TOTAL_E ']
@@ -91,7 +91,7 @@ def main():
     # Convertir a miles de millones de pesos
     yearly_totals_billions = yearly_totals / 1_000_000
 
-    print("Totales por aÃ±o (miles de millones de pesos):")
+    print("Totales por año (miles de millones de pesos):")
     print(yearly_totals_billions)
 
     # Preparar datos para la gráfica
@@ -133,7 +133,7 @@ def main():
     # Añadir etiquetas de valores totales y porcentajes
     for i, (year, total) in enumerate(zip(years, totals)):
         # Valor total en la parte superior
-        ax.text(i, total + total*0.02, f'${total:.1f}', 
+        ax.text(i, total + total*0.02, f'${total:,.2f}', 
                 ha='center', va='bottom', fontweight='bold', fontsize=9)
 
         # Calcular porcentajes
@@ -179,20 +179,31 @@ def main():
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
 
+    # Configurar formato del eje Y
+    import matplotlib.ticker as ticker
+    def format_money_axis(x, pos):
+        if x >= 1e6:
+            return f'${x*1e-6:,.1f}M'
+        elif x >= 1e3:
+            return f'${x*1e-3:,.1f}K'
+        else:
+            return f'${x:,.0f}'
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(format_money_axis))
+
     # Configurar grid sutil
     ax.grid(True, axis='y', alpha=0.3, linestyle='-', linewidth=0.5)
     ax.set_axisbelow(True)
 
     # Añadir título y texto descriptivo
-    fig.suptitle('Figura A.4. InversiÃ³n privada en Telecomunicaciones por tipo de inversiÃ³n', 
+    fig.suptitle('Figura A.4. Inversión privada en Telecomunicaciones por tipo de inversión', 
                  fontsize=14, fontweight='bold', color='#CC7A00', x=0.02, y=0.95, ha='left')
 
     # Añadir cuadro de texto con descripción
-    description = ("La inversiÃ³n privada total realizada por los\n"
+    description = ("La inversión privada total realizada por los\n"
                   "operadores de telecomunicaciones en 2023\n" 
                   "fue de $55.7 mil millones de pesos. De la cual,\n"
                   "la mayor parte fue dirigida a infraestructura\n"
-                  "con un 72.8% del total de la inversiÃ³n en el\n"
+                  "con un 72.8% del total de la inversión en el\n"
                   "sector.")
 
     # Crear cuadro de texto
@@ -201,8 +212,8 @@ def main():
             verticalalignment='top', bbox=textbox_props)
 
     # Añadir nota al pie
-    note = ("Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones. Para cada aÃ±o la inversiÃ³n se presenta acumulada al mes de diciembre.\n"
-           "Notas: Cifras en miles de millones de pesos (pesos corrientes de cada aÃ±o). Solo se considera la inversiÃ³n realizada por operadores de servicios de telecomunicaciones.")
+    note = ("Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones. Para cada año la inversión se presenta acumulada al mes de diciembre.\n"
+           "Notas: Cifras en miles de millones de pesos (pesos corrientes de cada año). Solo se considera la inversión realizada por operadores de servicios de telecomunicaciones.")
 
     fig.text(0.02, 0.02, note, fontsize=8, style='italic', wrap=True)
 

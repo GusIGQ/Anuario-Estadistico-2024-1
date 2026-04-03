@@ -1,5 +1,5 @@
-﻿"""
-Figura C.1 â€” Espectro radioelÃ©ctrico (MHz) asignado por banda de frecuencia
+"""
+Figura C.1 — Espectro radioeléctrico (MHz) asignado por banda de frecuencia
 Fuente: IFT con datos a agosto de 2024.
 Archivo de entrada: datos/C.1/TD_DIST_ESPECTRO_VA.csv
 Salida: output/Figura_C1.png
@@ -28,8 +28,8 @@ df = pd.read_csv(INPUT)
 row = df[df["ESTADO"] == "ago-24"].iloc[0]
 
 bandas = {
-    "Banda de\n2500 MHz": ("B_2_5_GHZ", "#E07A5F"),   # rojo/salmÃ³n
-    "Banda AWS":           ("B_AWS",     "#E07A5F"),   # rojo/salmÃ³n (mÃ¡s claro)
+    "Banda de\n2500 MHz": ("B_2_5_GHZ", "#E07A5F"),   # rojo/salmón
+    "Banda AWS":           ("B_AWS",     "#E07A5F"),   # rojo/salmón (más claro)
     "Banda de\n700 MHz":  ("B_700_MHZ", "#3D405B"),   # azul marino oscuro
     "Banda de\n3500 MHz": ("B_3_5_GHZ", "#3D405B"),   # azul marino oscuro
     "Banda PCS":           ("B_PCS",     "#2196a0"),   # teal
@@ -120,18 +120,31 @@ for (label, x0, y0, w, h, color) in celdas:
 
 # Título y fuente
 fig.text(0.01, 0.97,
-         "Figura C.1. Espectro radioelÃ©ctrico (MHz) asignado por banda de frecuencia",
+         "Figura C.1. Espectro radioeléctrico (MHz) asignado por banda de frecuencia",
          fontsize=12, fontweight="bold", va="top")
 
 fig.text(0.01, 0.01,
          f"Fuente: IFT con datos a agosto de 2024.  |  Total asignado: {total} MHz\n"
-         "Nota: El tamaÃ±o de los cuadros corresponde a los MHz asignados por banda de frecuencia.\n"
+         "Nota: El tamaño de los cuadros corresponde a los MHz asignados por banda de frecuencia.\n"
          "La banda AWS corresponde a las bandas de 1.7/2.1 GHz; la banda PCS corresponde a la banda de 1900 MHz.",
          fontsize=7.5, color="#555555", va="bottom")
 
 plt.tight_layout(rect=[0, 0.07, 1, 0.94])
-# Guardar salida
-plt.savefig(OUTPUT, dpi=150, bbox_inches="tight")
+# Guardar gráfica en formatos PNG y SVG
+output_dir = PROJECT_ROOT / "output"
+os.makedirs(output_dir, exist_ok=True)
+output_png = output_dir / "Figura_C1.png"
+output_svg = output_dir / "Figura_C1.svg"
+
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG (alta resolución)
+plt.savefig(output_png, dpi=300, bbox_inches="tight", facecolor='white', edgecolor='none')
+print(f"Gráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG (vectorial escalable)
+plt.savefig(output_svg, format='svg', bbox_inches="tight", facecolor='white', edgecolor='none')
+print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")
+
 plt.close()
-print(f"Guardado: {OUTPUT}")
 print(f"Total MHz (ago-24): {total}")

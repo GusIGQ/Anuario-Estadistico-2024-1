@@ -14,8 +14,8 @@ file_path = PROJECT_ROOT / "datos" / "E.9" / "Base de datos_MiPymes_imp_exp_2022
 df = pd.read_excel(file_path)
 
 # Definimos los nombres de las columnas basados en tu archivo
-col_pregunta = "Â¿Y cuÃ¡l de estos servicios considera el MÃS importante para llevar a cabo estas actividades?"
-col_factor = "Factor de ExpansiÃ³n Final"
+col_pregunta = "¿Y cuál de estos servicios considera el MÁS importante para llevar a cabo estas actividades?"
+col_factor = "Factor de Expansión Final"
 
 # 2. Procesamiento y Cálculo de Porcentajes Exactos
 # El IFT calcula el porcentaje sobre el TOTAL de respuestas, incluyendo Ns/Nc
@@ -29,11 +29,11 @@ porcentajes = (conteos_ponderados / total_expandido) * 100
 
 # 3. Preparación de datos para la gráfica (Excluyendo Ns/Nc para la visualización)
 servicios_map = {
-    "ConexiÃ³n a Internet fijo (incluye conexiÃ³n Wi-Fi)": "ConexiÃ³n a\nInternet fijo",
-    "TelefonÃ­a fija": "TelefonÃ­a fija",
-    "TelefonÃ­a mÃ³vil": "TelefonÃ­a mÃ³vil",
-    "ConexiÃ³n a Internet por datos mÃ³viles (por red de telefonÃ­a mÃ³vil)": "ConexiÃ³n a Internet\npor datos mÃ³viles",
-    "TelevisiÃ³n de paga": "TelevisiÃ³n de paga"
+    "Conexión a Internet fijo (incluye conexión Wi-Fi)": "Conexión a\nInternet fijo",
+    "Telefonía fija": "Telefonía fija",
+    "Telefonía móvil": "Telefonía móvil",
+    "Conexión a Internet por datos móviles (por red de telefonía móvil)": "Conexión a Internet\npor datos móviles",
+    "Televisión de paga": "Televisión de paga"
 }
 
 # Extraemos los valores específicos en el orden deseado
@@ -66,7 +66,7 @@ for bar in bars:
     ax.text(width + 1, bar.get_y() + bar.get_height()/2, 
             f'{width:.1f}%', va='center', fontsize=11, fontweight='bold', color='#333333')
 
-plt.title("Figura E.9. Servicios de Telecomunicaciones mÃ¡s importantes para MiPymes (Imp/Exp)", 
+plt.title("Figura E.9. Servicios de Telecomunicaciones más importantes para MiPymes (Imp/Exp)", 
           fontsize=12, loc='left', pad=20)
 
 plt.tight_layout()

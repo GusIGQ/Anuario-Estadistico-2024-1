@@ -1,28 +1,28 @@
 ﻿"""
-Figura D.6 â€” Usuarios que han vivido experiencias negativas al utilizar Internet
-             y/o realizar actividades en lÃ­nea, por sexo
+Figura D.6 — Usuarios que han vivido experiencias negativas al utilizar Internet
+             y/o realizar actividades en línea, por sexo
 
-Fuente : IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de
+Fuente : IFT, con información de la Encuesta de Confianza en el Servicio de
          Internet (ECSI) 2024.
 Archivo: baseconfianzadigital__1_.csv
-         (descargable desde la secciÃ³n "Encuestas a Usuarios" en
+         (descargable desde la sección "Encuestas a Usuarios" en
           https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml)
 Salida : output/Figura_D6.png
 
-MetodologÃ­a
+Metodología
 -----------
 Universo  : Personas usuarias de Internet (rescate_internet == 1),
-            mayores de 18 aÃ±os, levantamiento telefÃ³nico.
-Factor    : fac_per  (factor de expansiÃ³n de personas â‰¥ 18 aÃ±os,
+            mayores de 18 años, levantamiento telefónico.
+Factor    : fac_per  (factor de expansión de personas â‰¥ 18 años,
                       definido en el diccionario de la ECSI 2024).
 Sexo      : sexo == 2 â†’ Hombres  |  sexo == 1 â†’ Mujeres
-Variables : expp_mensnd  (P25_1_a) â€“ Le han enviado mensajes no deseados
-            expp_pubipi  (P25_1_b) â€“ Han publicado informaciÃ³n personal sin permiso
-            expp_datpre  (P25_1_d) â€“ Han usado sus datos para pedir prÃ©stamos/crÃ©ditos
-            expp_robcon  (P25_1_e) â€“ Han robado sus contraseÃ±as
-FÃ³rmula   : % = SUM(fac_per | var == 1) / SUM(fac_per) Ã— 100
+Variables : expp_mensnd  (P25_1_a) – Le han enviado mensajes no deseados
+            expp_pubipi  (P25_1_b) – Han publicado información personal sin permiso
+            expp_datpre  (P25_1_d) – Han usado sus datos para pedir préstamos/créditos
+            expp_robcon  (P25_1_e) – Han robado sus contraseñas
+Fórmula   : % = SUM(fac_per | var == 1) / SUM(fac_per) × 100
 
-Nota      : La encuesta usa respuesta mÃºltiple, por lo que los porcentajes
+Nota      : La encuesta usa respuesta múltiple, por lo que los porcentajes
             no suman 100 %.
 """
 
@@ -52,9 +52,9 @@ usuarios = df[df["rescate_internet"] == 1].copy()
 # 3. Variables de experiencias negativas
 VARS = {
     "expp_mensnd": "Recibir mensajes\nno deseados",
-    "expp_pubipi": "Han publicado informaciÃ³n\npersonal sin su permiso",
-    "expp_datpre": "Han usado sus datos para pedir\nprÃ©stamos o crÃ©ditos sin su permiso",
-    "expp_robcon": "Han robado sus contraseÃ±as",
+    "expp_pubipi": "Han publicado información\npersonal sin su permiso",
+    "expp_datpre": "Han usado sus datos para pedir\npréstamos o créditos sin su permiso",
+    "expp_robcon": "Han robado sus contraseñas",
 }
 
 GRUPOS = {
@@ -91,7 +91,7 @@ val_total   = [resultados["Total"][v]   for v in categorias]
 
 # 6. Colores del Anuario
 COLOR_HOMBRES = "#A8D5DC"   # azul-verde claro
-COLOR_MUJERES = "#E8937A"   # salmÃ³n / naranja suave
+COLOR_MUJERES = "#E8937A"   # salmón / naranja suave
 COLOR_TOTAL   = "#1F4E6B"   # azul oscuro
 
 # 7. Gráfica
@@ -153,16 +153,16 @@ ax.legend(handles=legend_handles, loc="upper right",
 # 10. Títulos y notas
 ax.set_title(
     "Figura D.6. Usuarios que han vivido experiencias negativas al utilizar\n"
-    "Internet y/o realizar actividades en lÃ­nea, por sexo",
+    "Internet y/o realizar actividades en línea, por sexo",
     fontsize=11, fontweight="bold", color="#1F4E6B",
     pad=14, loc="left"
 )
 
 nota = (
-    "Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
-    "Nota: Respuesta mÃºltiple, por lo que la suma no da 100%. La Encuesta de Confianza en el Servicio\n"
-    "de Internet (ECSI) 2024 fue levantada mediante entrevistas telefÃ³nicas realizadas a personas de\n"
-    "18 aÃ±os y mÃ¡s."
+    "Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
+    "Nota: Respuesta múltiple, por lo que la suma no da 100%. La Encuesta de Confianza en el Servicio\n"
+    "de Internet (ECSI) 2024 fue levantada mediante entrevistas telefónicas realizadas a personas de\n"
+    "18 años y más."
 )
 fig.text(0.01, -0.04, nota, fontsize=7.5, color="#555555",
          ha="left", va="top", wrap=True)

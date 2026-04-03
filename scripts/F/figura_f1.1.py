@@ -30,15 +30,15 @@ total_mujeres = totales_universo.get(2, 0)
 # 3. Diccionario de actividades (Actividad : Columna en ENDUTIH)
 # Usamos las que verificamos y aproximaciones para las demás
 diccionario_actividades = {
-    'MensajerÃ­a instantÃ¡nea': 'P7_16_9',       # (AproximaciÃ³n)
-    'Descargaron aplicaciones': 'P7_11_2',     # (AproximaciÃ³n)
+    'Mensajería instantánea': 'P7_16_9',       # (Aproximación)
+    'Descargaron aplicaciones': 'P7_11_2',     # (Aproximación)
     'Acceder a redes sociales': 'P7_35_3',     # MATCH EXACTO
     'Contenidos de audio y video': 'P7_17_2',  # MATCH EXACTO
-    'Jugar': 'P7_33',                          # (AproximaciÃ³n)
+    'Jugar': 'P7_33',                          # (Aproximación)
     'Adquirir bienes o servicios': 'P7_34_2',  # MATCH EXACTO
-    'TrÃ¡nsito y navegaciÃ³n': 'P7_32_1',        # (AproximaciÃ³n)
-    'Acceder a Banca MÃ³vil': 'P7_22_2',        # (AproximaciÃ³n)
-    'Editar fotos o videos': 'P7_36_3'         # (AproximaciÃ³n)
+    'Tránsito y navegación': 'P7_32_1',        # (Aproximación)
+    'Acceder a Banca Móvil': 'P7_22_2',        # (Aproximación)
+    'Editar fotos o videos': 'P7_36_3'         # (Aproximación)
 }
 
 # 4. Cálculo dinámico de porcentajes
@@ -128,11 +128,11 @@ ax.text(0.47, 0.88, "ðŸ“± Usuarios de Internet mediante Smartphone", ha='ce
 
 ax.text(0.33, 0.81, 'ðŸ‘© Mujeres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
 ax.text(0.33, 0.75, f"{int(total_mujeres):,}", ha='center', va='center', fontsize=22, fontweight='bold', color='#1F3864')
-ax.text(0.33, 0.71, "(75% con respecto al total\nde mujeres de 6 aÃ±os o mÃ¡s)", ha='center', va='center', fontsize=8, color='#666666')
+ax.text(0.33, 0.71, "(75% con respecto al total\nde mujeres de 6 años o más)", ha='center', va='center', fontsize=8, color='#666666')
 
 ax.text(0.61, 0.81, 'ðŸ‘¨ Hombres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
 ax.text(0.61, 0.75, f"{int(total_hombres):,}", ha='center', va='center', fontsize=22, fontweight='bold', color='#1F3864')
-ax.text(0.61, 0.71, "(73% con respecto al total\nde hombres de 6 aÃ±os o mÃ¡s)", ha='center', va='center', fontsize=8, color='#666666')
+ax.text(0.61, 0.71, "(73% con respecto al total\nde hombres de 6 años o más)", ha='center', va='center', fontsize=8, color='#666666')
 
 # Panel superior Derecho
 pm, ph = get_pct('Descargaron aplicaciones')
@@ -141,11 +141,11 @@ draw_panel(0.70, 0.70, 0.28, 0.22, "Descargaron aplicaciones", "ðŸ“¥", pm, 
 # Paneles Fila del Medio
 w_m, h_m = 0.31, 0.22
 y_mid = 0.43
-pm, ph = get_pct('MensajerÃ­a instantÃ¡nea')
-draw_panel(0.02, y_mid, w_m, h_m, "MensajerÃ­a instantÃ¡nea\n(WhatsApp, Messenger, Twitter, etcÃ©tera)", "ðŸ’¬", pm, ph)
+pm, ph = get_pct('Mensajería instantánea')
+draw_panel(0.02, y_mid, w_m, h_m, "Mensajería instantánea\n(WhatsApp, Messenger, Twitter, etcétera)", "ðŸ’¬", pm, ph)
 
 pm, ph = get_pct('Acceder a redes sociales')
-draw_panel(0.35, y_mid, w_m, h_m, "Acceder a redes sociales\n(Facebook, Instagram, etcÃ©tera)", "ðŸ‘¥", pm, ph)
+draw_panel(0.35, y_mid, w_m, h_m, "Acceder a redes sociales\n(Facebook, Instagram, etcétera)", "ðŸ‘¥", pm, ph)
 
 pm, ph = get_pct('Contenidos de audio y video')
 draw_panel(0.68, y_mid, 0.30, h_m, "Contenidos de audio y video\n(YouTube, Spotify, etc.)", "ðŸŽµ", pm, ph)
@@ -156,30 +156,31 @@ y_bot = 0.10
 spacing = 0.016
 
 pm, ph = get_pct('Jugar')
-draw_panel(0.02, y_bot, w_b, h_b, "Jugar (PokÃ©mon go, Candy Crush)", "ðŸŽ®", pm, ph)
+draw_panel(0.02, y_bot, w_b, h_b, "Jugar (Pokémon go, Candy Crush)", "ðŸŽ®", pm, ph)
 
-pm, ph = get_pct('TrÃ¡nsito y navegaciÃ³n')
-draw_panel(0.02 + 1*(w_b+spacing), y_bot, w_b, h_b, "TrÃ¡nsito y navegaciÃ³n\n(Google Maps)", "ðŸ—ºï¸", pm, ph)
+pm, ph = get_pct('Tránsito y navegación')
+draw_panel(0.02 + 1*(w_b+spacing), y_bot, w_b, h_b, "Tránsito y navegación\n(Google Maps)", "ðŸ—ºï¸", pm, ph)
 
 pm, ph = get_pct('Adquirir bienes o servicios')
 draw_panel(0.02 + 2*(w_b+spacing), y_bot, w_b, h_b, "Adquirir bienes/servicios (Uber, Rappi)", "ðŸ›ï¸", pm, ph)
 
-pm, ph = get_pct('Acceder a Banca MÃ³vil')
-draw_panel(0.02 + 3*(w_b+spacing), y_bot, w_b, h_b, "Acceder a Banca MÃ³vil (BBVA, Banamex)", "ðŸ¦", pm, ph)
+pm, ph = get_pct('Acceder a Banca Móvil')
+draw_panel(0.02 + 3*(w_b+spacing), y_bot, w_b, h_b, "Acceder a Banca Móvil (BBVA, Banamex)", "ðŸ¦", pm, ph)
 
 pm, ph = get_pct('Editar fotos o videos')
 draw_panel(0.02 + 4*(w_b+spacing), y_bot, w_b, h_b, "Editar fotos o videos", "ðŸ“¸", pm, ph)
 
 # Fuente al pie
 ax.text(0.02, 0.04, "Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.", fontsize=9, color='#666666')
-ax.text(0.02, 0.01, "Nota: Todos los usuarios se refieren a personas de 6 aÃ±os o mÃ¡s.", fontsize=9, color='#666666')
+ax.text(0.02, 0.01, "Nota: Todos los usuarios se refieren a personas de 6 años o más.", fontsize=9, color='#666666')
 
 # Guardar y mostrar
 output_dir = PROJECT_ROOT / "output"
 os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, "figura_f1.1.png")
 # Guardar salida
+fig.suptitle('Figura F.1.1. Actividades en Smartphone, Internet, computadora y uso de redes sociales', fontsize=14, fontweight='bold', y=1.02)
 plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor=fig.get_facecolor())
-print(f"InfografÃ­a guardada en: {output_path}")
+print(f"Infografía guardada en: {output_path}")
 
 plt.show()

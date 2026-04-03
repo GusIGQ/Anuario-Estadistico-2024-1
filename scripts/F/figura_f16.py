@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
@@ -10,48 +10,48 @@ import numpy as np
 
 print("Cargando la base de datos de Internet Fijo...")
 # 1. Cargar Base de Datos
-df = pd.read_csv('Tercera Encuesta 2023_Int&TV.xlsx - Tercera Encuesta 2023_Int&TV.csv', low_memory=False)
+df = pd.read_excel(PROJECT_ROOT / "datos" / "F.16" / "Tercera Encuesta 2023_Int&TV.xlsx")
 
 # 2. Factor de Expansión (Ponderador)
-w_col = 'Factor de ExpansiÃ³n Final Normalizado que considera calibraciÃ³n (post-estratificaciÃ³n) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
+w_col = 'Factor de Expansión Final Normalizado que considera calibración (post-estratificación) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
 df[w_col] = pd.to_numeric(df[w_col], errors='coerce')
 
 # 3. Filtro para usuarios de Internet Fijo
-col_internet = 'De la siguiente lista de servicios, Â¿podrÃ­a decirme cuÃ¡les tiene contratados o cuenta con ellos en su hogar? ConexiÃ³n a Internet fijo en su hogar (incluye conexiÃ³n Wi-Fi)'
-df_internet = df[df[col_internet] == 'SÃ­'].copy()
+col_internet = 'De la siguiente lista de servicios, ¿podría decirme cuáles tiene contratados o cuenta con ellos en su hogar? Conexión a Internet fijo en su hogar (incluye conexión Wi-Fi)'
+df_internet = df[df[col_internet] == 'Sí'].copy()
 
 # 4. Cálculo de ponderadores totales
 total_w = df_internet[w_col].sum()
-w_mujeres = df_internet[df_internet['GÃ©nero'] == 'Mujer'][w_col].sum()
-w_hombres = df_internet[df_internet['GÃ©nero'] == 'Hombre'][w_col].sum()
+w_mujeres = df_internet[df_internet['Género'] == 'Mujer'][w_col].sum()
+w_hombres = df_internet[df_internet['Género'] == 'Hombre'][w_col].sum()
 
 # Función para obtener respuestas Sí de una acción
 def get_mask(col_name):
-    full_name = f'Independientemente de si ha sido o no vÃ­ctima de violencia en Internet, Â¿quÃ© harÃ­a si la experimentara o quÃ© hizo en caso de haberla experimentado? {col_name}'
-    return df_internet[full_name].apply(lambda x: str(x).strip().lower() == 'sÃ­')
+    full_name = f'Independientemente de si ha sido o no víctima de violencia en Internet, ¿qué haría si la experimentara o qué hizo en caso de haberla experimentado? {col_name}'
+    return df_internet[full_name].apply(lambda x: str(x).strip().lower() == 'sí')
 
 # Función para calcular los porcentajes General, Mujeres, Hombres
 def get_pct(mask):
     w_t = df_internet.loc[mask, w_col].sum()
-    w_m = df_internet.loc[mask & (df_internet['GÃ©nero'] == 'Mujer'), w_col].sum()
-    w_h = df_internet.loc[mask & (df_internet['GÃ©nero'] == 'Hombre'), w_col].sum()
+    w_m = df_internet.loc[mask & (df_internet['Género'] == 'Mujer'), w_col].sum()
+    w_h = df_internet.loc[mask & (df_internet['Género'] == 'Hombre'), w_col].sum()
     return (w_t/total_w)*100, (w_m/w_mujeres)*100, (w_h/w_hombres)*100
 
 # 5. Agrupación y Mapeo de Categorías (Lógica exacta del Anuario)
 categories = [
     {
-        'label': 'Denunciar ante la\nPolicÃ­a CibernÃ©tica',
-        'mask': get_mask('Denunciar ante la PolicÃ­a CibernÃ©tica')
+        'label': 'Denunciar ante la\nPolicía Cibernética',
+        'mask': get_mask('Denunciar ante la Policía Cibernética')
     },
     {
-        'label': 'Denunciar a las autoridades\n(Ministerio PÃºblico, escolares\ny/o centro de trabajo, Seguridad\nPÃºblica, CNDH, SEDENA)',
+        'label': 'Denunciar a las autoridades\n(Ministerio Público, escolares\ny/o centro de trabajo, Seguridad\nPública, CNDH, SEDENA)',
         # Se agrupan TODAS las autoridades mencionadas
-        'mask': get_mask('Denunciar ante el Ministerio PÃºblico') | 
+        'mask': get_mask('Denunciar ante el Ministerio Público') | 
                 get_mask('Denunciar ante autoridades escolares/centro de trabajo') | 
-                get_mask('Denunciar a Seguridad PÃºblica') | 
-                get_mask('Denunciar ante la ComisiÃ³n Nacional de Derechos Humanos (CNDH)') | 
+                get_mask('Denunciar a Seguridad Pública') | 
+                get_mask('Denunciar ante la Comisión Nacional de Derechos Humanos (CNDH)') | 
                 get_mask('Reportarlo ante la SEDENA') | 
-                get_mask('Denunciar/ Reportarlo (No especifica ante quÃ© autoridades o dÃ³nde harÃ­a la denuncia/reporte)')
+                get_mask('Denunciar/ Reportarlo (No especifica ante qué autoridades o dónde haría la denuncia/reporte)')
     },
     {
         'label': 'Bloquear a la persona',
@@ -62,8 +62,8 @@ categories = [
         'mask': get_mask('Denunciar en la plataforma/red social')
     },
     {
-        'label': 'Cerrar la cuenta\n(red social, correo\nelectrÃ³nico)',
-        'mask': get_mask('Cerrar la cuenta (red social/correo electrÃ³nico)')
+        'label': 'Cerrar la cuenta\n(red social, correo\nelectrónico)',
+        'mask': get_mask('Cerrar la cuenta (red social/correo electrónico)')
     },
     {
         'label': 'No hacer algo/ Hacer\ncaso omiso/ Ignorar',
@@ -71,8 +71,8 @@ categories = [
         'mask': get_mask('No hacer caso/ Hacer caso omiso/ Ignorar') | get_mask('Nada')
     },
     {
-        'label': 'Cambiar nÃºmero de\ntelÃ©fono',
-        'mask': get_mask('Cambiar nÃºmero de telÃ©fono')
+        'label': 'Cambiar número de\nteléfono',
+        'mask': get_mask('Cambiar número de teléfono')
     }
 ]
 
@@ -100,7 +100,7 @@ rects3 = ax.bar(x + width, results_hom, width, label='Hombres', color='#c2185b')
 ax.set_ylabel('Porcentaje', fontsize=11)
 ax.set_xticks(x)
 ax.set_xticklabels(labels, ha='center', fontsize=9)
-ax.set_ylim(0, 40) # LÃ­mite superior de 40% (PDF muestra hasta 35%)
+ax.set_ylim(0, 40) # Límite superior de 40% (PDF muestra hasta 35%)
 
 # Formato % en eje Y
 ax.set_yticks(np.arange(0, 41, 5))
@@ -135,4 +135,4 @@ plt.title('Acciones en caso de experimentar violencia digital en Internet',
 plt.subplots_adjust(bottom=0.3)
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "figura_f16.png", dpi=300, bbox_inches='tight')
-print("Â¡Figura F.16 construida y validada!")
+print("¡Figura F.16 construida y validada!")

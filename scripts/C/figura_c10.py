@@ -17,7 +17,7 @@ years = df['ANIO'].tolist()
 values = df['IHH_TELMOVIL_E'].tolist()
 
 # 2. Verificación
-print("VerificaciÃ³n valores clave:")
+print("Verificación valores clave:")
 for y, v in zip(years, values):
     print(f"  {y}: {v}")
 print(f"\n2013 (Anuario: 5,229): {values[0]}")
@@ -63,13 +63,13 @@ ax.tick_params(colors='#555')
 
 # 6. Título y fuente
 fig.text(0.06, 0.97,
-         'â–  Figura C.10.  Herfindahl-Hirschman (IHH). ConcentraciÃ³n de mercado\n'
-         '   del servicio mÃ³vil de telefonÃ­a (2013-2023)',
+         'Figura C.10. Herfindahl-Hirschman (IHH). Concentración de mercado\n'
+         '   del servicio móvil de telefonía (2013-2023)',
          fontsize=11, fontweight='bold', color='#1f4e79', va='top')
 
 fig.text(0.06, 0.02,
-         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n'
-         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de telefonÃ­a.',
+         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n'
+         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al número de líneas del servicio móvil de telefonía.',
          fontsize=7.5, color='#555')
 
 plt.tight_layout(rect=[0, 0.06, 1, 0.93])

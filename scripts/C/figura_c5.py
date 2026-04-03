@@ -37,7 +37,7 @@ for c in cols:
 
 # 6. Verificación rápida
 check = {1990: 0.1, 2000: 14.1, 2013: 101.4, 2023: 144.7}
-print("â”€â”€ VerificaciÃ³n â”€â”€")
+print("── Verificación ──")
 for yr, expected in check.items():
     row = df_anual[df_anual['ANIO'] == yr]
     if not row.empty:
@@ -49,15 +49,15 @@ for yr, expected in check.items():
 COLOR_PREPAGO   = '#7EC8C8'   # azul/verde claro
 COLOR_POSPAGO   = '#2E6FA3'   # azul medio
 COLOR_POSPC     = '#1A3A5C'   # azul oscuro (controlado)
-COLOR_POSPL     = '#F4845F'   # salmÃ³n/naranja (libre)
+COLOR_POSPL     = '#F4845F'   # salmón/naranja (libre)
 COLOR_NOESP     = '#A8C8E0'   # gris azulado (sin segmento)
-COLOR_TOTAL     = '#E63946'   # rojo (lÃ­nea total)
+COLOR_TOTAL     = '#E63946'   # rojo (línea total)
 
 anios  = df_anual['ANIO'].values
 prepago = df_anual['L_PREPAGO_E'].values
 pospc   = df_anual['L_POSPAGOC_E'].values
 pospl   = df_anual['L_POSPAGOL_E'].values
-pospago = df_anual['L_POSPAGO_E'].values   # pospago genÃ©rico (aÃ±os <2017)
+pospago = df_anual['L_POSPAGO_E'].values   # pospago genérico (años <2017)
 noesp   = df_anual['L_NO_ESPECIFICADO_E'].values
 total   = df_anual['L_TOTAL_E'].values
 
@@ -71,11 +71,11 @@ ax.stackplot(
     anios,
     prepago, pospago, pospc, pospl, noesp,
     labels=[
-        'LÃ­neas Prepago',
-        'LÃ­neas Pospago',
-        'LÃ­neas Pospago controlado',
-        'LÃ­neas Pospago libre',
-        'LÃ­neas sin segmento especificado',
+        'Líneas Prepago',
+        'Líneas Pospago',
+        'Líneas Pospago controlado',
+        'Líneas Pospago libre',
+        'Líneas sin segmento especificado',
     ],
     colors=[COLOR_PREPAGO, COLOR_POSPAGO, COLOR_POSPC, COLOR_POSPL, COLOR_NOESP],
     alpha=0.85
@@ -83,7 +83,7 @@ ax.stackplot(
 
 # Línea de totales encima
 ax.plot(anios, total, color=COLOR_TOTAL, linewidth=2,
-        marker='o', markersize=3, label='LÃ­neas totales', zorder=5)
+        marker='o', markersize=3, label='Líneas totales', zorder=5)
 
 # 9. Etiquetas en extremos (1990 y 2023)
 def label(ax, x, y, txt, ha='left'):
@@ -137,7 +137,7 @@ ax.yaxis.set_major_formatter(mticker.FuncFormatter(
 # Reescalar eje Y a valores en millones (ya convertidos)
 ax.set_ylim(0, 170)
 ax.yaxis.set_major_locator(mticker.MultipleLocator(20))
-ax.set_ylabel('Millones de LÃ­neas', fontsize=9)
+ax.set_ylabel('Millones de Líneas', fontsize=9)
 
 ax.set_xlim(1989, 2024)
 ax.set_xticks(range(1990, 2024))
@@ -159,13 +159,13 @@ ax.legend(
 
 # 12. Título y fuente
 ax.set_title(
-    'Figura C.5. LÃ­neas del servicio mÃ³vil de telefonÃ­a (1990-2023)',
+    'Figura C.5. Líneas del servicio móvil de telefonía (1990-2023)',
     fontsize=11, fontweight='bold', loc='left', pad=10
 )
 fig.text(
     0.01, -0.04,
-    'Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n'
-    'Nota: A partir del tercer trimestre de 2017, se agregÃ³ la desagregaciÃ³n por pospago libre y pospago controlado.',
+    'Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.\n'
+    'Nota: A partir del tercer trimestre de 2017, se agregó la desagregación por pospago libre y pospago controlado.',
     fontsize=7, color='gray'
 )
 

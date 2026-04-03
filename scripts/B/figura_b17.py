@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
@@ -20,8 +20,8 @@ df_dic = df[(df['MES'] == 12) & (df['ANIO'] >= 2013) & (df['ANIO'] <= 2023)].cop
 # --- Mapeo corregido ---
 def asignar_grupo(nombre):
     n = str(nombre).upper()
-    if 'AMÃ‰RICA MÃ“VIL' in n or 'AMERICA MOVIL' in n or 'TELMEX' in n or 'CABLEMAS' in n or 'TELNOR' in n:
-        return 'AmÃ©rica MÃ³vil'
+    if 'AMÉRICA MÓVIL' in n or 'AMERICA MOVIL' in n or 'TELMEX' in n or 'CABLEMAS' in n or 'TELNOR' in n:
+        return 'América Móvil'
     if 'GRUPO TELEVISA' in n or 'CABLEVISION' in n:
         return 'Grupo Televisa'
     if 'MEGACABLE' in n:
@@ -34,7 +34,7 @@ def asignar_grupo(nombre):
         return 'Maxcom'
     if 'CABLECOM' in n:
         return 'Cablecom'
-    if nombre == 'IST':
+    if n == 'IST':
         return 'IST'
     return 'Otros'
 
@@ -43,11 +43,11 @@ df_dic['GRUPO_AGR'] = df_dic['GRUPO'].apply(asignar_grupo)
 pivot = df_dic.groupby(['ANIO', 'GRUPO_AGR'])['MS'].sum().unstack(fill_value=0)
 pivot.index = pivot.index.astype(int)
 
-print(pivot[['AmÃ©rica MÃ³vil', 'Grupo Televisa', 'Megacable-MCM',
+print(pivot[['América Móvil', 'Grupo Televisa', 'Megacable-MCM',
              'Grupo Salinas', 'Axtel', 'Maxcom', 'Cablecom', 'IST', 'Otros']])
 
 # --- Colores del Anuario ---
-GRUPOS = ['AmÃ©rica MÃ³vil', 'Grupo Televisa', 'Megacable-MCM',
+GRUPOS = ['América Móvil', 'Grupo Televisa', 'Megacable-MCM',
           'Grupo Salinas', 'Axtel', 'Maxcom', 'Cablecom', 'IST', 'Otros']
 COLORES = ['#E8907A', '#2C3E6B', '#4A7FB5', '#A8D4E6',
            '#4B3F72', '#8E8EA0', '#2E7D6B', '#C0392B', '#5BB8C1']
@@ -98,14 +98,14 @@ ax.legend(GRUPOS, loc='upper center', bbox_to_anchor=(0.5, -0.08),
 
 # Título y fuente
 ax.set_title(
-    'Figura B.17. ParticipaciÃ³n de mercado del servicio fijo de Internet (2013-2023)',
+    'Figura B.17. Participación de mercado del servicio fijo de Internet (2013-2023)',
     fontsize=11, fontweight='bold', loc='left', pad=12, color='#2C3E50'
 )
 fig.text(0.08, 0.01,
-         'Fuente: ParticipaciÃ³n de mercado calculada con respecto al nÃºmero de accesos '
+         'Fuente: Participación de mercado calculada con respecto al número de accesos '
          'del servicio fijo de Internet.\n'
          'Nota: IFT con datos proporcionados por los operadores de telecomunicaciones '
-         'a diciembre de cada aÃ±o.',
+         'a diciembre de cada año.',
          fontsize=7.5, color='gray')
 
 plt.tight_layout(rect=[0, 0.06, 1, 1])

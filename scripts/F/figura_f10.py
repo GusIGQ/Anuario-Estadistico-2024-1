@@ -13,25 +13,25 @@ df = pd.read_excel(PROJECT_ROOT / "datos" / "F.10" / "Tercera Encuesta 2023_Int&
 
 # 2. Definir columnas clave
 # Columna del ponderador (peso de la encuesta para representar a nivel nacional)
-w_col = 'Factor de ExpansiÃ³n Final Normalizado que considera calibraciÃ³n (post-estratificaciÃ³n) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
+w_col = 'Factor de Expansión Final Normalizado que considera calibración (post-estratificación) por sexo y grupos de edad 5 (redondeos corregidos) (a cifras del Censo INEGI, 2020)'
 df[w_col] = pd.to_numeric(df[w_col], errors='coerce')
 
 # Columna para filtrar únicamente a quienes tienen Internet Fijo
-col_internet = 'De la siguiente lista de servicios, Â¿podrÃ­a decirme cuÃ¡les tiene contratados o cuenta con ellos en su hogar? ConexiÃ³n a Internet fijo en su hogar (incluye conexiÃ³n Wi-Fi)'
+col_internet = 'De la siguiente lista de servicios, ¿podría decirme cuáles tiene contratados o cuenta con ellos en su hogar? Conexión a Internet fijo en su hogar (incluye conexión Wi-Fi)'
 
 # 3. Filtrar a los usuarios de Internet Fijo y calcular el peso total
-df_internet = df[df[col_internet] == 'SÃ­'].copy()
+df_internet = df[df[col_internet] == 'Sí'].copy()
 total_weight = df_internet[w_col].sum()
 
 # 4. Diccionario para mapear el final del nombre de la columna con el texto exacto que pide la gráfica
 label_mapping = {
-    'Menores de edad': 'NiÃ±os, niÃ±as y\nadolescentes',
+    'Menores de edad': 'Niños, niñas y\nadolescentes',
     'Mujeres': 'Mujeres',
     'Todas las personas son vulnerables': 'Todas las personas\nson vulnerables',
     'Adultos mayores / Personas de la tercera edad': 'Personas adultas\nmayores',
     'Personas con discapacidad': 'Personas con\ndiscapacidad',
     'Integrantes de la comunidad LGBTIQ+': 'Personas de la\ncomunidad LGBTIQ+',
-    'Personas indÃ­genas': 'Personas indÃ­genas',
+    'Personas indígenas': 'Personas indígenas',
     'Hombres': 'Hombres',
     'Personas negras o afrodescendientes': 'Personas\nafrodescendientes'
 }
@@ -50,7 +50,7 @@ for col in violencia_cols:
             label = label_mapping[category]
 
             # Sumar ponderador solo donde contestaron Sí
-            mask = df_internet[col].apply(lambda x: str(x).strip().lower() == 'sÃ­')
+            mask = df_internet[col].apply(lambda x: str(x).strip().lower() == 'sí')
             weighted_sum = df_internet.loc[mask, w_col].sum()
 
             # Obtener el porcentaje matemático
@@ -94,10 +94,11 @@ ax.spines['left'].set_visible(False)
 ax.get_xaxis().set_ticks([])
 ax.tick_params(axis='y', length=0, labelsize=11)
 
-plt.title('Personas usuarias con mayor riesgo de ser vÃ­ctimas\nde Violencia Digital a travÃ©s de Internet', 
+plt.title('Personas usuarias con mayor riesgo de ser víctimas\nde Violencia Digital a través de Internet', 
           fontsize=14, fontweight='bold', pad=20)
+fig.suptitle('Figura F.10. Principales razones de los usuarios de Internet para no utilizar servicios de gobierno', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 
 # 8. Exportar
 plt.savefig(PROJECT_ROOT / "output" / "figura_f10.png", dpi=300)
-print("Â¡Listo! GrÃ¡fica generada y calculada directo del CSV.")
+print("¡Listo! Gráfica generada y calculada directo del CSV.")

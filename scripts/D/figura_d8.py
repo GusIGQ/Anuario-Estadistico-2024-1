@@ -1,11 +1,11 @@
 ﻿"""
-Figura D.8 â€” PercepciÃ³n o grado de confianza que las personas tienen al hacer uso del Internet
-Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024
+Figura D.8 — Percepción o grado de confianza que las personas tienen al hacer uso del Internet
+Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024
 Archivo de entrada: baseconfianzadigital__3_.csv
 Variable: conf_int (pregunta 27.5)
-Factor de expansiÃ³n: fac_per
+Factor de expansión: fac_per
 
-CÃ³digos vÃ¡lidos:
+Códigos válidos:
   1 = Nada
   2 = Poco
   3 = Le es indiferente
@@ -13,7 +13,7 @@ CÃ³digos vÃ¡lidos:
   5 = Mucho
   9 = NS/NR
 
-FÃ³rmula:
+Fórmula:
   pct_categoria = SUM(fac_per | conf_int == categoria) / SUM(fac_per | conf_int in [1,2,3,4,5,9]) * 100
 """
 
@@ -52,12 +52,12 @@ for lbl, val in zip(LABELS, values):
 
 # 2. COLORES (paleta del Anuario IFT)
 COLORS = [
-    "#C0392B",   # Nada           â€” rojo
-    "#E8856A",   # Poco           â€” salmÃ³n
-    "#3B4A7A",   # Le es indiferente â€” azul oscuro
-    "#3B4A7A",   # Algo           â€” azul oscuro (mÃ¡s claro abajo)
-    "#7EC8C8",   # Mucho          â€” azul claro
-    "#5B6FA6",   # NS/NR          â€” azul medio
+    "#C0392B",   # Nada           — rojo
+    "#E8856A",   # Poco           — salmón
+    "#3B4A7A",   # Le es indiferente — azul oscuro
+    "#3B4A7A",   # Algo           — azul oscuro (más claro abajo)
+    "#7EC8C8",   # Mucho          — azul claro
+    "#5B6FA6",   # NS/NR          — azul medio
 ]
 
 # Algo usa tono más claro que Nada/indiferente
@@ -120,13 +120,13 @@ ax.legend(
 
 # Título y nota al pie
 ax.set_title(
-    "Figura D.8. PercepciÃ³n o grado de confianza que las personas\ntienen al hacer uso del Internet",
+    "Figura D.8. Percepción o grado de confianza que las personas\ntienen al hacer uso del Internet",
     fontsize=13, fontweight="bold", color="#1A1A2E", pad=28, loc="left",
 )
 
 fig.text(
     0.01, -0.04,
-    "Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.",
+    "Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.",
     fontsize=8.5, color="#666666",
 )
 

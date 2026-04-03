@@ -1,9 +1,9 @@
-﻿"""
-Figura A.3 â€“ Ãndices de precios (INPC e IPCOM)
+"""
+Figura A.3 – Índices de precios (INPC e IPCOM)
 
-Reproduce la grÃ¡fica del Anuario EstadÃ­stico 2024 del IFT (p. 13).
-- Dos lÃ­neas: INPC (ascendente) e IPCOM (descendente).
-- Datos a diciembre de cada aÃ±o (2010-2023) y julio de 2024.
+Reproduce la Gráfica del Anuario Estadístico 2024 del IFT (p. 13).
+- Dos líneas: INPC (ascendente) e IPCOM (descendente).
+- Datos a diciembre de cada año (2010-2023) y julio de 2024.
 - Base: julio 2018 = 100.
 - Columna 1 del CSV = INPC total, columna 9 = "08 Comunicaciones" (IPCOM).
 
@@ -54,7 +54,7 @@ inpc = [s[1] for s in selected]
 ipcom = [s[2] for s in selected]
 
 # 3. Imprimir tabla
-print(f"{'AÃ±o':<8} {'INPC':>10} {'IPCOM':>10}")
+print(f"{'año':<8} {'INPC':>10} {'IPCOM':>10}")
 print("-" * 30)
 for y, i, c in selected:
     print(f"{y:<8} {i:>10.2f} {c:>10.2f}")
@@ -67,19 +67,19 @@ ax.set_facecolor('#F8F8FA')
 x = np.arange(len(years))
 
 # Colores IFT
-color_inpc = '#2B1055'   # PÃºrpura oscuro
+color_inpc = '#2B1055'   # Púrpura oscuro
 color_ipcom = '#7B2D8E'  # Morado IFT
 
 # Líneas
 ax.plot(x, inpc, color=color_inpc, linewidth=2.5, zorder=4,
         marker='o', markersize=7, markerfacecolor=color_inpc,
         markeredgecolor='white', markeredgewidth=1.5,
-        label='Ãndice Nacional de Precios al Consumidor (INPC)')
+        label='Índice Nacional de Precios al Consumidor (INPC)')
 
 ax.plot(x, ipcom, color=color_ipcom, linewidth=2.5, zorder=4,
         marker='s', markersize=7, markerfacecolor=color_ipcom,
         markeredgecolor='white', markeredgewidth=1.5,
-        label='Ãndice de Precios de Comunicaciones (IPCOM)')
+        label='Índice de Precios de Comunicaciones (IPCOM)')
 
 # Etiquetas de datos (valores redondeados)
 for i_idx in range(len(years)):
@@ -116,11 +116,11 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 
 # 5. Título
-fig.text(0.02, 0.96, 'â–  ', fontsize=12, color='#7B2D8E', fontweight='bold',
+fig.text(0.02, 0.96, '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
          transform=fig.transFigure, va='top')
-fig.text(0.04, 0.965, 'Figura A.3.  ', fontsize=12, color='#333333',
+fig.text(0.04, 0.965, 'Figura A.3. ', fontsize=12, color='#333333',
          fontweight='bold', transform=fig.transFigure, va='top')
-fig.text(0.115, 0.965, 'Ãndices de precios (INPC e IPCOM)',
+fig.text(0.115, 0.965, 'Índices de precios (INPC e IPCOM)',
          fontsize=12, color='#333333', transform=fig.transFigure, va='top')
 
 # 6. Leyenda
@@ -130,8 +130,8 @@ ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2,
 # 7. Notas al pie
 note1 = ('Fuente: IFT con datos del INEGI a julio de 2024. Datos disponibles en: '
          'https://www.inegi.org.mx/app/indicesdeprecios/')
-note2 = ('Notas: Base julio 2018 = 100. Los Ã­ndices de 2010 a 2023 corresponden '
-         'a diciembre de cada aÃ±o, mientras que para el aÃ±o 2024 a julio.')
+note2 = ('Notas: Base julio 2018 = 100. Los índices de 2010 a 2023 corresponden '
+         'a diciembre de cada año, mientras que para el año 2024 a julio.')
 fig.text(0.02, 0.01, note1, fontsize=7.5, color='#555555',
          transform=fig.transFigure, va='bottom')
 fig.text(0.02, -0.02, note2, fontsize=7.5, color='#555555',
@@ -140,10 +140,21 @@ fig.text(0.02, -0.02, note2, fontsize=7.5, color='#555555',
 # 8. Guardar
 fig.subplots_adjust(left=0.06, right=0.97, top=0.92, bottom=0.14)
 
-output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Figura_A3.png')
-os.makedirs(os.path.dirname(output_path), exist_ok=True)
-# Guardar salida
-fig.savefig(output_path, dpi=200, bbox_inches='tight',
+output_dir = os.path.join(os.path.dirname(__file__), "..", "..", 'output')
+os.makedirs(output_dir, exist_ok=True)
+output_png = os.path.join(output_dir, 'Figura_A3.png')
+output_svg = os.path.join(output_dir, 'Figura_A3.svg')
+
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG (alta resolución)
+fig.savefig(output_png, dpi=300, bbox_inches='tight',
             facecolor='white', edgecolor='none')
-print(f"\nGrÃ¡fica guardada en: {output_path}")
+print(f"\nGráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG (vectorial escalable)
+fig.savefig(output_svg, format='svg', bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")
+
 plt.close(fig)

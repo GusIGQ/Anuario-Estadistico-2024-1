@@ -1,35 +1,35 @@
 ﻿"""
-Figura D.7 â€” Anuario EstadÃ­stico IFT 2024
+Figura D.7 — Anuario Estadístico IFT 2024
 Usuarios que han vivido experiencias negativas al utilizar Internet
-y/o realizar actividades en lÃ­nea, por grupo de edad.
+y/o realizar actividades en línea, por grupo de edad.
 
-Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el
+Fuente: IFT, con información de la Encuesta de Confianza en el
         Servicio de Internet (ECSI) 2024.
 Datos:  baseconfianzadigital.csv
         https://www.ift.org.mx/encuesta-confianza-en-internet
 
-Nota: Respuesta mÃºltiple, por lo que la suma no da 100%.
+Nota: Respuesta múltiple, por lo que la suma no da 100%.
 
-CÃ¡lculo:
-  PoblaciÃ³n base: usuarios de internet (rescate_internet == 1)
-  PonderaciÃ³n:    fac_per (Factor de ExpansiÃ³n Final de Personas)
+Cálculo:
+  Población base: usuarios de internet (rescate_internet == 1)
+  Ponderación:    fac_per (Factor de Expansión Final de Personas)
   Filtro edad:    edad_gpos (1=18-24, 2=25-34, 3=35-44, 4=45-54, 5=55+)
 
-  Variables de experiencias negativas (SecciÃ³n IV del cuestionario):
+  Variables de experiencias negativas (Sección IV del cuestionario):
     expp_mensnd  â†’ Le han enviado mensajes no deseados         (P25_1_a)
-    expp_pubipi  â†’ Han publicado informaciÃ³n personal sin permiso (P25_1_b)
-    expp_datpre  â†’ Han usado datos para pedir prÃ©stamos sin permiso (P25_1_d)
-    expp_robcon  â†’ Le han robado sus contraseÃ±as (hackeado)    (P25_1_e)
+    expp_pubipi  â†’ Han publicado información personal sin permiso (P25_1_b)
+    expp_datpre  â†’ Han usado datos para pedir préstamos sin permiso (P25_1_d)
+    expp_robcon  â†’ Le han robado sus contraseñas (hackeado)    (P25_1_e)
 
-  FÃ³rmula por grupo de edad g y experiencia e:
+  Fórmula por grupo de edad g y experiencia e:
     %e_g = SUM(fac_per | edad_gpos==g & expp_e==1)
            / SUM(fac_per | edad_gpos==g)  * 100
 
   Valores reproducidos (coinciden con el Anuario al decimal):
     Mensajes no deseados: 64.8 / 62.6 / 60.8 / 57.6 / 53.4
     Info personal:        16.5 / 14.5 / 13.1 / 14.5 /  9.4
-    Datos prÃ©stamos:       8.6 / 13.9 / 11.9 / 11.4 /  8.6
-    Robo contraseÃ±as:     23.1 / 20.0 / 18.2 / 11.2 /  9.5
+    Datos préstamos:       8.6 / 13.9 / 11.9 / 11.4 /  8.6
+    Robo contraseñas:     23.1 / 20.0 / 18.2 / 11.2 /  9.5
 """
 
 import os
@@ -58,19 +58,19 @@ df_usr = df[df['rescate_internet'] == 1].copy()   # solo usuarios de internet
 
 # Grupos de edad
 GRUPOS = {
-    1: '18 a 24 aÃ±os',
-    2: '25 a 34 aÃ±os',
-    3: '35 a 44 aÃ±os',
-    4: '45 a 54 aÃ±os',
-    5: '55 a mÃ¡s aÃ±os',
+    1: '18 a 24 años',
+    2: '25 a 34 años',
+    3: '35 a 44 años',
+    4: '45 a 54 años',
+    5: '55 a más años',
 }
 
 # Variables de experiencias negativas
 EXPERIENCIAS = {
     'Recibir mensajes\nno deseados':              'expp_mensnd',
-    'Han publicado informaciÃ³n\npersonal sin su permiso': 'expp_pubipi',
-    'Han usado sus datos para pedir\nprÃ©stamos o crÃ©ditos sin su permiso': 'expp_datpre',
-    'Han robado sus contraseÃ±as':                 'expp_robcon',
+    'Han publicado información\npersonal sin su permiso': 'expp_pubipi',
+    'Han usado sus datos para pedir\npréstamos o créditos sin su permiso': 'expp_datpre',
+    'Han robado sus contraseñas':                 'expp_robcon',
 }
 
 # Cálculo ponderado
@@ -93,9 +93,9 @@ for g, label in GRUPOS.items():
 # Paleta (igual que el Anuario)
 COLORES = {
     'Recibir mensajes\nno deseados':              '#9BD0D4',   # azul cielo
-    'Han publicado informaciÃ³n\npersonal sin su permiso': '#F4A185',  # salmÃ³n
-    'Han usado sus datos para pedir\nprÃ©stamos o crÃ©ditos sin su permiso': '#2E4A72',  # azul oscuro
-    'Han robado sus contraseÃ±as':                 '#C0392B',   # rojo
+    'Han publicado información\npersonal sin su permiso': '#F4A185',  # salmón
+    'Han usado sus datos para pedir\npréstamos o créditos sin su permiso': '#2E4A72',  # azul oscuro
+    'Han robado sus contraseñas':                 '#C0392B',   # rojo
 }
 
 GRUPOS_LABEL = list(GRUPOS.values())          # eje X
@@ -179,17 +179,17 @@ ax.legend(
 # Título de la figura
 fig.text(
     0.01, 0.97,
-    'â–  Figura D.7. Usuarios que han vivido experiencias negativas al utilizar Internet\n'
-    '   y/o realizar actividades en lÃ­nea, por grupo de edad',
+    'Figura D.7. Usuarios que han vivido experiencias negativas al utilizar Internet\n'
+    '   y/o realizar actividades en línea, por grupo de edad',
     fontsize=10, fontweight='bold', color='#1a1a1a',
     va='top',
 )
 
 # Fuente y nota
 nota = (
-    'Fuente: IFT, con informaciÃ³n de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n'
-    'Nota: Respuesta mÃºltiple, por lo que la suma no da 100%. Es importante seÃ±alar que los resultados '
-    'pueden presentar variaciones\nque pueden ser explicadas por el error teÃ³rico de cada encuesta.'
+    'Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n'
+    'Nota: Respuesta múltiple, por lo que la suma no da 100%. Es importante señalar que los resultados '
+    'pueden presentar variaciones\nque pueden ser explicadas por el error teórico de cada encuesta.'
 )
 fig.text(0.01, 0.01, nota, fontsize=7.5, color='#555555', va='bottom')
 
@@ -201,12 +201,12 @@ plt.close()
 print(f"âœ…  Figura guardada en: {OUT_PATH}")
 
 # Verificación numérica
-print("\nVerificaciÃ³n de valores calculados vs Anuario IFT 2024:")
+print("\nVerificación de valores calculados vs Anuario IFT 2024:")
 anuario = {
     'Recibir mensajes\nno deseados':              [64.8, 62.7, 60.8, 57.6, 53.4],
-    'Han publicado informaciÃ³n\npersonal sin su permiso': [16.5, 14.5, 13.1, 14.5,  9.4],
-    'Han usado sus datos para pedir\nprÃ©stamos o crÃ©ditos sin su permiso': [ 8.6, 13.9, 11.9, 11.4,  8.6],
-    'Han robado sus contraseÃ±as':                 [23.1, 20.0, 18.2, 11.2,  9.5],
+    'Han publicado información\npersonal sin su permiso': [16.5, 14.5, 13.1, 14.5,  9.4],
+    'Han usado sus datos para pedir\npréstamos o créditos sin su permiso': [ 8.6, 13.9, 11.9, 11.4,  8.6],
+    'Han robado sus contraseñas':                 [23.1, 20.0, 18.2, 11.2,  9.5],
 }
 for exp, vals_ref in anuario.items():
     titulo_corto = exp.split('\n')[0][:40]

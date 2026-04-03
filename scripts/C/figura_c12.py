@@ -1,5 +1,5 @@
 ﻿"""
-Figura C.12 â€” LÃ­neas del servicio mÃ³vil de acceso a Internet
+Figura C.12 — Líneas del servicio móvil de acceso a Internet
             por cada 100 habitantes (2010-2023)
 Fuente: IFT con datos de operadores, CONAPO, INEGI y estimaciones propias.
 Archivo: TD_TELEDENSIDAD_H_IMOVIL_ITE_VA.csv
@@ -33,9 +33,9 @@ fig, ax = plt.subplots(figsize=(13, 6.5))
 fig.patch.set_facecolor("white")
 ax.set_facecolor("white")
 
-C_FILL = "#D6EAF8"   # azul muy claro â€” Ã¡rea rellena
-C_LINE = "#2471A3"   # azul medio     â€” lÃ­nea y marcadores
-C_DOT  = "#154360"   # azul oscuro    â€” puntos
+C_FILL = "#D6EAF8"   # azul muy claro — área rellena
+C_LINE = "#2471A3"   # azul medio     — línea y marcadores
+C_DOT  = "#154360"   # azul oscuro    — puntos
 
 x = np.arange(len(anios))
 
@@ -72,7 +72,7 @@ ax.spines["bottom"].set_linewidth(0.8)
 
 # Título
 ax.set_title(
-    "Figura C.12. LÃ­neas del servicio mÃ³vil de acceso a Internet\n"
+    "Figura C.12. Líneas del servicio móvil de acceso a Internet\n"
     "por cada 100 habitantes (2010-2023)",
     fontsize=11, fontweight="bold", loc="left", pad=12
 )
@@ -81,7 +81,7 @@ ax.set_title(
 fig.text(
     0.05, -0.03,
     "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones "
-    "a diciembre de cada aÃ±o, del CONAPO, el INEGI y estimaciones propias.",
+    "a diciembre de cada año, del CONAPO, el INEGI y estimaciones propias.",
     fontsize=7.5, color="#555555"
 )
 

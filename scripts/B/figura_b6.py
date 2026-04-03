@@ -1,5 +1,5 @@
-﻿"""
-Figura B.6 â€” LÃ­neas del Servicio Fijo de TelefonÃ­a Residencial
+"""
+Figura B.6 — Líneas del Servicio Fijo de Telefonía Residencial
 por cada 100 hogares por entidad federativa.
 
 Fuente datos: TD_PENETRACIONES_TELFIJA_ITE_VA.csv (BIT IFT)
@@ -23,7 +23,7 @@ import os
 # 1. RUTAS Y LECTURA DE DATOS
 BASE_DIR = PROJECT_ROOT
 DATA_PATH = os.path.join(BASE_DIR, 'datos', 'B.6', 'TD_PENETRACIONES_TELFIJA_ITE_VA.csv')
-OUTPUT_DIR = os.path.join(BASE_DIR, 'figuras', 'B6')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 OUTPUT_PATH = os.path.join(OUTPUT_DIR, 'Figura_B6.png')
 
 # Crear directorio de salida si no existe
@@ -36,7 +36,7 @@ data = dict(zip(df['ENTIDAD'], df['P_RES_H_TELFIJA_E']))
 
 # 2. RANGOS Y COLORES
 COLORS  = ['#c5e8f7', '#5bafd6', '#2e6fa3', '#f4a58a', '#c0392b']
-LABELS  = ['Menos de 29', '29 a 42', '43 a 55', '56 a 68', 'MÃ¡s de 68']
+LABELS  = ['Menos de 29', '29 a 42', '43 a 55', '56 a 68', 'Más de 68']
 BREAKS  = [0, 29, 43, 56, 69, 999]
 
 def get_color(val):
@@ -51,7 +51,7 @@ import json
 
 GEOJSON_PATH = os.path.join(BASE_DIR, 'datos', 'mexico.json')
 if not os.path.exists(GEOJSON_PATH):
-    print("Descargando mapa de MÃ©xico...")
+    print("Descargando mapa de México...")
     urllib.request.urlretrieve('https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json', GEOJSON_PATH)
 
 with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
@@ -60,7 +60,7 @@ with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
 # Mapeo de nombres del GeoJSON a los datos
 NAME_MAPPING = {
     'Veracruz': 'Veracruz de Ignacio de la Llave',
-    'MichoacÃ¡n': 'MichoacÃ¡n de Ocampo',
+    'Michoacán': 'Michoacán de Ocampo',
     'Coahuila': 'Coahuila de Zaragoza',
 }
 
@@ -93,7 +93,7 @@ for feature in mexico_geojson['features']:
 
 ax.set_xlim(-118.5, -86.0)
 ax.set_ylim(14.0, 33.5)
-ax.set_aspect(1.1)  # Ajuste de proyecciÃ³n Mercator aproximada
+ax.set_aspect(1.1)  # Ajuste de proyección Mercator aproximada
 ax.axis('off')
 
 # 5. LEYENDA
@@ -101,7 +101,7 @@ patches = [mpatches.Patch(facecolor=COLORS[i], edgecolor='none',
                            label=LABELS[i]) for i in range(5)]
 legend = ax.legend(
     handles=patches,
-    title='LÃ­neas del servicio fijo de TelefonÃ­a\nResidencial por cada 100 hogares:',
+    title='Líneas del servicio fijo de Telefonía\nResidencial por cada 100 hogares:',
     loc='lower left',
     bbox_to_anchor=(0.01, 0.03),
     fontsize=10,
@@ -128,7 +128,7 @@ ax.text(0.80, 0.62, 'Tasa de crecimiento\nanual de 1.9%',
 
 # Título
 ax.set_title(
-    'Figura B.6.  LÃ­neas del Servicio Fijo de TelefonÃ­a Residencial\n'
+    'Figura B.6. Líneas del Servicio Fijo de Telefonía Residencial\n'
     'por cada 100 hogares por entidad federativa',
     color='#2c3e50', fontsize=14, fontweight='bold', pad=12)
 
@@ -141,7 +141,21 @@ fig.text(
     color='#666666', fontsize=8, va='bottom')
 
 plt.tight_layout()
-# Guardar salida
-plt.savefig(OUTPUT_PATH, dpi=150, bbox_inches='tight',
-            facecolor=fig.get_facecolor())
-print(f"âœ“ Figura guardada en {OUTPUT_PATH}")
+
+# Guardar gráfica en formatos PNG y SVG
+output_dir = os.path.dirname(OUTPUT_PATH)
+os.makedirs(output_dir, exist_ok=True)
+output_png = os.path.join(output_dir, 'Figura_B6.png')
+output_svg = os.path.join(output_dir, 'Figura_B6.svg')
+
+plt.rcParams['svg.fonttype'] = 'none'
+
+# Guardar salida PNG
+plt.savefig(output_png, dpi=300, bbox_inches='tight',
+            facecolor=fig.get_facecolor(), edgecolor='none')
+print(f"✓ Gráfica guardada en versión PNG de alta resolución: {output_png}")
+
+# Guardar salida SVG
+plt.savefig(output_svg, format='svg', bbox_inches='tight',
+            facecolor=fig.get_facecolor(), edgecolor='none')
+print(f"✓ Gráfica guardada en versión vectorial SVG editable: {output_svg}")

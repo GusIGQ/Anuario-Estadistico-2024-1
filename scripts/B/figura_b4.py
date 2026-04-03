@@ -21,7 +21,7 @@ fig, ax = plt.subplots(figsize=(14, 6))
 # Línea y área
 ax.plot(df_plot['ANIO'], df_plot['L_TOTAL_E'],
         color='#2E5F8A', linewidth=2, marker='o', markersize=5, zorder=3,
-        label='LÃ­neas totales')
+        label='Líneas totales')
 ax.fill_between(df_plot['ANIO'], df_plot['L_TOTAL_E'],
                 alpha=0.15, color='#2E5F8A')
 
@@ -54,12 +54,12 @@ ax.spines[['top', 'right']].set_visible(False)
 
 # 5. Leyenda, título y fuente
 ax.legend(loc='upper left', fontsize=9)
-ax.set_title('Figura B.4. LÃ­neas del Servicio Fijo de TelefonÃ­a (2000-2023)',
+ax.set_title('Figura B.4. Líneas del Servicio Fijo de Telefonía (2000-2023)',
              fontsize=11, fontweight='bold', loc='left', pad=10)
-ax.set_ylabel('LÃ­neas totales', fontsize=9)
+ax.set_ylabel('Líneas totales', fontsize=9)
 
 fig.text(0.01, -0.05,
-         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o.',
+         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.',
          fontsize=7, color='gray')
 
 # 6. Guardar
@@ -69,5 +69,5 @@ plt.savefig(PROJECT_ROOT / "output" / "Figura_B4.png", dpi=150, bbox_inches='tig
 print("Figura guardada: figura_B4_lineas_telfija.png")
 
 # 7. Imprimir valores calculados
-print("\nValores calculados (diciembre de cada aÃ±o):")
+print("\nValores calculados (diciembre de cada año):")
 print(df_plot.to_string(index=False))

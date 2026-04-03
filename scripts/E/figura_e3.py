@@ -13,9 +13,9 @@ df_2022 = pd.read_excel(PROJECT_ROOT / "datos" / "E.2" / "Base de datos_Cuarta E
 df_2023 = pd.read_excel(PROJECT_ROOT / "datos" / "E.2" / "Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx")
 
 # 2. Identificar columnas (son iguales en ambos años)
-col_clasif = 'ClasificaciÃ³n de la empresa por su tamaÃ±o'
-col_int = 'En tÃ©rminos generales Â¿quÃ© tan satisfechos se encuentran con el servicio de Internet recibido en la empresa o negocio en los Ãºltimos 12 meses? Recodificada'
-col_fija = 'En tÃ©rminos generales Â¿quÃ© tan satisfechos se encuentran con el servicio de telefonÃ­a fija recibido en la empresa o negocio en los Ãºltimos 12 meses? Recodificada'
+col_clasif = 'Clasificación de la empresa por su tamaño'
+col_int = 'En términos generales ¿qué tan satisfechos se encuentran con el servicio de Internet recibido en la empresa o negocio en los últimos 12 meses? Recodificada'
+col_fija = 'En términos generales ¿qué tan satisfechos se encuentran con el servicio de telefonía fija recibido en la empresa o negocio en los últimos 12 meses? Recodificada'
 
 # 3. Calcular promedios para 2022 y 2023
 means_int_2022 = df_2022.groupby(col_clasif)[col_int].mean()
@@ -25,7 +25,7 @@ means_int_2023 = df_2023.groupby(col_clasif)[col_int].mean()
 means_fija_2023 = df_2023.groupby(col_clasif)[col_fija].mean()
 
 # 4. Ordenar los datos (Micro, Pequeña, Mediana)
-order = ['Micro', 'PequeÃ±a', 'Mediana']
+order = ['Micro', 'Pequeña', 'Mediana']
 
 val_int_2022 = [means_int_2022.get(x, 0) for x in order]
 val_fija_2022 = [means_fija_2022.get(x, 0) for x in order]
@@ -85,10 +85,11 @@ ax2.spines['right'].set_visible(False)
 ax2.spines['left'].set_visible(False)
 ax2.spines['bottom'].set_visible(False)
 ax2.yaxis.set_visible(False)
-ax2.set_title('TelefonÃ­a Fija', fontweight='bold', fontsize=14, pad=15)
+ax2.set_title('Telefonía Fija', fontweight='bold', fontsize=14, pad=15)
 ax2.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
 
 # Guardar la gráfica sin valores hardcodeados
+fig.suptitle('Figura E.3. Servicios de telecomunicaciones contratados por las MiPymes', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "Figura_E2.png", dpi=300, bbox_inches='tight')
+plt.savefig(PROJECT_ROOT / "output" / "Figura_E3.png", dpi=300, bbox_inches='tight')

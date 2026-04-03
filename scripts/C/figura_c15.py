@@ -1,12 +1,12 @@
 ﻿"""
-Figura C.15 â€” ParticipaciÃ³n de mercado del servicio mÃ³vil de acceso a Internet (2013-2023)
-Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada aÃ±o.
-Nota: ParticipaciÃ³n de mercado calculada con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de Internet.
+Figura C.15 — Participación de mercado del servicio móvil de acceso a Internet (2013-2023)
+Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.
+Nota: Participación de mercado calculada con respecto al número de líneas del servicio móvil de Internet.
 
 Archivo de entrada: TD_MARKET_SHARE_INTMOVIL_ITE_VA.csv
   - Columnas usadas: ANIO, MES, K_GRUPO, GRUPO, MARKET_SHARE
   - Filtro: MES == 12, ANIO 2013-2023
-  - AgrupaciÃ³n: 5 grupos (AmÃ©rica MÃ³vil, AT&T, Grupo Walmart, TelefÃ³nica, Otros)
+  - Agrupación: 5 grupos ( América Móvil, AT&T, Grupo Walmart, Telefónica, Otros)
 """
 
 import pandas as pd
@@ -23,7 +23,7 @@ import os, sys
 # 1. LECTURA
 CSV_PATH = PROJECT_ROOT / "datos" / "C.15" / "TD_MARKET_SHARE_INTMOVIL_ITE_VA.csv"
 if not os.path.exists(CSV_PATH):
-    print(f"ERROR: No se encontrÃ³ {CSV_PATH}")
+    print(f"ERROR: No se encontró {CSV_PATH}")
     sys.exit(1)
 
 # Cargar datos
@@ -44,13 +44,13 @@ df_dic = df[(df["MES"] == 12) & (df["ANIO"] >= 2013) & (df["ANIO"] <= 2023)].cop
 # todo lo demás Otros
 def mapear_grupo(k_grupo, nombre):
     if k_grupo == "G006":
-        return "AmÃ©rica MÃ³vil"
+        return " América Móvil"
     if k_grupo == "G007":
         return "AT&T"
     if k_grupo == "C804":
         return "Grupo Walmart"
     if k_grupo == "G003":
-        return "TelefÃ³nica"
+        return "Telefónica"
     return "Otros"
 
 df_dic["GRUPO_FIG"] = df_dic.apply(
@@ -58,7 +58,7 @@ df_dic["GRUPO_FIG"] = df_dic.apply(
 )
 
 # 5. CÁLCULO DE MARKET SHARE POR GRUPO Y A O
-ORDEN = ["AmÃ©rica MÃ³vil", "AT&T", "Grupo Walmart", "TelefÃ³nica", "Otros"]
+ORDEN = [" América Móvil", "AT&T", "Grupo Walmart", "Telefónica", "Otros"]
 
 pivot = (
     df_dic.groupby(["ANIO", "GRUPO_FIG"])["MS"]
@@ -67,20 +67,20 @@ pivot = (
     .reindex(columns=ORDEN, fill_value=0)
 )
 
-print("â”€â”€ Valores calculados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
-print(f"{'AÃ±o':>4}  {'AmÃ©rica MÃ³vil':>13}  {'AT&T':>6}  {'G.Walmart':>9}  {'TelefÃ³nica':>10}  {'Otros':>5}")
+print("── Valores calculados ──────────────────────────────────────────────────")
+print(f"{'año':>4}  {' América Móvil':>13}  {'AT&T':>6}  {'G.Walmart':>9}  {'Telefónica':>10}  {'Otros':>5}")
 for anio, row in pivot.iterrows():
-    print(f"{anio:>4}  {row['AmÃ©rica MÃ³vil']:>13.2f}  {row['AT&T']:>6.2f}  "
-          f"{row['Grupo Walmart']:>9.2f}  {row['TelefÃ³nica']:>10.2f}  {row['Otros']:>5.2f}")
+    print(f"{anio:>4}  {row[' América Móvil']:>13.2f}  {row['AT&T']:>6.2f}  "
+          f"{row['Grupo Walmart']:>9.2f}  {row['Telefónica']:>10.2f}  {row['Otros']:>5.2f}")
 
 anios = pivot.index.tolist()
 
 # 6. COLORES (igual que el Anuario)
 COLORES = {
-    "AmÃ©rica MÃ³vil": "#F4A07A",   # salmÃ³n/naranja claro
+    " América Móvil": "#F4A07A",   # salmón/naranja claro
     "AT&T":          "#2D3270",   # azul marino oscuro
     "Grupo Walmart": "#4A5299",   # azul marino medio
-    "TelefÃ³nica":    "#A8D8EA",   # azul claro/celeste
+    "Telefónica":    "#A8D8EA",   # azul claro/celeste
     "Otros":         "#E8614A",   # rojo-coral
 }
 
@@ -137,13 +137,13 @@ ax.legend(
 # 10. TÍTULO Y FUENTE
 fig.text(
     0.07, 0.96,
-    "â–   Figura C.15.  ParticipaciÃ³n de mercado del servicio mÃ³vil de acceso a Internet (2013-2023)",
+    "Figura C.15. Participación de mercado del servicio móvil de acceso a Internet (2013-2023)",
     fontsize=11, fontweight="bold", color="#2D3270", va="top"
 )
 fig.text(
     0.07, 0.025,
-    "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada aÃ±o.\n"
-    "Nota: ParticipaciÃ³n de mercado calculada con respecto al nÃºmero de lÃ­neas del servicio mÃ³vil de Internet.",
+    "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.\n"
+    "Nota: Participación de mercado calculada con respecto al número de líneas del servicio móvil de Internet.",
     fontsize=7.5, color="#555555"
 )
 

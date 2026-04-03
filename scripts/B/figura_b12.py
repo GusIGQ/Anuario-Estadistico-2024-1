@@ -1,6 +1,6 @@
 ﻿"""
-Figura B.12 â€” Accesos del Servicio Fijo de Internet por cada 100 hogares (2000-2023)
-Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o,
+Figura B.12 — Accesos del Servicio Fijo de Internet por cada 100 hogares (2000-2023)
+Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año,
         del CONAPO y el INEGI.
 CSV: TD_PENETRACION_H_BAF_ITE_VA.csv
 Columna: P_BAF_E (precalculada por IFT) | Filtro: MES==12
@@ -43,14 +43,14 @@ fig, ax = plt.subplots(figsize=(14, 6))
 fig.patch.set_facecolor("white")
 ax.set_facecolor("white")
 
-aÃ±os    = data["anio"].values
+años    = data["anio"].values
 valores = data["pen"].values
 
-ax.plot(aÃ±os, valores, color=COLOR_LINE, linewidth=2.0, zorder=3)
-ax.scatter(aÃ±os, valores, color=COLOR_DOT, s=30, zorder=4)
+ax.plot(años, valores, color=COLOR_LINE, linewidth=2.0, zorder=3)
+ax.scatter(años, valores, color=COLOR_DOT, s=30, zorder=4)
 
 # Etiquetas sobre cada punto
-for anio, val in zip(aÃ±os, valores):
+for anio, val in zip(años, valores):
     offset = 1.8
     ha = "center"
     ax.annotate(
@@ -64,8 +64,8 @@ for anio, val in zip(aÃ±os, valores):
 # Ejes
 ax.set_xlim(1999.3, 2023.7)
 ax.set_ylim(-5, 85)
-ax.set_xticks(aÃ±os)
-ax.set_xticklabels([str(a) for a in aÃ±os], rotation=0, fontsize=8.5)
+ax.set_xticks(años)
+ax.set_xticklabels([str(a) for a in años], rotation=0, fontsize=8.5)
 ax.set_yticks([])
 ax.tick_params(axis="both", which="both", length=0, labelcolor="#444")
 ax.spines[["top","right","left","bottom"]].set_visible(False)
@@ -85,7 +85,7 @@ ax.set_title(
 )
 fig.text(
     0.01, -0.04,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada aÃ±o, del CONAPO y el INEGI.",
+    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año, del CONAPO y el INEGI.",
     fontsize=7.5, color="#666", style="italic"
 )
 

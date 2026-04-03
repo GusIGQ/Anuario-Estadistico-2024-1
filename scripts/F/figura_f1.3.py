@@ -18,13 +18,13 @@ df = pd.read_csv(ruta_csv, low_memory=False)
 
 # Diccionario de habilidades mapeando la descripción con su columna en la ENDUTIH
 mapa_habilidades = {
-    'Enviar y recibir correo electrÃ³nico': 'P6_8_1',
+    'Enviar y recibir correo electrónico': 'P6_8_1',
     'Descargar contenidos de Internet': 'P6_8_2',
     'Crear archivos de texto': 'P6_8_4',
     'Copiar archivos entre directorios (carpetas)': 'P6_8_3',
     'Crear presentaciones': 'P6_8_6',
-    'Crear hojas de cÃ¡lculo': 'P6_8_5',
-    'Instalar dispositivos perifÃ©ricos': 'P6_8_7',
+    'Crear hojas de cálculo': 'P6_8_5',
+    'Instalar dispositivos periféricos': 'P6_8_7',
     'Crear o usar bases de datos': 'P6_8_8',
     'Programar en lenguaje especializado': 'P6_8_9'
 }
@@ -74,7 +74,7 @@ rects2 = ax.barh(x - width/2, pct_hombres, width, label='Hombres', color='#B4B4B
 
 # Personalización del diseño
 ax.set_xlabel('Porcentaje (%)', fontsize=11)
-ax.set_title('Figura F.1 Habilidades en la computadora\n(Porcentaje con respecto del total de usuarios de computadora)', 
+ax.set_title('Figura F.1.3. Habilidades en la computadora\n(Porcentaje con respecto del total de usuarios de computadora)', 
              pad=20, fontsize=14, fontweight='bold')
 ax.set_yticks(x)
 ax.set_yticklabels(nombres_habilidades, fontsize=11)
@@ -94,7 +94,7 @@ def autolabel(rects):
         # Colocamos la etiqueta a la derecha de la barra
         ax.annotate(f'{int(width_val)}%',
                     xy=(width_val, rect.get_y() + rect.get_height() / 2),
-                    xytext=(15, 0),  # 15 puntos de separaciÃ³n
+                    xytext=(15, 0),  # 15 puntos de separación
                     textcoords="offset points",
                     ha='center', va='center',
                     fontsize=10, fontweight='bold', color='#333333')
@@ -103,9 +103,10 @@ autolabel(rects1)
 autolabel(rects2)
 
 # Ajustar márgenes para que los textos no se corten
+fig.suptitle('Figura F.1.3. Habilidades en la computadora', fontsize=14, fontweight='bold', y=1.02)
 fig.tight_layout()
 
-print("Generando grÃ¡fica...")
+print("Generando Gráfica...")
 
 # Guardar la gráfica en la carpeta de salida
 output_dir = PROJECT_ROOT / "output"
@@ -113,6 +114,6 @@ os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, "figura_f1.3.png")
 # Guardar salida
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
-print(f"GrÃ¡fica guardada en: {output_path}")
+print(f"Gráfica guardada en: {output_path}")
 
 plt.show()

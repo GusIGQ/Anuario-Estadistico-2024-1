@@ -1,5 +1,5 @@
 ﻿"""
-Figura C.2 â€” DistribuciÃ³n del espectro radioelÃ©ctrico por operador y por banda de frecuencia
+Figura C.2 — Distribución del espectro radioeléctrico por operador y por banda de frecuencia
 Fuente: IFT con datos a agosto de 2024.
 Archivo de entrada: datos/C.2/TD_ESPECTRO_BANDA_VA.csv
 Salida: output/Figura_C2.png
@@ -117,7 +117,7 @@ ax.legend(handles=patches, loc="upper right", frameon=False,
 
 # Título y fuente
 fig.text(0.01, 0.97,
-         "Figura C.2. DistribuciÃ³n del espectro radioelÃ©ctrico por operador y por banda de frecuencia",
+         "Figura C.2. Distribución del espectro radioeléctrico por operador y por banda de frecuencia",
          fontsize=12, fontweight="bold", va="top")
 
 fig.text(0.01, 0.02,

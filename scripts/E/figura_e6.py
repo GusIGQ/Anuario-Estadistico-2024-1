@@ -16,13 +16,13 @@ file_path = PROJECT_ROOT / "datos" / "E.6" / "Base de datos_Cuarta Encuesta 2023
 df = pd.read_excel(file_path)
 
 # Definir las columnas a utilizar
-vender_internet_col = 'Â¿CuÃ¡l de las siguientes actividades realiza a travÃ©s de Internet? Vender servicios o productos'
-beneficio_col = 'Â¿CuÃ¡l es el principal beneficio de que la empresa venda a travÃ©s de Internet?'
-size_col = 'ClasificaciÃ³n de la empresa por su tamaÃ±o'
-factor_col = 'Factor de ExpansiÃ³n Final'
+vender_internet_col = '¿Cuál de las siguientes actividades realiza a través de Internet? Vender servicios o productos'
+beneficio_col = '¿Cuál es el principal beneficio de que la empresa venda a través de Internet?'
+size_col = 'Clasificación de la empresa por su tamaño'
+factor_col = 'Factor de Expansión Final'
 
 # Filtrar solo las empresas que SÍ venden por internet
-df_vende = df[df[vender_internet_col] == 'SÃ­']
+df_vende = df[df[vender_internet_col] == 'Sí']
 
 # Función para calcular los porcentajes ponderados
 def obtener_porcentajes(df_subset):
@@ -37,14 +37,14 @@ def obtener_porcentajes(df_subset):
 # Calcular para cada segmento
 datos_general = obtener_porcentajes(df_vende)
 datos_micro = obtener_porcentajes(df_vende[df_vende[size_col] == 'Micro'])
-datos_pequena = obtener_porcentajes(df_vende[df_vende[size_col] == 'PequeÃ±a'])
+datos_pequena = obtener_porcentajes(df_vende[df_vende[size_col] == 'Pequeña'])
 datos_mediana = obtener_porcentajes(df_vende[df_vende[size_col] == 'Mediana'])
 
 # Categorías que queremos graficar (en el orden de la imagen)
 categorias = [
     'Incremento de ventas', 
     'Ampliar canales de venta', 
-    'InclusiÃ³n de marketing digital', 
+    'Inclusión de marketing digital', 
     'La rapidez en la que se realizan las ventas o compras', 
     'Otro'
 ]
@@ -53,7 +53,7 @@ categorias = [
 etiquetas_x = [
     'Incremento de ventas', 
     'Ampliar canales\nde venta', 
-    'InclusiÃ³n de\nmarketing digital', 
+    'Inclusión de\nmarketing digital', 
     'La rapidez en la que se\nrealizan las ventas...', 
     'Otros'
 ]
@@ -69,13 +69,13 @@ valores_mediana = [datos_mediana.get(cat, 0) for cat in categorias]
 # Configuración de colores basados en la infografía
 colores = {
     'General': '#a2d2d9', # Azul claro
-    'Micro': '#f19a9b',   # SalmÃ³n
-    'PequeÃ±a': '#297b93', # Azul oscuro
+    'Micro': '#f19a9b',   # Salmón
+    'Pequeña': '#297b93', # Azul oscuro
     'Mediana': '#ea5b60'  # Rojo
 }
 
 # Preparar las posiciones de las barras
-x = np.arange(len(categorias))  # LocalizaciÃ³n de las etiquetas
+x = np.arange(len(categorias))  # Localización de las etiquetas
 ancho_barra = 0.15              # Ancho de cada barra
 
 # Crear grafica
@@ -84,7 +84,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 # Dibujar las barras para cada segmento
 barras_general = ax.bar(x - ancho_barra*1.5, valores_general, ancho_barra, label='General', color=colores['General'])
 barras_micro = ax.bar(x - ancho_barra*0.5, valores_micro, ancho_barra, label='Micro', color=colores['Micro'])
-barras_pequena = ax.bar(x + ancho_barra*0.5, valores_pequena, ancho_barra, label='PequeÃ±a', color=colores['PequeÃ±a'])
+barras_pequena = ax.bar(x + ancho_barra*0.5, valores_pequena, ancho_barra, label='Pequeña', color=colores['Pequeña'])
 barras_mediana = ax.bar(x + ancho_barra*1.5, valores_mediana, ancho_barra, label='Mediana', color=colores['Mediana'])
 
 # Función para añadir las etiquetas de porcentaje encima de cada barra
@@ -105,7 +105,7 @@ autolabel(barras_mediana)
 
 # Formatear el gráfico
 ax.set_ylabel('Porcentaje (%)')
-ax.set_title('Beneficios de vender a travÃ©s de Internet fijo')
+ax.set_title('Beneficios de vender a través de Internet fijo')
 ax.set_xticks(x)
 ax.set_xticklabels(etiquetas_x)
 ax.set_ylim(0, 65) # Limite en Y para dar espacio a las etiquetas y coincidir con el 60% de la imagen
@@ -122,8 +122,9 @@ ax.yaxis.grid(True, linestyle='--', alpha=0.7)
 ax.set_axisbelow(True)
 
 # Ajustar el diseño para que no se corte nada
+fig.suptitle('Figura E.6. Beneficios de vender a través de Internet para las MiPymes', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 
 # Guardar la gráfica como imagen en lugar de mostrarla
 plt.savefig(PROJECT_ROOT / "output" / "Figura_E6.png", dpi=300, bbox_inches='tight')
-print("Â¡CÃ¡lculo finalizado y grÃ¡fica guardada exitosamente como 'grafica_beneficios_calculada.png'!")
+print("¡Cálculo finalizado y Gráfica guardada exitosamente como 'grafica_beneficios_calculada.png'!")

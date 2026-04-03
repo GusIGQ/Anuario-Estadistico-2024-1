@@ -1,16 +1,16 @@
 ﻿"""
-Figura D.3 â€” Horas promedio de uso de internet por grupos de edad
+Figura D.3 — Horas promedio de uso de internet por grupos de edad
 Fuente: ENDUTIH 2023, INEGI
 
-Variable clave: P7_4 â€” "En promedio, Â¿cuÃ¡ntas horas al dÃ­a utiliza Internet?"
-  Valores: 01 = 1 hora o menos, 02 = 2 horas, ..., 12 = 12 horas o mÃ¡s
-  IMPORTANTE: el valor ya es numÃ©rico (horas), no hay que convertir.
+Variable clave: P7_4 — "En promedio, ¿cuántas horas al día utiliza Internet?"
+  Valores: 01 = 1 hora o menos, 02 = 2 horas, ..., 12 = 12 horas o más
+  IMPORTANTE: el valor ya es numérico (horas), no hay que convertir.
 
-Factor de expansiÃ³n: FAC_PER
+Factor de expansión: FAC_PER
 Edad: EDAD
 
 Archivo a usar: tr_endutih_usuarios_anual_2023.csv
-  (Solo contiene personas que SÃ declararon usar internet â€” P7_1 == 1)
+  (Solo contiene personas que SÍ declararon usar internet — P7_1 == 1)
 """
 
 import pandas as pd
@@ -34,7 +34,7 @@ df = pd.read_csv(RUTA, low_memory=False)
 
 print("Columnas disponibles:", df.columns.tolist())
 print(f"Total de registros: {len(df):,}")
-print(f"\nDistribuciÃ³n de P7_4 (horas de uso):\n{df['P7_4'].value_counts().sort_index()}")
+print(f"\nDistribución de P7_4 (horas de uso):\n{df['P7_4'].value_counts().sort_index()}")
 print(f"\nRango de edades: {df['EDAD'].min()} a {df['EDAD'].max()}")
 
 # 2. LIMPIAR Y PREPARAR
@@ -46,13 +46,13 @@ df['factor'] = pd.to_numeric(df['FAC_PER'], errors='coerce')
 
 # Eliminar registros sin horas o sin factor válido
 df_valido = df.dropna(subset=['horas', 'edad', 'factor']).copy()
-print(f"\nRegistros vÃ¡lidos para cÃ¡lculo: {len(df_valido):,}")
+print(f"\nRegistros válidos para cálculo: {len(df_valido):,}")
 
 # 3. DEFINIR GRUPOS DE EDAD (exactamente como el Anuario)
 
 bins   = [5, 11, 17, 24, 34, 44, 54, 64, 999]
 labels = ['6 a 11', '12 a 17', '18 a 24', '25 a 34',
-          '35 a 44', '45 a 54', '55 a 64', '65 o mÃ¡s']
+          '35 a 44', '45 a 54', '55 a 64', '65 o más']
 
 df_valido['grupo_edad'] = pd.cut(
     df_valido['edad'],
@@ -83,7 +83,7 @@ print("\n=== VALORES ESPERADOS DEL ANUARIO ===")
 esperados = {
     '18 a 24': 5.9, '25 a 34': 5.6, '12 a 17': 4.7,
     '35 a 44': 4.5, '45 a 54': 3.8, '55 a 64': 3.3,
-    '65 o mÃ¡s': 2.9, '6 a 11': 2.5
+    '65 o más': 2.9, '6 a 11': 2.5
 }
 for g, v in esperados.items():
     calculado = resultado[resultado['grupo'] == g]['horas_promedio'].values
@@ -110,7 +110,7 @@ for g, v in esperados.items():
 
 # Orden descendente por horas (como en el Anuario)
 orden_anuario = ['18 a 24', '25 a 34', '12 a 17', '35 a 44',
-                 '45 a 54', '55 a 64', '65 o mÃ¡s', '6 a 11']
+                 '45 a 54', '55 a 64', '65 o más', '6 a 11']
 
 res_ordenado = resultado.set_index('grupo').reindex(orden_anuario).reset_index()
 
@@ -120,7 +120,7 @@ colores = [
     '#2B4E7A',  # 12-17  azul marino
     '#1E6B8A',  # 35-44  azul medio
     '#7EC8C8',  # 45-54  teal claro
-    '#5B6EA8',  # 55-64  azul violÃ¡ceo
+    '#5B6EA8',  # 55-64  azul violáceo
     '#7B8DC8',  # 65+    lavanda
     '#48B8C8',  # 6-11   celeste
 ]

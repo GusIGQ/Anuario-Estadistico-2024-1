@@ -18,10 +18,10 @@ df_fija = pd.read_excel(file_fija)
 df_int_tv = pd.read_excel(file_int_tv)
 
 # 2. Definir las columnas base (Satisfacción general escala 0-100)
-col_movil = 'En tÃ©rminos generales, Â¿quÃ© tan satisfecho se encuentra con el servicio de telefonÃ­a mÃ³vil que ha recibido en los Ãºltimos 12 meses? Recodificada'
-col_fija = 'En tÃ©rminos generales, Â¿quÃ© tan satisfecho se encuentra con el servicio de telefonÃ­a fija que ha recibido en los Ãºltimos 12 meses? Recodificada'
-col_tv = 'En tÃ©rminos generales, Â¿quÃ© tan satisfecho se encuentra con el servicio de televisiÃ³n de paga que ha recibido en los Ãºltimos 12 meses? Recodificada '
-col_int = 'En tÃ©rminos generales, Â¿quÃ© tan satisfecho se encuentra con el servicio de Internet que ha recibido en los Ãºltimos 12 meses? Recodificada '
+col_movil = 'En términos generales, ¿qué tan satisfecho se encuentra con el servicio de telefonía móvil que ha recibido en los últimos 12 meses? Recodificada'
+col_fija = 'En términos generales, ¿qué tan satisfecho se encuentra con el servicio de telefonía fija que ha recibido en los últimos 12 meses? Recodificada'
+col_tv = 'En términos generales, ¿qué tan satisfecho se encuentra con el servicio de televisión de paga que ha recibido en los últimos 12 meses? Recodificada '
+col_int = 'En términos generales, ¿qué tan satisfecho se encuentra con el servicio de Internet que ha recibido en los últimos 12 meses? Recodificada '
 
 # 3. Calcular el promedio directamente desde los datos crudos
 val_movil = df_movil[col_movil].dropna().mean()
@@ -31,7 +31,7 @@ val_int = df_int_tv[col_int].dropna().mean()
 
 # 4. Construir el DataFrame dinámico
 data_calc = {
-    'Servicio': ['Internet fijo', 'TelevisiÃ³n de paga', 'TelefonÃ­a mÃ³vil', 'TelefonÃ­a fija'],
+    'Servicio': ['Internet fijo', 'Televisión de paga', 'Telefonía móvil', 'Telefonía fija'],
     'Calculado': [val_int, val_tv, val_movil, val_fija]
 }
 df_calc = pd.DataFrame(data_calc)
@@ -56,6 +56,7 @@ ax.spines['left'].set_visible(False)
 ax.xaxis.set_visible(False)
 ax.tick_params(axis='y', length=0, labelsize=11)
 
+fig.suptitle('Figura E.1. Índice de satisfacción de los usuarios de servicios de telecomunicaciones', fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 # Guardar salida
 plt.savefig(PROJECT_ROOT / "output" / "Figura_E1.png", dpi=300, bbox_inches='tight')

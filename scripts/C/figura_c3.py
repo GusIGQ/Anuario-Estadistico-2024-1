@@ -1,4 +1,7 @@
-
+"""
+Figura C.3: Evolución de la penetración de servicios de telecomunicaciones
+Revisar: scripts\C\figura_c4.py
+"""
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
