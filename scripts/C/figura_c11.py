@@ -1,7 +1,6 @@
 ﻿"""
 Figura C.11 — Líneas del servicio móvil de acceso a Internet (2010-2023)
-Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.
-Archivo: TD_LINEAS_HIST_INTMOVIL_ITE_VA.csv
+Refactorizado para coincidir con la UI y paleta de colores de Figura C.5.
 """
 
 import pandas as pd
@@ -11,16 +10,12 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
+import matplotlib.ticker as mticker
 import numpy as np
-import sys
+from matplotlib.patches import FancyBboxPatch
 
-# Ruta al CSV
-CSV_PATH = PROJECT_ROOT / "datos" / "C.11" / "TD_LINEAS_HIST_INTMOVIL_ITE_VA.csv"
-OUTPUT   = "output/Figura_C11.png"
-
-# 1. Lectura y limpieza
+# ── 1. Lectura y limpieza ─────────────────────────────────────────────────────
+CSV_PATH = 'datos/C.11/TD_LINEAS_HIST_INTMOVIL_ITE_VA.csv'
 df = pd.read_csv(CSV_PATH, encoding="latin1")
 
 cols_num = ["L_PREPAGO_E", "L_POSPAGO_E", "L_POSPAGOC_E",
@@ -30,108 +25,147 @@ for col in cols_num:
                .str.replace(",", "").str.strip(), errors="coerce")
                .fillna(0))
 
-# 2. Filtrar diciembre 2010-2023 y agregar por año
+# ── 2. Filtrar diciembre 2010-2023 y agregar por año ──────────────────────────
 dic = df[(df["MES"] == 12) & (df["ANIO"] >= 2010) & (df["ANIO"] <= 2023)]
 g   = dic.groupby("ANIO")[cols_num].sum() / 1_000_000   # millones de líneas
 
-# 3. Construir segmentos apilados
-# Antes de 2017 solo existe L_POSPAGO_E; desde 2017 se desagrega en C y L
-# El stacking del Anuario es (de abajo a arriba):
-# Sin segmento Prepago Pospago (pre-2017) Pospago controlado Pospago libre
-
-anios    = g.index.tolist()
-sin_seg  = g["L_NO_ESPECIFICADO_E"].values
+anios    = g.index.values
 prepago  = g["L_PREPAGO_E"].values
-pospago  = g["L_POSPAGO_E"].values        # solo hasta 2016
-pospagoc = g["L_POSPAGOC_E"].values       # desde 2017
-pospagol = g["L_POSPAGOL_E"].values       # desde 2017
+pospago  = g["L_POSPAGO_E"].values        
+pospagoc = g["L_POSPAGOC_E"].values       
+pospagol = g["L_POSPAGOL_E"].values       
+sin_seg  = g["L_NO_ESPECIFICADO_E"].values
 total    = g["L_TOTAL_E"].values
 
-# 4. Figura
-fig, ax = plt.subplots(figsize=(13, 7))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+# ── 3. Paleta Monocromática Teal (Mismos verdes estilo C.5) ───────────────────
+COLOR_PREPAGO   = '#86adae'
+COLOR_POSPAGO   = '#64a0a1'
+COLOR_POSPC     = '#5c9596'
+COLOR_POSPL     = '#4c7d7e'
+COLOR_NOESP     = '#3b6667'
+COLOR_TOTAL     = '#132b2d'  # Verde oscuro casi negro para la línea
+color_texto     = '#3c3c3b'
 
-# Colores (aproximados al Anuario)
-C_SIN_SEG  = "#F4A261"   # salmón / naranja claro  — sin segmento
-C_PREPAGO  = "#90E0EF"   # azul cielo             — prepago
-C_POSPAGO  = "#CAF0F8"   # azul muy claro          — pospago (pre-2017)
-C_POSP_C   = "#023E8A"   # azul marino oscuro      — pospago controlado
-C_POSP_L   = "#0077B6"   # azul medio              — pospago libre
-C_TOTAL    = "#E63946"   # rojo/rosa               — línea total
+# ── 4. Configuración de Gráfica ───────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-x = np.arange(len(anios))
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-# Área apilada rellena (fill_between por segmento)
-bottom_sin  = np.zeros(len(anios))
-bottom_pre  = sin_seg
-bottom_pos  = bottom_pre  + prepago
-bottom_posC = bottom_pos  + pospago
-bottom_posL = bottom_posC + pospagoc
-
-ax.fill_between(x, bottom_sin, bottom_sin + sin_seg,
-                color=C_SIN_SEG, alpha=0.85, label="Líneas sin segmento especificado")
-ax.fill_between(x, bottom_pre, bottom_pre + prepago,
-                color=C_PREPAGO, alpha=0.85, label="Líneas Prepago")
-ax.fill_between(x, bottom_pos, bottom_pos + pospago,
-                color=C_POSPAGO, alpha=0.85, label="Líneas Pospago")
-ax.fill_between(x, bottom_posC, bottom_posC + pospagoc,
-                color=C_POSP_C, alpha=0.85, label="Líneas Pospago controlado")
-ax.fill_between(x, bottom_posL, bottom_posL + pospagol,
-                color=C_POSP_L, alpha=0.85, label="Líneas Pospago libre")
-
-# Línea total
-ax.plot(x, total, color=C_TOTAL, linewidth=2.2, marker="o",
-        markersize=4, zorder=5, label="Líneas totales")
-
-# Etiquetas sobre la línea total (redondeadas a entero, como en el Anuario)
-for xi, (t, a) in enumerate(zip(total, anios)):
-    label = str(int(round(t)))
-    offset = 3.5
-    ax.annotate(label, xy=(xi, t), xytext=(0, offset),
-                textcoords="offset points",
-                ha="center", va="bottom", fontsize=8.5,
-                color=C_TOTAL, fontweight="bold")
-
-# Ejes y estilo
-ax.set_xlim(-0.5, len(anios) - 0.5)
-ax.set_ylim(0, 145)
-ax.set_xticks(x)
-ax.set_xticklabels([str(a) for a in anios], rotation=90, fontsize=9)
-ax.set_ylabel("Millones de líneas", fontsize=10)
-ax.yaxis.set_tick_params(labelsize=9)
-
-# Quitar bordes superior y derecho
-ax.spines["top"].set_visible(False)
-ax.spines["right"].set_visible(False)
-ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.5)
-
-# Título
-ax.set_title(
-    "Figura C.11. Líneas del servicio móvil de acceso a Internet (2010-2023)",
-    fontsize=11, fontweight="bold", loc="left", pad=12
+# Área rellena apilada (Mismo orden y opacidad que C.5)
+ax.stackplot(
+    anios, prepago, pospago, pospagoc, pospagol, sin_seg,
+    labels=[
+        'Líneas Prepago', 'Líneas Pospago', 'Líneas Pospago controlado',
+        'Líneas Pospago libre', 'Líneas sin segmento especificado'
+    ],
+    colors=[COLOR_PREPAGO, COLOR_POSPAGO, COLOR_POSPC, COLOR_POSPL, COLOR_NOESP],
+    alpha=0.85, zorder=2
 )
 
-# Leyenda horizontal abajo
-handles = [
-    mpatches.Patch(color=C_SIN_SEG, label="Líneas sin segmento especificado"),
-    mpatches.Patch(color=C_PREPAGO,  label="Líneas Prepago"),
-    mpatches.Patch(color=C_POSPAGO,  label="Líneas Pospago"),
-    mpatches.Patch(color=C_POSP_C,   label="Líneas Pospago controlado"),
-    mpatches.Patch(color=C_POSP_L,   label="Líneas Pospago libre"),
-    plt.Line2D([0],[0], color=C_TOTAL, linewidth=2, marker="o",
-               markersize=5, label="Líneas totales"),
-]
-ax.legend(handles=handles, loc="upper left", fontsize=8,
-          frameon=False, ncol=3, bbox_to_anchor=(0, -0.18))
+# Línea de totales encima
+ax.plot(anios, total, color=COLOR_TOTAL, linewidth=2.5, marker='o', markersize=6, 
+        markeredgewidth=0, label='Líneas totales', zorder=4)
 
-# Nota al pie
-fig.text(0.05, -0.06,
-    "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.\n"
-    "Nota: A partir de 2017, se comenzó a solicitar la desagregación por pospago libre y pospago controlado.",
-    fontsize=7.5, color="#555555")
+# ── 5. Etiquetas de datos (Chips estilo C.5 horizontales) ─────────────────────
+for yr, t in zip(anios, total):
+    ax.annotate(f"{t:.1f}",
+                xy=(yr, t), xytext=(0, 6), textcoords='offset points',
+                fontsize=8, fontweight='bold', color=color_texto,
+                ha='center', va='bottom', zorder=5,
+                bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=COLOR_TOTAL, linewidth=0.8))
 
-plt.tight_layout()
-# Guardar salida
-plt.savefig(OUTPUT, dpi=180, bbox_inches="tight")
-print(f"Figura guardada: {OUTPUT}")
+# ── 6. Diseño limpio de Ejes ──────────────────────────────────────────────────
+ax.set_ylim(0, 140)
+ax.yaxis.set_major_locator(mticker.MultipleLocator(20))
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
+
+ax.set_xlim(2009.5, 2023.5)
+ax.set_xticks(anios)
+ax.set_xticklabels([])
+ax.tick_params(axis='x', length=0, pad=0)
+
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
+
+# ── 7. Títulos ────────────────────────────────────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+
+ax.annotate("Figura C.11.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" Líneas del servicio móvil de acceso a Internet (2010-2023) [Millones]", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(115, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# ── 8. Leyenda ────────────────────────────────────────────────────────────────
+handles, labels_leg = ax.get_legend_handles_labels()
+fig.legend(handles, labels_leg, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=6, fontsize=10, frameon=False, handlelength=2.5)
+
+# ── 9. Notas al pie ───────────────────────────────────────────────────────────
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.07
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fig.text(x_start + 0.032, y_fuente, 'IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.', fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+y_nota = 0.045
+fig.text(x_start, y_nota, "Nota: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fig.text(x_start + 0.025, y_nota, 'A partir de 2017, se comenzó a solicitar la desagregación por pospago libre y pospago controlado.', fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 10. Layout ────────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+
+# ── 11. Rectángulo redondeado de años — dibujado DESPUÉS del layout ───────────
+# Forzar el render para que las transformaciones estén actualizadas
+fig.canvas.draw()
+
+ax_bbox = ax.get_window_extent()   
+fig_bbox = fig.get_window_extent()  
+
+gap_px   = 0    
+rect_h_px = 28  
+rect_y_px = ax_bbox.y0 - gap_px - rect_h_px
+
+def px_to_fig(x_px, y_px):
+    return (x_px / fig_bbox.width, y_px / fig_bbox.height)
+
+rx0, ry0 = px_to_fig(ax_bbox.x0, rect_y_px)
+rw  = (ax_bbox.x1 - ax_bbox.x0) / fig_bbox.width
+rh  = rect_h_px / fig_bbox.height
+
+radius = 0.008
+
+rect_patch = FancyBboxPatch(
+    (rx0, ry0), rw, rh,
+    boxstyle=f'round,pad=0,rounding_size={radius}',
+    facecolor='#F8F8FA', edgecolor='#7c7c7c', linewidth=0.9,
+    transform=fig.transFigure, clip_on=False, zorder=10
+)
+fig.add_artist(rect_patch)
+
+y_text_fig = ry0 + rh / 2  
+
+for year in anios:
+    x_px, _ = ax.transData.transform((year, 0))
+    x_fig = x_px / fig_bbox.width
+    fig.text(x_fig, y_text_fig, str(year),
+             ha='center', va='center',
+             fontsize=7.5, fontweight='bold', color='#3c3c3b',
+             clip_on=False, zorder=11)
+
+# ── 12. Guardar ───────────────────────────────────────────────────────────────
+plt.savefig('output/Figura_C11.png', dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+plt.savefig('output/Figura_C11.pdf', bbox_inches='tight', facecolor='white', edgecolor='none')
+print("\nGuardado: output/Figura_C11.png y output/Figura_C11.pdf")
+plt.show()

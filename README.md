@@ -8,6 +8,18 @@ de las páginas del INEGI e IFT. Este Anuario saco de un link: [https://www.ift.
 
 ---
 
+## Guía rápida para desarrolladores
+
+- **Códigos:** Se encuentran en la carpeta `scripts/`. **Nota importante:** No se cuenta con un orquestador automatizado; cada figura debe generarse corriendo su script individualmente (código a código).
+- **Resultados:** Las gráficas generadas (imágenes PNG) se guardan en la carpeta `output/`.
+- **Datos:** Los archivos base se ubican en `datos/`.
+- **Documentación adicional:**
+  - **Paleta de Colores:** Ver [reportes/Guia_colores.md](reportes/Guia_colores.md).
+  - **Estilos de Gráficas:** Ver [reportes/clasificacion_estilos.md](reportes/clasificacion_estilos.md).
+  - **Complemento Técnico:** El archivo [README_complemento.md](README_complemento.md) era un intento de documentar todo eso (fuentes, trazabilidad), pero es trabajo que se realizará próximamente ya que no se reportó todo por falta de tiempo.
+
+---
+
 ## Flujo de trabajo por cada figura
 
 ```
@@ -38,7 +50,7 @@ practica 1 - Copy/
 │   ├── mapas/                   ← Shapefiles de México (si se necesitan)
 │   └── otros/                   ← Otros archivos fuente
 │
-├── scripts/                     ← Scripts de Python por figura
+├── scripts/                     ← Scripts de Python por figura (Sin orquestador, correr código a código)
 │   ├── figura_a1.py             ← Figura A.1 - YA COMPLETADA
 │   ├── figura_1_1.py
 │   ├── figura_1_2.py
@@ -100,7 +112,7 @@ Para cada gráfica se documenta lo siguiente:
 
 **Datos utilizados:**
 
-- Fila 7: `B.1bP - Producto interno bruto` (PIB total)
+- uila 7: `B.1bP - Producto interno bruto` (PIB total)
 - Fila 154: `515 - Radio y televisión`
 - Fila 155: `517 - Telecomunicaciones`
 - Columnas: T1 a T4 de cada año (cada año ocupa 7 columnas: T1,T2,T3,T4,6M,9M,Anual)
@@ -131,37 +143,6 @@ Para cada gráfica se documenta lo siguiente:
 
 ---
 
-## Tipos de gráficas esperadas y herramientas
-
-| Tipo de gráfica               | Librería Python       | Notas                           |
-| ------------------------------ | ---------------------- | ------------------------------- |
-| Barras verticales/horizontales | matplotlib             | Ya implementado en A.1          |
-| Líneas / series de tiempo     | matplotlib             | —                              |
-| Pastel / dona                  | matplotlib             | `ax.pie()`                    |
-| Barras apiladas                | matplotlib             | `ax.bar(bottom=...)`          |
-| Mapas de México               | geopandas + matplotlib | Requiere shapefile de entidades |
-| Treemap                        | squarify               | `pip install squarify`        |
-| Dispersión / puntos           | matplotlib             | —                              |
-
----
-
-## Paleta de colores estilo IFT
-
-```python
-# Colores principales del Anuario IFT 2024
-IFT_PURPURA_OSCURO = '#2B1055'
-IFT_PURPURA         = '#7B2D8E'
-IFT_AZUL_CLARO      = '#7597C9'
-IFT_GRIS            = '#6B6B6B'
-IFT_LILA            = '#8B78A8'
-IFT_FONDO           = '#F8F8FA'
-IFT_TEXTO           = '#333333'
-IFT_TEXTO_CLARO     = '#555555'
-IFT_BORDE           = '#CCCCCC'
-```
-
----
-
 ## Cómo reportar el trabajo
 
 ### Opción recomendada: Reporte técnico con fichas
@@ -169,9 +150,8 @@ IFT_BORDE           = '#CCCCCC'
 1. **Portada**: Título, nombre, asesor (Iván), fecha
 2. **Índice de figuras**: Lista de todas las figuras reproducidas
 3. **Por cada figura**:
-   - Captura de la gráfica generada
-   - Ficha técnica (enlace, archivo, filas, columnas, cálculos)
-   - Comparación visual con el original (opcional)
+   - titulo de la figura
+   - Figura png de C:\Users\ivan-\Documents\GitHub\anuario\output
 4. **Conclusiones**: Hasta ahora replicamos las figuras A.1 a A.10. Existe discrepancia entre los datos originales y los calculados. Los datos descargados son datos crudos, mientras que el PDF del anuario presenta datos procesados y redondeados.
 
  El anuario dice  "La información reportada está sujeta a revisiones y a modificaciones derivadas de cambios que realizan los operadores a las cifras previamente reportadas." por lo que es posible que algunas cifras hayan cambiado desde la descarga de los datos, lo cual podría explicar diferencias con el PDF original.
@@ -199,6 +179,4 @@ py -m pip install reportlab             # Para exportar a PDF
 
 ## Vinculo del reporte final
 
-- Índice de figuras: [reporte/indice_figuras.md](reporte/indice_figuras.md)
-- Fichas técnicas: [reporte/fichas_tecnicas.md](reporte/fichas_tecnicas.md)
-- Complemento técnico A.1-A.10: [README_complemento.md](README_complemento.md)
+- Reporte técnico A-G: [17-CRT_DGP_017_2026_reporte.docx](17-CRT_DGP_017_2026_reporte.docx)

@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "sections_order": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "notes": [
+    "Discovery is non-recursive over scripts/<section>/figura_*.py",
+    "scripts/B/b8 is excluded by design"
+  ],
+  "overrides": {
+    "scripts/H/figura_h3.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": false
+    },
+    "scripts/H/figura_h4.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h5.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h6.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h7.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h8.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h9.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h10.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h11.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h12.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h13.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    },
+    "scripts/H/figura_h14.py": {
+      "enabled": true,
+      "expected_png": false,
+      "placeholder": true
+    }
+  }
+}

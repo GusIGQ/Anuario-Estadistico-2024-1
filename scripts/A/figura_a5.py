@@ -1,9 +1,9 @@
-﻿"""
+"""
 Figura A.5 — Inversión Extranjera Directa (IED) en telecomunicaciones
 
 Gráfica de barras horizontales:
-  - Barra larga (azul claro): IED total de México (millones de dólares)
-  - Barra corta (púrpura oscuro): IED en Telecomunicaciones (sector 517 SCIAN)
+  - Barra larga (azul claro -> ahora teal claro): IED total de México (millones de dólares)
+  - Barra corta (púrpura oscuro -> ahora teal oscuro): IED en Telecomunicaciones (sector 517 SCIAN)
 
 Datos actualizados al 3er trimestre de 2025.
 Período: 2013-2024 (2024 acumulado a junio).
@@ -17,12 +17,17 @@ import openpyxl
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
+
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
+
 import matplotlib.ticker as mticker
 
-# 1. Leer datos
+# ── 1. Leer datos ─────────────────────────────────────────────────────────────
 base = os.path.join(os.path.dirname(__file__), "..", "..", 'datos', 'A.5')
 
 # --- IED total de México (datos actualizados) ---
@@ -69,7 +74,7 @@ for row in ws2.iter_rows(min_row=5, max_col=80, values_only=False):
         break
 wb2.close()
 
-# 2. Preparar arrays
+# ── 2. Preparar arrays ────────────────────────────────────────────────────────
 years = list(range(2013, 2025))
 ied_mexico = np.array([total_ied[y] for y in years])
 ied_telecom = np.array([telecom_ied[y] for y in years])
@@ -80,119 +85,115 @@ print("-" * 36)
 for i, yr in enumerate(years):
     print(f"{yr:<6} {ied_mexico[i]:>14,.2f} {ied_telecom[i]:>14,.2f}")
 
-# 3. Gráfica
-fig, ax = plt.subplots(figsize=(14, 8.5))
+# ── 3. Gráfica ESTILO A.9 ─────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+
+fig, ax = plt.subplots(figsize=(16, 8.5))
 fig.patch.set_facecolor('white')
-ax.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
 n = len(years)
 y_pos = np.arange(n)
 bar_height = 0.38
 
-# Colores estilo IFT
-COLOR_MEXICO = '#A8C8E8'     # Azul claro
-COLOR_TELECOM = '#2B1055'    # Púrpura oscuro
+# Colores replicados de Figura A.9
+COLOR_MEXICO = '#86adae'     # Teal claro (sustituye a Azul Claro)
+COLOR_TELECOM = '#335a5c'    # Teal oscuro (sustituye a Púrpura Oscuro)
+color_texto = '#3c3c3b'
 
-# Barras: IED México (barra larga, azul claro)
-bars_mx = ax.barh(y_pos + bar_height / 2, ied_mexico, height=bar_height,
+# Barras horizontales
+bars_mx = ax.barh(y_pos - bar_height / 2, ied_mexico, height=bar_height,
                   color=COLOR_MEXICO, edgecolor='none', zorder=2,
                   label='Inversión Extranjera Directa de México')
 
-# Barras: IED Telecom (barra corta, púrpura oscuro)
-bars_tc = ax.barh(y_pos - bar_height / 2, ied_telecom, height=bar_height,
+bars_tc = ax.barh(y_pos + bar_height / 2, ied_telecom, height=bar_height,
                   color=COLOR_TELECOM, edgecolor='none', zorder=2,
                   label='Inversión Extranjera Directa en Telecomunicaciones')
 
-# 4. Anotaciones de valor
+# ── 4. Anotaciones de valor ───────────────────────────────────────────────────
 for i, yr in enumerate(years):
-    # Valor IED México
     mx_val = ied_mexico[i]
-    ax.text(mx_val + 300, y_pos[i] + bar_height / 2,
-            f'{mx_val:,.0f}'.replace(',', ','),
-            va='center', ha='left', fontsize=8, color='#555555',
-            fontweight='bold')
+    ax.text(mx_val + 300, y_pos[i] - bar_height / 2, f'{mx_val:,.0f}'.replace(',', ','),
+            va='center', ha='left', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
 
-    # Valor IED Telecom
     tc_val = ied_telecom[i]
     if tc_val >= 0:
-        ax.text(tc_val + 300, y_pos[i] - bar_height / 2,
-                f'{tc_val:,.2f}'.replace(',', ','),
-                va='center', ha='left', fontsize=8, color='#555555',
-                fontweight='bold')
+        ax.text(tc_val + 300, y_pos[i] + bar_height / 2, f'{tc_val:,.2f}'.replace(',', ','),
+                va='center', ha='left', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
     else:
-        ax.text(tc_val - 300, y_pos[i] - bar_height / 2,
-                f'{tc_val:,.2f}'.replace(',', ','),
-                va='center', ha='right', fontsize=8, color='#555555',
-                fontweight='bold')
+        ax.text(tc_val - 300, y_pos[i] + bar_height / 2, f'{tc_val:,.2f}'.replace(',', ','),
+                va='center', ha='right', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
 
-# 5. Ejes
+# ── 5. Ejes ───────────────────────────────────────────────────────────────────
 ax.set_yticks(y_pos)
-ax.set_yticklabels(years, fontsize=10, fontweight='bold', color='#333333')
-ax.invert_yaxis()  # 2024 arriba, 2013 abajo
+ax.set_yticklabels(years, fontsize=9, fontweight='normal', color=color_texto)
+ax.invert_yaxis()  # Mantenemos lógica de orden del año original de A.5
 
-ax.set_xlabel('Millones de dólares', fontsize=11, fontweight='bold',
-              color='#333333', labelpad=10)
-ax.set_ylabel('AÑO', fontsize=11, fontweight='bold',
-              color='#333333', labelpad=10)
+ax.set_xlabel('Millones de dólares', fontsize=11, fontweight='medium', color=color_texto, labelpad=15)
+ax.set_ylabel('Año', fontsize=11, fontweight='medium', color=color_texto, labelpad=15)
 
 # Rango del eje X
-x_min = min(ied_telecom.min(), 0) - 2000
+x_min = min(ied_telecom.min(), 0) - 4000
 x_max = ied_mexico.max() + 5000
 ax.set_xlim(x_min, x_max)
 ax.xaxis.set_major_locator(mticker.MultipleLocator(10000))
-ax.xaxis.set_major_formatter(mticker.FuncFormatter(
-    lambda v, _: f'{int(v):,}'.replace(',', ',')))
-ax.tick_params(axis='x', labelsize=9, colors='#555555')
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{int(v):,}'.replace(',', ',')))
+ax.tick_params(axis='x', labelsize=9, colors=color_texto)
 
-# Grid vertical suave
-ax.grid(axis='x', alpha=0.25, color='#999999', zorder=0)
-ax.axvline(x=0, color='#999999', linewidth=0.8, zorder=1)
+# Grid y bordes A.9
+ax.grid(axis='x', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
 
-# Bordes
-for spine in ['top', 'right']:
-    ax.spines[spine].set_visible(False)
-ax.spines['bottom'].set_color('#CCCCCC')
-ax.spines['left'].set_color('#CCCCCC')
+# Lína vertical en 0 (necesaria en esta gráfica por valores negativos)
+ax.axvline(x=0, color='#999999', linewidth=0.8, zorder=1) 
 
-# 6. Título
-fig.text(0.02, 0.96, '■ ', fontsize=12, color='#7B2D8E', fontweight='bold',
-         transform=fig.transFigure, va='top')
-fig.text(0.04, 0.965, 'Figura A.5. ', fontsize=12, color='#333333',
-         fontweight='bold', transform=fig.transFigure, va='top')
-fig.text(0.115, 0.965,
-         'Inversión Extranjera Directa (IED) en telecomunicaciones',
-         fontsize=12, color='#333333', transform=fig.transFigure, va='top')
+# ── 6. Títulos (Bloque Institucional A.9) ─────────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# 7. Leyenda
-ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.14), ncol=2,
-          fontsize=10, frameon=False, handlelength=2.5)
+ax.annotate("Figura A.5.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-# 8. Notas al pie
-note_fuente = (
-    'Fuente: IFT con datos de la Secretaría de Economía (datos actualizados '
-    'al 3er trimestre de 2025). Datos disponibles en:\n'
-    'https://www.gob.mx/se/acciones-y-programas/'
-    'competitividad-y-normatividad-inversion-extranjera-directa?state=published.')
-note_notas = (
-    'Notas: Cifras en millones de dólares de Estados Unidos de América '
-    '(dólares corrientes de cada año). La información mostrada se refiere a '
-    'la Rama 5151 Transmisión de programas de radio y televisión,\n'
-    'Subsector 517 Telecomunicaciones del Sistema de Clasificación Industrial '
-    'de América del Norte (SCIAN). Los datos de 2024 corresponden a la '
-    'inversión acumulada al mes de junio. Para los demás años\n'
-    'se presenta la inversión acumulada al mes de diciembre.')
+ax.annotate(" Inversión Extranjera Directa (IED) en telecomunicaciones", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
 
-fig.text(0.02, 0.02, note_fuente, fontsize=7.5, color='#555555',
-         fontweight='bold', transform=fig.transFigure, va='bottom',
-         linespacing=1.4)
-fig.text(0.02, -0.03, note_notas, fontsize=7.5, color='#555555',
-         transform=fig.transFigure, va='bottom', linespacing=1.4)
+# ── 7. Leyenda ────────────────────────────────────────────────────────────────
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.08), ncol=2, fontsize=10, frameon=False, handlelength=2.5)
 
-# 9. Guardar
-fig.subplots_adjust(left=0.07, right=0.92, top=0.92, bottom=0.15)
+# ── 8. Notas al pie ───────────────────────────────────────────────────────────
+font_size_notes = 8
+x_start = 0.08
+
+# Fuente
+y_fuente = 0.06
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+note_fuente = 'IFT con datos de la Secretaría de Economía (datos actualizados al 3er trimestre de 2025). Datos disponibles en: https://www.gob.mx/se/acciones-y-programas/...'
+ax.annotate(note_fuente, xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Notas
+y_nota = 0.042
+ax.annotate("Notas: ", xy=(x_start, y_nota), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+note_notas = 'Cifras en millones de dólares (dólares corrientes). Rama 5151 Transmisión de programas de radio y TV, Subsector 517 Telecomunicaciones. 2024 acumulada a junio.'
+ax.annotate(note_notas, xy=(x_start, y_nota), xycoords='figure fraction',
+            xytext=(32, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 9. Guardar ────────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
 output_path = os.path.join(os.path.dirname(__file__), "..", "..", 'output', 'Figura_A5.png')
-# Guardar salida
-fig.savefig(output_path, dpi=200, bbox_inches='tight',
-            facecolor='white', edgecolor='none')
+fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
 print(f"\nGráfica guardada en: {output_path}")
 plt.close(fig)

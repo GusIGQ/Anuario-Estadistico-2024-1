@@ -1,33 +1,24 @@
-# /usr/bin/env python3
-# - - coding: utf-8 - -
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Script para generar la Figura A.4: Inversión privada en Telecomunicaciones por tipo de inversión
+Replicando el estilo UI institucional de B.17 con chips exteriores y líneas cuadradas
 """
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
-import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
 import numpy as np
-import locale
 from pathlib import Path
 import sys
+import os
 
-# Configurar locale para formato de números en español
+# ─── Configuración del Logger y Rutas ─────────────────────────────────────────────
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 try:
-    locale.setlocale(locale.LC_ALL, 'es_ES.UTF-8')
-except:
-    try:
-        locale.setlocale(locale.LC_ALL, 'Spanish_Spain.1252')
-    except:
-        print("No se pudo configurar el locale español")
-
-# Configurar matplotlib para español
-plt.rcParams['font.size'] = 10
-plt.rcParams['font.family'] = 'sans-serif'
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
 def clean_numeric_column(col):
     """Limpia columnas numéricas que pueden tener comas y espacios"""
@@ -35,31 +26,24 @@ def clean_numeric_column(col):
         return 0.0
     if isinstance(col, (int, float)):
         return col
-    # Convertir a string y limpiar
     col_str = str(col).strip()
-    # Si es un guión o está vacío, retornar 0
     if col_str == '-' or col_str == '' or col_str == 'nan':
         return 0.0
     try:
-        # Remover espacios y comas, convertir a float
         return float(col_str.replace(',', '').replace(' ', ''))
     except (ValueError, TypeError):
         return 0.0
 
 def main():
-    # Rutas de archivos
-    base_path = Path(__file__).parent.parent.parent
-    data_file = base_path / "datos" / "A.4" / "TD_INVERSION_TELECOM_ITE_VA.csv"
-    output_dir = base_path / "output"
-
-    # Crear directorio de salida si no existe
-    output_dir.mkdir(exist_ok=True)
-
+    base_path = Path(__file__).parent.parent
+    repo_root = base_path.parent
+    data_file = repo_root / "datos" / "A.4" / "TD_INVERSION_TELECOM_ITE_VA.csv"
+    output_dir = repo_root / "output"
+    output_dir.mkdir(exist_ok=True, parents=True)
+    
     print(f"Leyendo datos desde: {data_file}")
-
-    # Leer el archivo CSV
+    
     try:
-        # Cargar datos
         df = pd.read_csv(data_file, encoding='utf-8')
     except UnicodeDecodeError:
         try:
@@ -67,164 +51,140 @@ def main():
         except Exception as e:
             print(f"Error leyendo el archivo: {e}")
             return
-
-    print(f"Datos cargados: {len(df)} filas")
-    print(f"Columnas: {list(df.columns)}")
-    print(f"años disponibles: {sorted(df['ANIO'].unique())}")
-
-    # Usar los nombres exactos de las columnas con espacios
+            
     investment_cols = [' INV_INFRA_E ', ' INV_ACT_NO_TANG_E  ', ' INV_OTRO_ACT_E ', ' INV_NO_ESP_E ', ' INV_TOTAL_E ']
-
-    # Limpiar y convertir columnas numéricas
+    
     for col in investment_cols:
         if col in df.columns:
             df[col] = df[col].apply(clean_numeric_column)
-
-    # Filtrar años 2013-2023 (según la figura)
+            
     df_filtered = df[(df['ANIO'] >= 2013) & (df['ANIO'] <= 2023)].copy()
-
-    print(f"Datos filtrados (2013-2023): {len(df_filtered)} filas")
-
-    # Agrupar por año y sumar inversiones (en miles de pesos)
     yearly_totals = df_filtered.groupby('ANIO')[investment_cols].sum()
-
-    # Convertir a miles de millones de pesos
     yearly_totals_billions = yearly_totals / 1_000_000
-
-    print("Totales por año (miles de millones de pesos):")
-    print(yearly_totals_billions)
-
-    # Preparar datos para la gráfica
-    years = yearly_totals_billions.index.tolist()
+    
+    years = [int(y) for y in yearly_totals_billions.index.tolist()]
     infra = yearly_totals_billions[' INV_INFRA_E '].values
     otros = yearly_totals_billions[' INV_OTRO_ACT_E '].values 
     no_tangibles = yearly_totals_billions[' INV_ACT_NO_TANG_E  '].values
     no_especificada = yearly_totals_billions[' INV_NO_ESP_E '].values
     totals = yearly_totals_billions[' INV_TOTAL_E '].values
-
-    # Configurar la figura
-    fig, ax = plt.subplots(1, 1, figsize=(14, 8))
-
-    # Definir colores según la imagen
-    colors = {
-        'infra': '#2E5984',        # Azul oscuro para infraestructura
-        'otros': '#A8CDF0',        # Azul claro para otros activos
-        'no_tangibles': '#1A365D', # Azul muy oscuro para activos no tangibles
-        'no_especificada': '#E53E3E' # Rojo para no especificada
+    
+    # --- Configuración Estilo Institucional ---
+    plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+    C_TEXT = '#3c3c3b'
+    
+    fig, ax = plt.subplots(figsize=(16, 8.5))
+    fig.patch.set_facecolor('white')
+    ax.set_facecolor('#F8F8FA')
+    
+    # Categorías organizadas de forma secuencial
+    CATEGORIAS = ['Infraestructura', 'Otros Activos', 'Activos No Tangibles', 'No Especificada']
+    VALS_DICT = {
+        'Infraestructura': infra,
+        'Otros Activos': otros,
+        'Activos No Tangibles': no_tangibles,
+        'No Especificada': no_especificada
     }
-
-    # Crear barras apiladas
-    width = 0.6
+    COLORES_DICT = {
+        'Infraestructura': '#234244',
+        'Otros Activos': '#4c7d7e',
+        'Activos No Tangibles': '#64a0a1',
+        'No Especificada': '#86adae'
+    }
+    
     x_pos = np.arange(len(years))
+    width = 0.45  # Ancho esbelto idéntico al esquema de B.17
+    
+    # --- Construcción de Barras Apiladas ---
+    bottoms = np.zeros(len(years))
+    bottoms_dict = {}
+    
+    for cat in CATEGORIAS:
+        vals = VALS_DICT[cat]
+        bottoms_dict[cat] = bottoms.copy()
+        ax.bar(x_pos, vals, width, bottom=bottoms, color=COLORES_DICT[cat], label=cat, edgecolor='white', linewidth=0.5, zorder=3)
+        bottoms += vals
 
-    # Crear las barras apiladas
-    p1 = ax.bar(x_pos, infra, width, color=colors['infra'], label='Infraestructura')
-    p2 = ax.bar(x_pos, otros, width, bottom=infra, color=colors['otros'], label='Otros Activos')
-    p3 = ax.bar(x_pos, no_tangibles, width, bottom=infra+otros, color=colors['no_tangibles'], label='Activos No Tangibles')
-    p4 = ax.bar(x_pos, no_especificada, width, bottom=infra+otros+no_tangibles, color=colors['no_especificada'], label='No Especificada')
+    # --- Lógica de Chips con Líneas Cuadradas Escalonadas (Anti-colisión) ---
+    chip_style = dict(boxstyle="round,pad=0.3,rounding_size=0.6", fc="white", ec="#D1D1DF", lw=1.2)
+    max_total = max(totals)
+    min_dist = max_total * 0.045  # Distancia vertical adaptada a la escala de inversión
 
-    # Configurar ejes
-    ax.set_xlabel('')
-    ax.set_ylabel('')
-    ax.set_title('')
+    for i, x_val in enumerate(x_pos):
+        last_y = -min_dist
+        
+        # Valor total arriba de la barra
+        ax.text(i, totals[i] + max_total * 0.015, f'${totals[i]:.1f}', 
+                ha='center', va='bottom', fontweight='bold', fontsize=9, color=C_TEXT, zorder=4)
+        
+        for j, cat in enumerate(CATEGORIAS):
+            val = VALS_DICT[cat][i]
+            if val >= 0.1:  # Renderizar chip si existe un valor significativo
+                pct = (val / totals[i]) * 100 if totals[i] > 0 else 0
+                y_center = bottoms_dict[cat][i] + val / 2
+                
+                # Prevención de solapamiento
+                y_text = max(y_center, last_y + min_dist)
+                last_y = y_text
+                
+                # Desplazamiento exterior horizontal
+                x_text = x_val - (width / 2) - 0.12
+                x_target = x_val - (width / 2)
+                
+                # Escalonado sutil para evitar cruce de líneas verticales
+                x_elbow = x_text + 0.02 + (j * 0.008)
+                
+                # Trazo de la línea guía cuadrada (Horizontal -> Vertical -> Horizontal)
+                ax.plot([x_text, x_elbow, x_elbow, x_target], 
+                        [y_text, y_text, y_center, y_center], 
+                        color="#A0A0B0", lw=1.2, zorder=3)
+                
+                # Colocación de la etiqueta dentro del contenedor blanco
+                chip_text = f"{pct:.1f}%"
+                ax.annotate(chip_text, xy=(x_text, y_text),
+                            ha="right", va="center",
+                            bbox=chip_style, color=COLORES_DICT[cat], fontweight='bold', fontsize=8,
+                            zorder=4)
+
+    # --- Ejes ---
     ax.set_xticks(x_pos)
-    ax.set_xticklabels(years)
-
-    # Añadir etiquetas de valores totales y porcentajes
-    for i, (year, total) in enumerate(zip(years, totals)):
-        # Valor total en la parte superior
-        ax.text(i, total + total*0.02, f'${total:,.2f}', 
-                ha='center', va='bottom', fontweight='bold', fontsize=9)
-
-        # Calcular porcentajes
-        if total > 0:
-            pct_infra = (infra[i] / total) * 100
-            pct_otros = (otros[i] / total) * 100 
-            pct_no_tangibles = (no_tangibles[i] / total) * 100
-            pct_no_especificada = (no_especificada[i] / total) * 100
-
-            # Añadir porcentajes en las barras (solo si son significativos)
-            cumm = 0
-            if pct_infra > 5:  # Solo mostrar si es mayor a 5%
-                y_pos = cumm + infra[i]/2
-                ax.text(i, y_pos, f'{pct_infra:.1f}%', ha='center', va='center', 
-                       color='white', fontweight='bold', fontsize=8)
-            cumm += infra[i]
-
-            if pct_otros > 5:
-                y_pos = cumm + otros[i]/2
-                ax.text(i, y_pos, f'{pct_otros:.1f}%', ha='center', va='center',
-                       color='black', fontweight='bold', fontsize=8)
-            cumm += otros[i]
-
-            if pct_no_tangibles > 5:
-                y_pos = cumm + no_tangibles[i]/2  
-                ax.text(i, y_pos, f'{pct_no_tangibles:.1f}%', ha='center', va='center',
-                       color='white', fontweight='bold', fontsize=8)
-            cumm += no_tangibles[i]
-
-            if pct_no_especificada > 5:
-                y_pos = cumm + no_especificada[i]/2
-                ax.text(i, y_pos, f'{pct_no_especificada:.1f}%', ha='center', va='center',
-                       color='white', fontweight='bold', fontsize=8)
-
-    # Configurar leyenda
-    ax.legend(loc='upper right', bbox_to_anchor=(1.0, 1.0), frameon=False)
-
-    # Configurar límites del eje Y
-    ax.set_ylim(0, max(totals) * 1.1)
-
-    # Eliminar bordes superiores e izquierdos
+    ax.set_xticklabels(years, fontsize=10, fontweight='bold', color=C_TEXT)
+    ax.tick_params(axis='x', length=0, pad=8)
+    
+    ax.set_xlim(-0.8, len(years) - 0.2)  # Margen izquierdo suficiente para los primeros chips
+    ax.set_ylim(0, max_total * 1.15)
+    ax.set_yticks([])  # Ocultar marcas numéricas del eje Y
+    
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_color('#7c7c7c')
+    ax.spines['bottom'].set_linewidth(1)
+    
+    ax.grid(True, axis='y', color='#d1d1d1', linestyle='-', linewidth=1, zorder=0)
 
-    # Configurar formato del eje Y
-    import matplotlib.ticker as ticker
-    def format_money_axis(x, pos):
-        if x >= 1e6:
-            return f'${x*1e-6:,.1f}M'
-        elif x >= 1e3:
-            return f'${x*1e-3:,.1f}K'
-        else:
-            return f'${x:,.0f}'
-    ax.yaxis.set_major_formatter(ticker.FuncFormatter(format_money_axis))
+    # --- Encabezado Institucional ---
+    fig.text(0.08, 0.92, '   ', fontsize=2, va='center',
+             bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+    fig.text(0.095, 0.92, 'Figura A.4.', fontsize=14, fontweight='bold', color=C_TEXT, va='center')
+    fig.text(0.17, 0.92, 'Inversión privada en Telecomunicaciones por tipo de inversión', 
+               fontsize=14, fontweight='medium', color=C_TEXT, va='center')
 
-    # Configurar grid sutil
-    ax.grid(True, axis='y', alpha=0.3, linestyle='-', linewidth=0.5)
-    ax.set_axisbelow(True)
+    # --- Leyenda ---
+    handles, labels = ax.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.08),
+               ncol=4, frameon=False, prop={'weight': 'bold', 'size': 10}, labelcolor=C_TEXT)
 
-    # Añadir título y texto descriptivo
-    fig.suptitle('Figura A.4. Inversión privada en Telecomunicaciones por tipo de inversión', 
-                 fontsize=14, fontweight='bold', color='#CC7A00', x=0.02, y=0.95, ha='left')
+    # --- Pie de página ---
+    fig.text(0.08, 0.05, "Fuente:", fontweight='bold', fontsize=8, color=C_TEXT)
+    fig.text(0.115, 0.05, "IFT con datos proporcionados por los operadores de telecomunicaciones. Para cada año la inversión se presenta acumulada al mes de diciembre.", fontsize=8, color=C_TEXT)
+    fig.text(0.08, 0.03, "Nota:", fontweight='bold', fontsize=8, color=C_TEXT)
+    fig.text(0.108, 0.03, "Cifras en miles de millones de pesos (pesos corrientes de cada año). Solo se considera la inversión realizada por operadores de servicios de telecomunicaciones.", fontsize=8, color=C_TEXT)
 
-    # Añadir cuadro de texto con descripción
-    description = ("La inversión privada total realizada por los\n"
-                  "operadores de telecomunicaciones en 2023\n" 
-                  "fue de $55.7 mil millones de pesos. De la cual,\n"
-                  "la mayor parte fue dirigida a infraestructura\n"
-                  "con un 72.8% del total de la inversión en el\n"
-                  "sector.")
-
-    # Crear cuadro de texto
-    textbox_props = dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8, edgecolor='gray')
-    ax.text(0.02, 0.98, description, transform=ax.transAxes, fontsize=10,
-            verticalalignment='top', bbox=textbox_props)
-
-    # Añadir nota al pie
-    note = ("Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones. Para cada año la inversión se presenta acumulada al mes de diciembre.\n"
-           "Notas: Cifras en miles de millones de pesos (pesos corrientes de cada año). Solo se considera la inversión realizada por operadores de servicios de telecomunicaciones.")
-
-    fig.text(0.02, 0.02, note, fontsize=8, style='italic', wrap=True)
-
-    # Ajustar layout
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.85, bottom=0.15)
-
-    # Guardar la figura
+    plt.subplots_adjust(left=0.10, right=0.92, top=0.85, bottom=0.18)
+    
     output_file = output_dir / "Figura_A4.png"
-    # Guardar salida
-    plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.savefig(output_file, dpi=200, bbox_inches='tight', facecolor='white')
     print(f"Figura guardada en: {output_file}")
     plt.close(fig)
 

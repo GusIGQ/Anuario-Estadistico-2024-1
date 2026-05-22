@@ -4,52 +4,35 @@ Figura D.5 — ¿Cómo aprendió a buscar información o usar el Internet?
 
 Fuente : IFT, con información de la Encuesta de Confianza en el Servicio de
          Internet (ECSI) 2024.
-Archivo: baseconfianzadigital__1_.csv
-         (descargable desde la sección "Encuestas a Usuarios" en
-          https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml)
-Salida : output/Figura_D5.png
-
-Metodología
------------
-Universo  : Personas usuarias de Internet (rescate_internet == 1).
-Factor    : fac_per  (factor de expansión de personas â‰¥ 18 años).
-Variables : apren_uso_int_1  (P13_1) – Por su cuenta (Sin ayuda)
-            apren_uso_int_2  (P13_2) – Capacitación en el trabajo
-            apren_uso_int_3  (P13_3) – Curso en la escuela
-            apren_uso_int_4  (P13_4) – Curso en centro comunitario
-            apren_uso_int_5  (P13_5) – Curso particular
-            apren_uso_int_6  (P13_6) – Amigos o familiares
-            apren_uso_int_8  (P13_8) – Otros
-            apren_uso_int_9  (P13_9) – NS/NR
-Fórmula   : % = SUM(fac_per | var == 1) / SUM(fac_per) × 100
-
-Nota      : Respuesta múltiple — los porcentajes no suman 100 %.
-            Los porcentajes consideran el diseño muestral de la encuesta.
 """
 
 import os
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.ticker as mticker
-import numpy as np
 
+# ───────────────────────────────────────────────────────────────────────
 # 1. Rutas
-DATOS_DIR = os.path.join(PROJECT_ROOT / "datos" / "D.5")
-OUT_DIR   = os.path.join(PROJECT_ROOT / "output")
+# ───────────────────────────────────────────────────────────────────────
+CSV_PATH = Path(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\D.5\baseconfianzadigital.csv")
+OUT_DIR  = Path(r"C:\Users\ivan-\Documents\GitHub\anuario\output")
 
-CSV_PATH = os.path.join(PROJECT_ROOT / "datos" / "D.5" / "baseconfianzadigital.csv")
-
+# ───────────────────────────────────────────────────────────────────────
 # 2. Carga y filtro
+# ───────────────────────────────────────────────────────────────────────
+print("Cargando la base de datos...")
 df       = pd.read_csv(CSV_PATH, low_memory=False)
 usuarios = df[df["rescate_internet"] == 1].copy()
 
+# ───────────────────────────────────────────────────────────────────────
 # 3. Variables en el orden del Anuario
+# ───────────────────────────────────────────────────────────────────────
 VARS = {
     "apren_uso_int_1": "Por su cuenta",
     "apren_uso_int_2": "Capacitación en\nel trabajo",
@@ -61,88 +44,110 @@ VARS = {
     "apren_uso_int_9": "NS/NR",
 }
 
+# ───────────────────────────────────────────────────────────────────────
 # 4. Cálculo ponderado
+# ───────────────────────────────────────────────────────────────────────
 total_pond = usuarios["fac_per"].sum()
 resultados = {}
 for var, etiqueta in VARS.items():
     n = usuarios[usuarios[var] == 1]["fac_per"].sum()
     resultados[etiqueta] = round(n / total_pond * 100, 1)
 
-# Verificación en consola
-print("Valores calculados:")
+print("\nValores calculados:")
 for etiqueta, pct in resultados.items():
     print(f"  {etiqueta.replace(chr(10),' '):35s}: {pct:.1f}%")
 
+# ───────────────────────────────────────────────────────────────────────
 # 5. Estructura para la gráfica
+# ───────────────────────────────────────────────────────────────────────
 etiquetas = list(resultados.keys())
 valores   = list(resultados.values())
-n_cat     = len(etiquetas)
-x         = np.arange(n_cat)
+x         = np.arange(len(etiquetas))
+width     = 0.55
 
-# Colores: barra destacada (Por su cuenta) en rojo-salmón,
-# resto en azul oscuro / azul medio, igual que el Anuario
-COLORES = [
-    "#E8937A",  # Por su cuenta          â†’ salmón/rojo (barra más alta)
-    "#E8937A",  # Capacitación trabajo   â†’ salmón
-    "#1F4E6B",  # Curso escuela          â†’ azul oscuro
-    "#A8D5DC",  # Curso centro comunit.  â†’ azul claro
-    "#A8D5DC",  # Curso particular       â†’ azul claro
-    "#1F4E6B",  # Amigos o familiares    â†’ azul oscuro
-    "#A8D5DC",  # Otros                  â†’ azul claro
-    "#A8D5DC",  # NS/NR                  â†’ azul claro
-]
+# ───────────────────────────────────────────────────────────────────────
+# 6. Gráficar con el estilo institucional (Ref: Figura D.3)
+# ───────────────────────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# 6. Gráfica
-fig, ax = plt.subplots(figsize=(13, 7))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-bars = ax.bar(x, valores, width=0.55, color=COLORES, zorder=3)
+# Paleta Teal Monocromática (mismos 8 colores de la Figura D.3)
+COLORES_CRT = ['#86adae', '#64a0a1', '#5c9596', '#4c7d7e', '#3b6667', '#335a5c', '#234244', '#132b2d']
+color_texto = '#3c3c3b'
 
-# Etiquetas sobre cada barra
-for bar, val in zip(bars, valores):
-    ax.text(
-        bar.get_x() + bar.get_width() / 2,
-        bar.get_height() + 0.4,
-        f"{val:.1f}%",
-        ha="center", va="bottom",
-        fontsize=9, fontweight="bold", color="#333333"
-    )
+# Dibujar las barras con la paleta de colores
+bars = ax.bar(x, valores, width, color=COLORES_CRT, edgecolor='none', zorder=2)
 
-# 7. Formato de ejes
+# Etiquetas de datos (Chips) con borde dinámico
+for rect in bars:
+    height = rect.get_height()
+    bar_color = rect.get_facecolor() # Extrae el color individual para el borde del chip
+    ax.annotate(f'{height:.1f}%',
+                xy=(rect.get_x() + rect.get_width() / 2, height),
+                xytext=(0, 6),
+                textcoords="offset points",
+                ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
+
+# Diseño limpio de Ejes conforme a D.3
 ax.set_xticks(x)
-ax.set_xticklabels(etiquetas, fontsize=9, ha="center", color="#333333")
-ax.set_ylim(0, 65)
-ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{int(v)}%"))
-ax.set_yticks(range(0, 70, 10))
-ax.tick_params(axis="y", labelsize=9, colors="#555555")
+ax.set_xticklabels([])
+ax.tick_params(axis='x', length=0, pad=8)
 
-ax.yaxis.grid(True, linestyle="--", linewidth=0.5, color="#CCCCCC", zorder=0)
-ax.set_axisbelow(True)
-for spine in ax.spines.values():
-    spine.set_visible(False)
-ax.tick_params(axis="x", bottom=False)
+for idx, (group, color) in enumerate(zip(etiquetas, COLORES_CRT)):
+    # Desplazamiento horizontal ligeramente ajustado para centrar mejor textos de múltiples líneas
+    offset_x_cuadro = 0.30
+    offset_x_texto = 0.20
+    
+    # Cuadrado de color
+    ax.annotate('   ', xy=(idx - offset_x_cuadro, -0.04), xycoords=ax.get_xaxis_transform(),
+                bbox=dict(boxstyle="round,pad=0.2,rounding_size=0.4", facecolor=color, edgecolor='none'),
+                ha='center', va='center')
+    # Etiqueta de texto
+    ax.annotate(group, xy=(idx - offset_x_texto, -0.04), xycoords=ax.get_xaxis_transform(),
+                fontsize=9, fontweight='bold', color=color_texto, ha='left', va='center', linespacing=1.2)
 
-# 8. Título y notas
-ax.set_title(
-    "Figura D.5. ¿Cómo aprendió a buscar información o usar el Internet?\n"
-    "(Porcentaje de personas usuarias de Internet)",
-    fontsize=11, fontweight="bold", color="#1F4E6B",
-    pad=14, loc="left"
-)
+ax.set_ylim(0, max(valores) * 1.25)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
 
-nota = (
-    "Fuente: IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n"
-    "Nota: Los porcentajes reportados consideran el diseño muestral de la encuesta."
-)
-fig.text(0.01, -0.02, nota, fontsize=7.5, color="#555555", ha="left", va="top")
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
 
-plt.tight_layout()
+# Títulos
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# 9. Guardar
-out_path = os.path.join(OUT_DIR, "Figura_D5.png")
-# Guardar salida
-plt.savefig(out_path, dpi=150, bbox_inches="tight",
-            facecolor="white", edgecolor="none")
-plt.close()
-print(f"\nFigura guardada en: {out_path}")
+ax.annotate("Figura D.5.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" ¿Cómo aprendió a buscar información o usar el Internet?", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(100, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# Notas al pie
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.08
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = ('IFT, con información de la Encuesta de Confianza en el Servicio de Internet (ECSI) 2024.\n'
+               'Nota: Los porcentajes reportados consideran el diseño muestral de la encuesta.')
+fig.text(x_start + 0.032, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top', linespacing=1.5)
+
+# Guardar
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+out_path = OUT_DIR / "Figura_D5.png"
+plt.savefig(out_path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"\n¡Figura D.5 construida y validada con estilo institucional en {out_path}!")

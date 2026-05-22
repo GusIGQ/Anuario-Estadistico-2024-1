@@ -1,58 +1,99 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+import numpy as np
 
-# 1. Cargar datos
-df = pd.read_csv(PROJECT_ROOT / "datos" / "B.5" / "TD_PENETRACION_H_TELFIJA_ITE_VA.csv", encoding='latin1')
+# ── 1. Cargar datos ────────────────────────────────────────────────────────
+df = pd.read_csv(r'C:\Users\ivan-\Documents\GitHub\anuario\datos\B.5\TD_PENETRACION_H_TELFIJA_ITE_VA.csv', encoding='latin1')
 
-# 2. Filtrar: solo diciembre (MES 12), rango 1971-2023
+# ── 2. Filtrar: solo diciembre (MES=12), rango 1971-2023 ───────────────────
 # La columna P_H_TELFIJA_E ya contiene el cálculo: líneas / 100 hogares
 df_plot = df[(df['MES'] == 12) & (df['ANIO'] >= 1971) & (df['ANIO'] <= 2023)].copy()
 
-anios   = df_plot['ANIO'].values
+anios = df_plot['ANIO'].values
 valores = df_plot['P_H_TELFIJA_E'].values
 
-# 3. Graficar
-fig, ax = plt.subplots(figsize=(16, 6))
+# ── 3. Configuración de Gráfica (Estilo F.16) ───────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-bars = ax.bar(anios, valores, color='#5B8DB8', width=0.7, zorder=2)
+fig, ax = plt.subplots(figsize=(18, 7.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-# Etiquetas sobre cada barra
-for anio, val, bar in zip(anios, valores, bars):
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
-            str(int(val)), ha='center', va='bottom', fontsize=6.5, color='#333333')
+# Colores institucionales alineados a la Paleta Teal
+COLOR_BARRA = '#335a5c'  # Teal oscuro (mismo tono base utilizado en F.16)
+color_texto = '#3c3c3b'
 
-# 4. Formato de ejes
-ax.set_xlim(1970.2, 2023.8)
-ax.set_ylim(0, 90)
+# Dibujar las barras
+rects = ax.bar(anios, valores, width=0.7, color=COLOR_BARRA, edgecolor='none', zorder=2)
+
+# ── 4. Etiquetas de datos (Chips estilo F.16) ──────────────────────────────
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        bar_color = rect.get_facecolor()
+        # Se formatea a entero tal como en el script original
+        ax.annotate(f'{int(height)}',
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 10),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3, rotation=0,
+                    bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
+
+autolabel(rects)
+
+# ── 5. Diseño limpio de Ejes ───────────────────────────────────────────────
+ax.set_xlim(1970, 2024)
+# Margen extra arriba
+ax.set_ylim(0, max(valores) * 1.15)
+
 ax.set_xticks(anios)
-ax.set_xticklabels(anios, rotation=90, fontsize=7.5)
-ax.yaxis.grid(True, linestyle='--', alpha=0.4)
-ax.set_axisbelow(True)
-ax.spines[['top', 'right']].set_visible(False)
-ax.tick_params(axis='y', labelsize=8)
+ax.set_xticklabels(anios, rotation=90, fontsize=9, fontweight='normal', color=color_texto)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
 
-# 5. Título y fuente
-ax.set_title('Figura B.5. Líneas del Servicio Fijo de Telefonía por cada 100 hogares (1971-2023)',
-             fontsize=11, fontweight='bold', loc='left', pad=10)
-ax.set_ylabel('Líneas por cada 100 hogares', fontsize=9)
+ax.set_ylabel('Líneas por cada 100 hogares', fontsize=10, color=color_texto, labelpad=10)
 
-fig.text(0.01, -0.04,
-         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones '
-         'a diciembre de cada año, del CONAPO y el INEGI.',
-         fontsize=7, color='gray')
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
 
-# 6. Guardar
-plt.tight_layout()
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "Figura_B5.png", dpi=150, bbox_inches='tight')
-print("Figura guardada: Figura_B5.png")
+# ── 6. Títulos (Estilo Institucional F.16) ──────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# 7. Imprimir valores calculados
+ax.annotate("Figura B.5.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" Líneas del Servicio Fijo de Telefonía por cada 100 hogares (1971-2023)", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(100, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# ── 7. Notas al pie ─────────────────────────────────────────────────────────
+font_size_notes = 8
+x_start = 0.04
+y_fuente = 0.04
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = ('IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año, del CONAPO y el INEGI.')
+fig.text(x_start + 0.035, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 8. Guardar ──────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.04, right=0.98, top=0.85, bottom=0.20)
+plt.savefig(r'C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_B5.png', dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print("¡Figura B.5 construida y validada con estilo institucional F.16!")
+
+# ── 9. Imprimir valores calculados ──────────────────────────────────────────
 print("\nValores calculados (líneas por cada 100 hogares, diciembre):")
 print(df_plot[['ANIO', 'P_H_TELFIJA_E']].to_string(index=False))

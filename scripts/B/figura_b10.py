@@ -1,25 +1,24 @@
 ﻿"""
 Figura B.10 (BAF) — Índice Herfindahl-Hirschman. Concentración de mercado
 del Servicio Fijo de Acceso a Internet (2013-2023)
-Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.
-Nota: IHH estimado con respecto al número de accesos del servicio fijo de internet.
-CSV: TD_IHH_BAF_ITE_VA.csv
-Columna: IHH_BAF_E | Filtro: MES==12 | años: 2013-2023
 """
 
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
-import os
 
-# 1. Carga y cálculo
-df = pd.read_csv(PROJECT_ROOT / "datos" / "b.10" / "TD_IHH_BAF_ITE_VA.csv", encoding="latin1")
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
+
+# ── 1. Carga y cálculo ────────────────────────────────────────────────────────
+df = pd.read_csv(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\b.10\TD_IHH_BAF_ITE_VA.csv", encoding="latin1")
 df["IHH_BAF_E"] = (
     df["IHH_BAF_E"].astype(str)
     .str.replace(",", "").str.strip()
@@ -39,67 +38,100 @@ data = data[(data["anio"] >= 2013) & (data["anio"] <= 2023)].reset_index(drop=Tr
 print("Valores calculados IHH BAF:")
 print(data.to_string(index=False))
 
-# 2. Figura
-COLOR_BAR   = "#2A8FA0"   # teal similar al Anuario
-COLOR_LABEL = "#1A3A5C"
+# ── 2. Figura estilo A.9 ──────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Crear grafica
-fig, ax = plt.subplots(figsize=(10, 7))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-años    = data["anio"].values
+COLOR_BAR = '#335a5c'  # Teal oscuro (Extraído de figura_a9)
+color_texto = '#3c3c3b'
+
+años = data["anio"].values
 valores = data["ihh"].values
+y_pos = range(len(años))
+bar_height = 0.55
 
 # Barras horizontales
 bars = ax.barh(
-    [str(a) for a in años],
+    y_pos,
     valores,
     color=COLOR_BAR,
-    height=0.65,
-    zorder=3,
+    height=bar_height,
+    edgecolor='none',
+    zorder=2
 )
 
-# Etiquetas al final de cada barra
-for bar, val in zip(bars, valores):
+# ── 3. Anotaciones de valor ───────────────────────────────────────────────────
+for i, val in enumerate(valores):
     ax.text(
-        val + 30, bar.get_y() + bar.get_height() / 2,
+        val + 50, i,
         f"{int(val):,}",
         va="center", ha="left",
-        fontsize=9.5, color=COLOR_LABEL, fontweight="bold"
+        fontsize=9, color=color_texto, fontweight="normal",
+        zorder=3
     )
 
-# Ejes
+# ── 4. Ejes y Cuadrícula ──────────────────────────────────────────────────────
+ax.set_yticks(y_pos)
+ax.set_yticklabels([str(a) for a in años], fontsize=9, fontweight='normal', color=color_texto)
 ax.set_xlim(0, max(valores) * 1.15)
 ax.invert_yaxis()
-ax.set_xlabel("")
-ax.set_xticks([])
-ax.tick_params(axis="y", which="both", length=0, labelsize=10, labelcolor="#333")
-ax.spines[["top","right","bottom","left"]].set_visible(False)
 
-# Etiquetas de año extremo
-ax.text(
-    -50, 0, "2013", ha="right", va="center",
-    fontsize=9, color="#555"
-)
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{int(v):,}'))
+ax.tick_params(axis='x', labelsize=9, colors=color_texto)
+ax.tick_params(axis='y', length=0)
 
-# Título y fuente
-ax.set_title(
-    "Índice Herfindahl-Hirschman (IHH).\nConcentración de mercado del Servicio Fijo de Internet (2013-2023)",
-    fontsize=11, fontweight="bold", color=COLOR_LABEL,
-    loc="left", pad=12
-)
-fig.text(
-    0.01, -0.02,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
-    "Nota: IHH estimado con respecto al número de accesos del servicio fijo de internet.",
-    fontsize=7.5, color="#666", style="italic"
-)
+# Grid y bordes A.9
+ax.grid(axis='x', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
 
-plt.tight_layout()
+# ── 5. Títulos (Bloque Institucional A.9) ─────────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+
+ax.annotate("Figura B.10.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" Índice Herfindahl-Hirschman (IHH). Concentración de mercado del Servicio Fijo de Internet (2013-2023)", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(115, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# ── 6. Notas al pie (Riguroso estilo A.9) ─────────────────────────────────────
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.06
+y_nota = 0.04
+
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+
+ax.annotate("IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.", 
+            xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+ax.annotate("Nota: ", xy=(x_start, y_nota), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+
+ax.annotate("IHH estimado con respecto al número de accesos del servicio fijo de internet.", 
+            xy=(x_start, y_nota), xycoords='figure fraction',
+            xytext=(26, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 7. Guardar ────────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, "figura_b10.png")
-# Guardar salida
-plt.savefig(output_path, dpi=150, bbox_inches="tight")
-print(f"\nGuardado: {output_path}")
+output_path = os.path.join(output_dir, "Figura_B10.png")
+fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"Gráfica guardada en: {output_path}")
+plt.close(fig)

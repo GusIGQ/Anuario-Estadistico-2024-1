@@ -5,11 +5,10 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 import matplotlib.patches as mpatches
 
 # --- Cargar datos ---
-df = pd.read_csv(PROJECT_ROOT / "datos" / "b.18" / "TD_IHH_BAF_ITE_VA.csv", encoding='utf-8')
+df = pd.read_csv(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\b.18\TD_IHH_BAF_ITE_VA.csv", encoding='utf-8')
 df['IHH_BAF_E'] = pd.to_numeric(
     df['IHH_BAF_E'].astype(str).str.replace(',', '').str.strip(),
     errors='coerce'
@@ -42,7 +41,7 @@ for bar, val in zip(bars, values):
             f'{val:,}', va='center', ha='left', fontsize=10, color=COLOR_LABEL,
             fontweight='bold')
 
-# Eje Y años como categorías
+# Eje Y â€” aÃ±os como categorÃ­as
 ax.set_yticks(years)
 ax.set_yticklabels([str(y) for y in years], fontsize=10)
 ax.invert_yaxis()
@@ -54,9 +53,9 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 
-# Título
+# TÃ­tulo
 ax.set_title(
-    'Figura B.18. Herfindahl-Hirschman (IHH). Concentración de mercado\n'
+    'Figura B.18. Herfindahl-Hirschman (IHH). ConcentraciÃ³n de mercado\n'
     'del Servicio Fijo de Internet (2013-2023)',
     fontsize=12, fontweight='bold', loc='left', pad=15, color=COLOR_LABEL
 )
@@ -64,13 +63,13 @@ ax.set_title(
 # Fuente
 fig.text(0.08, 0.01,
          'Fuente: IFT con datos proporcionados por los operadores de '
-         'telecomunicaciones a diciembre de cada año.\n'
-         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al número '
+         'telecomunicaciones a diciembre de cada aÃ±o.\n'
+         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al nÃºmero '
          'de accesos del servicio fijo de Internet.',
          fontsize=7.5, color='gray')
 
 plt.tight_layout(rect=[0, 0.05, 1, 1])
-# Guardar salida
 plt.savefig('output/Figura_B18.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Guardada: output/Figura_B18.png")
+

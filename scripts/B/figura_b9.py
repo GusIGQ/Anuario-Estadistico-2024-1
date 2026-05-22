@@ -1,48 +1,40 @@
-﻿"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Figura B.9 — Participación de mercado del Servicio Fijo de Telefonía (2013-2023)
-Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones
-        a diciembre de cada año.
-Archivo: TD_MARKET_SHARE_TELFIJA_ITE_VA.csv
-Portal:  https://bit.ift.org.mx/BitWebApp/descargaDatos.xhtml
-         Sección: Servicio Fijo de Telefonía
-
-Metodología:
-- Filtrar MES == 12 (diciembre) y ANIO 2013-2023
-- Mapear operadores individuales a 7 grupos (como en la figura)
-- Los valores de MARKET_SHARE ya están precalculados en el CSV
-- Para 2021: MAXCOM (0.37%) aparece bajo DISH-MVS en el CSV actual
-  â†’ se mantiene en "Otros" (diferencia de redondeo vs Anuario)
-- Para 2023: pequeñas diferencias (~0.3-1%) por revisiones posteriores
-  de operadores (comportamiento documentado en el Anuario)
+Replicando el estilo UI institucional de B.17
 """
 
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-import matplotlib.patches as mpatches
+import os
 import numpy as np
 
-# 1. LECTURA Y LIMPIEZA
-df = pd.read_csv(
-    "datos/b.9/TD_MARKET_SHARE_TELFIJA_ITE_VA.csv",
-    encoding="latin1"
-)
-df["MARKET_SHARE"] = (
-    df["MARKET_SHARE"].str.replace("%", "").str.strip().astype(float)
-)
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+try:
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
-# 2. FILTRO: diciembre, 2013-2023
+# ── 1. LECTURA Y LIMPIEZA ──
+base_path = Path(__file__).parent.parent
+repo_root = base_path.parent
+data_file = repo_root / "datos" / "b.9" / "TD_MARKET_SHARE_TELFIJA_ITE_VA.csv"
+output_dir = repo_root / "output"
+output_dir.mkdir(exist_ok=True, parents=True)
+
+df = pd.read_csv(data_file, encoding="latin1")
+df["MARKET_SHARE"] = df["MARKET_SHARE"].str.replace("%", "").str.strip().astype(float)
+
+# ── 2. FILTRO ──
 df_dic = df[(df["MES"] == 12) & (df["ANIO"].between(2013, 2023))].copy()
 
-# 3. MAPEO DE OPERADORES A GRUPOS
-# Operadores con nombre explícito en la figura mapeo directo
-# El resto Otros
+# ── 3. MAPEO ──
 mapeo = {
-    "América Móvil":  " América Móvil",
+    "AMÉRICA MÓVIL":  "América Móvil",
     "GRUPO TELEVISA": "Grupo Televisa",
     "MEGACABLE-MCM":  "Megacable-MCM",
     "GRUPO SALINAS":  "Grupo Salinas",
@@ -51,129 +43,112 @@ mapeo = {
 }
 df_dic["GRUPO_FIGURA"] = df_dic["GRUPO"].map(mapeo).fillna("Otros")
 
-# 4. PIVOTE: años - grupos
-pivot = (
-    df_dic
-    .groupby(["ANIO", "GRUPO_FIGURA"])["MARKET_SHARE"]
-    .sum()
-    .unstack(fill_value=0)
-)
+# ── 4. PIVOTE ──
+pivot = df_dic.groupby(["ANIO", "GRUPO_FIGURA"])["MARKET_SHARE"].sum().unstack(fill_value=0)
 
-# Orden de columnas igual que en la figura (de abajo a arriba en la barra)
 orden = [
-    " América Móvil",
-    "Grupo Televisa",
-    "Megacable-MCM",
-    "Grupo Salinas",
-    "Axtel",
-    "Telefónica",
-    "Otros",
+    "América Móvil", "Grupo Televisa", "Megacable-MCM",
+    "Grupo Salinas", "Axtel", "Telefónica", "Otros"
 ]
 pivot = pivot.reindex(columns=orden, fill_value=0)
+years = pivot.index.astype(int).tolist()
 
-years = pivot.index.tolist()
-
-# 5. COLORES (paleta del Anuario IFT)
-colores = {
-    " América Móvil":  "#1a3a5c",   # azul marino oscuro
-    "Grupo Televisa": "#4a9fd4",   # azul claro
-    "Megacable-MCM":  "#1b2a4a",   # azul muy oscuro
-    "Grupo Salinas":  "#e8956a",   # naranja
-    "Axtel":          "#d64c3e",   # rojo
-    "Telefónica":     "#5bbfb5",   # turquesa
-    "Otros":          "#7fc8e0",   # azul pálido
+# Colores Institucionales
+COLORES_DICT = {
+    "América Móvil":  "#1e6284",
+    "Grupo Televisa": "#ed8945",
+    "Megacable-MCM":  "#5844a0",
+    "Grupo Salinas":  "#99b554",
+    "Axtel":          "#8e244d",
+    "Telefónica":     "#368491",
+    "Otros":          "#728781",
 }
+colores_list = [COLORES_DICT[g] for g in orden]
 
-# 6. FIGURA
-fig, ax = plt.subplots(figsize=(16, 8))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+# ── 5. CONFIGURACIÓN DE FIGURA ──
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+C_TEXT = '#3c3c3b'
+
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
 x = np.arange(len(years))
-bar_w = 0.55
+width = 0.45 
 
 bottoms = np.zeros(len(years))
-bars_dict = {}
+bottoms_dict = {}
 
-for grupo in orden:
+for grupo, color in zip(orden, colores_list):
     vals = pivot[grupo].values
-    bars = ax.bar(x, vals, bar_w, bottom=bottoms,
-                  color=colores[grupo], label=grupo,
-                  zorder=2)
-    bars_dict[grupo] = (bars, bottoms.copy(), vals)
+    bottoms_dict[grupo] = bottoms.copy()
+    ax.bar(x, vals, width, bottom=bottoms, color=color, label=grupo, edgecolor='white', linewidth=0.5, zorder=3)
     bottoms += vals
 
-# 7. ETIQUETAS DENTRO DE CADA SEGMENTO
-# Solo etiquetas visibles ( 0.5%)
-for grupo in orden:
-    bars, bot, vals = bars_dict[grupo]
-    for i, (bar, b, v) in enumerate(zip(bars, bot, vals)):
-        if v >= 0.5:
-            cy = b + v / 2
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                cy,
-                f"{v:.2f}%",
-                ha="center", va="center",
-                fontsize=6.5, color="white", fontweight="bold",
-                zorder=3
-            )
+# ── 6. ETIQUETAS (Chips y Líneas Cuadradas idéntico a B.17) ──
+chip_style = dict(boxstyle="round,pad=0.3,rounding_size=0.6", fc="white", ec="#D1D1DF", lw=1.2)
+min_dist = 4.0 
 
-# 8. EJES Y ESTILO
+for i, x_val in enumerate(x):
+    last_y = -10
+    
+    for j, (grupo, color) in enumerate(zip(orden, colores_list)):
+        val = pivot[grupo].values[i]
+        if val >= 0.1: 
+            y_center = bottoms_dict[grupo][i] + val / 2
+            
+            y_text = max(y_center, last_y + min_dist)
+            last_y = y_text
+            
+            x_text = x_val - (width / 2) - 0.12 
+            x_target = x_val - (width / 2)
+            
+            x_elbow = x_text + 0.02 + (j * 0.008) 
+            
+            ax.plot([x_text, x_elbow, x_elbow, x_target], 
+                    [y_text, y_text, y_center, y_center], 
+                    color="#A0A0B0", lw=1.2, zorder=3)
+            
+            chip_text = f"{val:.2f}%"
+            ax.annotate(chip_text, xy=(x_text, y_text),
+                        ha="right", va="center",
+                        bbox=chip_style, color=color, fontweight='bold', fontsize=8,
+                        zorder=4)
+
+# ── 7. EJES Y ESTILO ──
 ax.set_xticks(x)
-ax.set_xticklabels(years, fontsize=10)
+ax.set_xticklabels([str(y) for y in years], fontsize=10, fontweight='bold', color=C_TEXT)
+ax.tick_params(axis='x', length=0, pad=8) 
+
 ax.set_ylim(0, 105)
-ax.set_yticks([])
-ax.spines["top"].set_visible(False)
-ax.spines["right"].set_visible(False)
-ax.spines["left"].set_visible(False)
-ax.yaxis.set_visible(False)
-ax.tick_params(axis="x", length=0)
+ax.set_yticks([]) 
 
-# 9. LEYENDA
-handles = [
-    mpatches.Patch(color=colores[g], label=g) for g in orden
-]
-ax.legend(
-    handles=handles,
-    loc="lower center",
-    bbox_to_anchor=(0.5, -0.12),
-    ncol=7,
-    fontsize=8.5,
-    frameon=False,
-    handlelength=1.2,
-    handleheight=0.8,
-)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['bottom'].set_linewidth(1)
 
-# 10. TÍTULO Y FUENTE
-ax.set_title(
-    "Figura B.9. Participación de mercado del Servicio Fijo de Telefonía (2013-2023)",
-    fontsize=12, fontweight="bold", loc="left", pad=14,
-    color="#c0392b"
-)
-fig.text(
-    0.01, -0.04,
-    "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n"
-    "Nota: Participación de mercado estimada con respecto al número de líneas del servicio fijo de telefonía.",
-    fontsize=7.5, color="#555555"
-)
+# ── 8. ENCABEZADO Y PIE ──
+fig.text(0.08, 0.92, '   ', fontsize=2, va='center',
+         bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+fig.text(0.095, 0.92, 'Figura B.9.', fontsize=14, fontweight='bold', color=C_TEXT, va='center')
+fig.text(0.165, 0.92, 'Participación de mercado del Servicio Fijo de Telefonía (2013-2023)', 
+           fontsize=14, fontweight='medium', color=C_TEXT, va='center')
 
-plt.tight_layout(rect=[0, 0.04, 1, 1])
-# Guardar salida
-plt.savefig("figura_B9.png", dpi=180, bbox_inches="tight",
-            facecolor="white")
-plt.close()
-print("figura_B9.png generada")
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.08),
+           ncol=7, frameon=False, prop={'weight': 'bold', 'size': 10}, labelcolor=C_TEXT)
 
-# 11. VERIFICACI N DE VALORES CLAVE
-print("\n=== Verificación vs Anuario (valores clave) ===")
-checks = {
-    2013: (" América Móvil", 70.11),
-    2015: ("Grupo Televisa", 14.76),
-    2019: ("Megacable-MCM", 11.17),
-    2020: ("Grupo Salinas", 11.32),
-}
-for anio, (grp, esperado) in checks.items():
-    calc = pivot.loc[anio, grp]
-    ok = "âœ…" if abs(calc - esperado) < 0.05 else "âš ï¸"
-    print(f"  {anio} {grp}: calculado={calc:.2f}%  esperado={esperado:.2f}%  {ok}")
+fig.text(0.08, 0.05, "Fuente:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.115, 0.05, "IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.", fontsize=8, color=C_TEXT)
+fig.text(0.08, 0.03, "Nota:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.108, 0.03, "Participación de mercado estimada con respecto al número de líneas del servicio fijo de telefonía.", fontsize=8, color=C_TEXT)
+
+plt.subplots_adjust(left=0.10, right=0.92, top=0.85, bottom=0.18)
+
+# ── 9. GUARDAR FIGURA ──
+output_file = output_dir / "figura_B9.png"
+plt.savefig(output_file, dpi=200, bbox_inches='tight', facecolor='white')
+print(f"Guardada: {output_file}")
+plt.close(fig)

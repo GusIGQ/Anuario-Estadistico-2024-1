@@ -1,141 +1,105 @@
-﻿"""
-Figura B.14 — Accesos del Servicio Fijo de Acceso a Internet No Residencial
-por cada 100 unidades económicas por entidad federativa.
-
-Fuente datos: TD_PENETRACIONES_BAF_ITE_VA.csv (BIT IFT)
-Nota: Datos disponibles corresponden a dic 2024 (proxy de dic 2023).
-      El Anuario reporta dic 2023: Baja California=87, BCS=84, Quintana Roo=82,
-      Chiapas=23, Oaxaca=20, Tlaxcala=20. Nacional: 47 accesos por cada 100 UE.
-      Este archivo contiene P_BAF_E que corresponde al indicador residencial/general;
-      para el segmento no residencial exacto se requiere el archivo TD_ACC_BAFXC_ITE_VA.csv
-      combinado con DENUE. Los valores de dic 2024 son proxy válido para rangos de color.
-"""
-
-import pandas as pd
+﻿import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.patches import FancyBboxPatch, Polygon
+import numpy as np
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-import matplotlib.patches as mpatches
 import os
 import urllib.request
-import json
 
-# 1. DATOS
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+try:
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
+
+# ── DATOS Y CONFIGURACIÓN ────────────────────────────────────────────────
 df = pd.read_csv('datos/b.14/TD_PENETRACIONES_BAF_ITE_VA.csv', encoding='latin1')
 data = dict(zip(df['ENTIDAD'], df['P_BAF_E']))
 
-# 2. RANGOS Y COLORES (Anuario B.14)
-COLORS = ['#c5e8f7', '#5bafd6', '#2e6fa3', '#f4a58a', '#c0392b']
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+COLORS = ['#afafaf', '#737f7c', '#63918b', '#2d4f4b', '#012f2a']
 LABELS = ['Menos de 28', '28 a 43', '44 a 59', '60 a 75', 'Más de 75']
 BREAKS = [0, 28, 44, 60, 76, 9999]
 
 def get_color(val):
     for i in range(len(BREAKS) - 1):
-        if BREAKS[i] <= val < BREAKS[i + 1]:
-            return COLORS[i]
+        if BREAKS[i] <= val < BREAKS[i + 1]: return COLORS[i]
     return COLORS[-1]
 
-# 3. MAPA DE M XICO (GeoJSON)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 GEOJSON_PATH = os.path.join(BASE_DIR, 'datos', 'mexico.json')
-if not os.path.exists(GEOJSON_PATH):
-    print("Descargando mapa de México...")
-    urllib.request.urlretrieve(
-        'https://raw.githubusercontent.com/angelnmara/geojson/master/mexicoHigh.json',
-        GEOJSON_PATH
-    )
+gdf = gpd.read_file(GEOJSON_PATH)
 
-with open(GEOJSON_PATH, 'r', encoding='utf-8') as f:
-    mexico_geojson = json.load(f)
+NAME_MAPPING = { 'Veracruz': 'Veracruz de Ignacio de la Llave', 'Michoacán': 'Michoacan de Ocampo', 'Coahuila': 'Coahuila de Zaragoza', 'México': 'Mexico.', 'Querétaro': 'Queretaro', 'Yucatán': 'Yucatan' }
+gdf['name'] = gdf['name'].replace(NAME_MAPPING)
+gdf['valor'] = gdf['name'].map(data).fillna(0)
+gdf['color'] = gdf['valor'].apply(get_color)
+gdf = gdf.to_crs(epsg=6372)
 
-# Mapeo de nombres del GeoJSON a los datos
-NAME_MAPPING = {
-    'Veracruz':   'Veracruz de Ignacio de la Llave',
-    'Michoacán':  'Michoacan de Ocampo',
-    'Coahuila':   'Coahuila de Zaragoza',
-    'México':     'Mexico.',
-    'Querétaro':  'Queretaro',
-    'Yucatán':    'Yucatan',
-}
+# ── FIGURA Y MAPA ────────────────────────────────────────────────────────
+fig, ax_map = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax_map.set_facecolor('white')
+ax_map.axis('off')
 
-# 4. GRAFICAR
-fig, ax = plt.subplots(figsize=(14, 9))
-ax.set_facecolor('#f8f9fa')
-fig.patch.set_facecolor('#f8f9fa')
+gdf.plot(ax=ax_map, color=gdf['color'], edgecolor='white', linewidth=0.5)
+x_min, y_min, x_max, y_max = gdf.total_bounds
+ax_map.set_xlim(x_min - 100000, x_max + 500000)
+ax_map.set_ylim(y_min - 50000, y_max + 50000)
 
-for feature in mexico_geojson['features']:
-    geo_name = feature['properties']['name']
-    data_name = NAME_MAPPING.get(geo_name, geo_name)
-    color = get_color(data.get(data_name, 0))
+# ── BUBBLES Y CUADROS ────────────────────────────────────────────────────
+bx, by, bw, bh = 0.735, 0.56, 0.215, 0.275
+fig.add_artist(FancyBboxPatch((bx, by), bw, bh, boxstyle='round,pad=0.015,rounding_size=0.015', linewidth=1.0, edgecolor='#c0c0c0', facecolor='#f7f7f7', transform=fig.transFigure, zorder=6, clip_on=False))
+fig.add_artist(Polygon(np.array([[bx + 0.015, by + 0.06], [bx + 0.065, by + 0.06], [bx - 0.018, by - 0.04]]), closed=True, facecolor='#f7f7f7', edgecolor='#c0c0c0', linewidth=1.0, transform=fig.transFigure, zorder=5, clip_on=False))
+fig.text(bx + bw / 2, by + bh * 0.80, 'Accesos del servicio fijo de acceso\na Internet No Residencial por cada\n100 unidades económicas:', transform=fig.transFigure, fontsize=9.5, color='#3c3c3b', ha='center', va='center', zorder=7, multialignment='center', clip_on=False)
+fig.text(bx + bw / 2, by + bh * 0.37, '47', transform=fig.transFigure, fontsize=60, fontweight='bold', color='#3c3c3b', ha='center', va='center', zorder=7, clip_on=False)
+fig.add_artist(plt.Line2D([bx + 0.02, bx + bw - 0.02], [by + bh * 0.60, by + bh * 0.60], transform=fig.transFigure, color='#d0d0d0', linewidth=0.8, zorder=7, clip_on=False))
 
-    geom_type = feature['geometry']['type']
-    coords = feature['geometry']['coordinates']
+tx, ty, tw, th = 0.28, 0.155, 0.225, 0.095
+fig.add_artist(FancyBboxPatch((tx, ty), tw, th, boxstyle='round,pad=0.012,rounding_size=0.012', linewidth=0, facecolor='#2d4f4b', transform=fig.transFigure, zorder=6, clip_on=False))
+fig.add_artist(FancyBboxPatch((tx + 0.008, ty + 0.012), 0.038, th - 0.024, boxstyle='round,pad=0.005,rounding_size=0.008', linewidth=0, facecolor='#012f2a', transform=fig.transFigure, zorder=7, clip_on=False))
+icon_cx, icon_cy, icon_hw, icon_hh = tx + 0.027, ty + th / 2, 0.010, 0.020
+fig.add_artist(plt.Line2D([icon_cx - icon_hw, icon_cx - icon_hw*0.3, icon_cx + icon_hw*0.3, icon_cx + icon_hw], [icon_cy - icon_hh*0.4,  icon_cy + icon_hh*0.1, icon_cy - icon_hh*0.15, icon_cy + icon_hh*0.55], transform=fig.transFigure, color='white', linewidth=2.0, solid_capstyle='round', solid_joinstyle='round', zorder=8, clip_on=False))
+fig.add_artist(plt.Line2D([icon_cx + icon_hw * 0.65, icon_cx + icon_hw], [icon_cy + icon_hh * 0.20, icon_cy + icon_hh * 0.55], transform=fig.transFigure, color='white', linewidth=2.0, solid_capstyle='round', zorder=8, clip_on=False))
+text_cx = tx + 0.046 + (tw - 0.046) / 2
+fig.text(text_cx, ty + th * 0.65, 'Tasa de crecimiento', transform=fig.transFigure, fontsize=9.5, fontweight='bold', color='white', ha='center', va='center', zorder=7, clip_on=False)
+fig.text(text_cx, ty + th * 0.28, 'anual de 4.4%', transform=fig.transFigure, fontsize=9.5, fontweight='bold', color='white', ha='center', va='center', zorder=7, clip_on=False)
 
-    def draw_polygon(polygon_coords):
-        poly_points = polygon_coords[0]
-        poly = plt.Polygon(poly_points, closed=True,
-                           facecolor=color, edgecolor='white',
-                           linewidth=0.6, alpha=0.93)
-        ax.add_patch(poly)
+# ── TÍTULO Y LEYENDA CORREGIDA ───────────────────────────────────────────
+fig.text(0.08, 0.94, ' ', bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'), va='center', fontsize=2)
+fig.text(0.093, 0.94, 'Figura B.14.', fontsize=14, fontweight='bold', color='#3c3c3b', va='center')
+fig.text(0.165, 0.94, 'Accesos del Servicio Fijo de Internet No Residencial por cada 100 unidades económicas por entidad federativa', fontsize=14, fontweight='medium', color='#3c3c3b', va='center')
 
-    if geom_type == 'Polygon':
-        draw_polygon(coords)
-    elif geom_type == 'MultiPolygon':
-        for poly_coords in coords:
-            draw_polygon(poly_coords)
-
-ax.set_xlim(-118.5, -86.0)
-ax.set_ylim(14.0, 33.5)
-ax.set_aspect(1.1)
-ax.axis('off')
-
-# 5. LEYENDA
-patches = [mpatches.Patch(facecolor=COLORS[i], edgecolor='none',
-                           label=LABELS[i]) for i in range(5)]
-legend = ax.legend(
-    handles=patches,
+leg = ax_map.legend(
+    handles=[mpatches.Patch(facecolor=COLORS[i], edgecolor='none', label=LABELS[i]) for i in range(5)],
     title='Accesos del servicio fijo de acceso\na Internet No Residencial por cada\n100 unidades económicas:',
     loc='lower left',
-    bbox_to_anchor=(0.01, 0.03),
-    fontsize=10,
-    title_fontsize=11,
-    facecolor='#ffffff',
-    labelcolor='#2c3e50',
+    bbox_to_anchor=(0.08, 0.12),
+    bbox_transform=fig.transFigure,
+    prop={'weight': 'normal', 'size': 10},
+    title_fontproperties={'weight': 'bold', 'size': 10},
+    facecolor='white',
+    labelcolor='#3c3c3b',
     edgecolor='none',
-    framealpha=0.9,
+    framealpha=0.0,
+    ncol=1,
+    handletextpad=0.5,
+    labelspacing=0.3,
+    handlelength=1.2,
+    borderpad=0.0,
+    borderaxespad=0.
 )
-legend.get_title().set_color('#2c3e50')
+leg._legend_box.align = "left"
+leg.get_title().set_multialignment('left')
+leg.get_title().set_color('#3c3c3b')
 
-# 6. BADGE NACIONAL
-ax.text(0.80, 0.72, '47', transform=ax.transAxes,
-        fontsize=42, fontweight='bold', color='#2c3e50', ha='center', va='center',
-        bbox=dict(boxstyle='round,pad=0.4', facecolor='#ffffff',
-                  edgecolor='#dddddd', linewidth=1.5))
-ax.text(0.80, 0.62, 'Tasa de crecimiento\nanual de 4.4%',
-        transform=ax.transAxes, fontsize=11, color='#2c3e50',
-        ha='center', va='center',
-        bbox=dict(boxstyle='round,pad=0.4', facecolor='#ffffff',
-                  edgecolor='#dddddd', linewidth=1.5))
+fig.text(0.08, 0.07, 'Fuente:', fontsize=8, fontweight='bold', color='#3c3c3b', ha='left', va='center')
+fig.text(0.11, 0.07, 'IFT con datos de los operadores a diciembre de 2023 y del DENUE del INEGI a noviembre de 2023. proxy dic 2024.', fontsize=8, fontweight='normal', color='#3c3c3b', ha='left', va='center')
 
-# 7. TÍTULO Y PIE
-ax.set_title(
-    'Figura B.14. Accesos del Servicio Fijo de Internet No Residencial\n'
-    'por cada 100 unidades económicas por entidad federativa',
-    color='#2c3e50', fontsize=14, fontweight='bold', pad=12)
-
-fig.text(
-    0.01, 0.005,
-    'Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de 2023 '
-    'y del DENUE del INEGI, a noviembre de 2023.\n'
-    'Nota: valores graficados son proxy de dic 2024 (diferencia variable por estado respecto a dic 2023).',
-    color='#666666', fontsize=8, va='bottom')
-
-plt.tight_layout()
+plt.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.15)
 os.makedirs('output', exist_ok=True)
-# Guardar salida
-plt.savefig('output/Figura_B14.png', dpi=150, bbox_inches='tight',
-            facecolor=fig.get_facecolor())
-print("âœ“ Figura guardada en output/Figura_B14.png")
+plt.savefig('output/Figura_B14.png', dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')

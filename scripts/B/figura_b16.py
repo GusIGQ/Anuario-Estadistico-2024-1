@@ -5,27 +5,25 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
+import matplotlib.patches as patches
 from matplotlib.patches import FancyBboxPatch
 import numpy as np
-from pathlib import Path
 
-# Rutas
-INPUT  = PROJECT_ROOT / "datos" / "b.16" / "TD_ACC_BAF_XT_XC_VA.csv"
-OUTPUT = PROJECT_ROOT / "output" / "Figura_B16.png"
+# ─── Rutas ────────────────────────────────────────────────────────────────────────
+INPUT  = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\b.16\TD_ACC_BAF_XT_XC_VA.csv"
+OUTPUT = r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_B16.png"
 Path(OUTPUT).parent.mkdir(parents=True, exist_ok=True)
 
-# Lectura
+# ─── Lectura ──────────────────────────────────────────────────────────────────────
 df = pd.read_csv(INPUT, encoding="cp1252")
 
 # Normalizar nombre duplicado
 df["TECNO_ACCESO_INTERNET"] = df["TECNO_ACCESO_INTERNET"].str.strip()
 df["TECNO_ACCESO_INTERNET"] = df["TECNO_ACCESO_INTERNET"].replace(
-    {"Tecnología Móvil": "Tecnología móvil"}
+    {"TecnologÃ­a MÃ³vil": "TecnologÃ­a mÃ³vil"}
 )
 
-# Filtros
+# ─── Filtros ──────────────────────────────────────────────────────────────────────
 TECNO_PRINCIPALES = ["Fibra óptica", "Cable coaxial", "DSL",
                      "Tecnología móvil", "Satelital"]
 
@@ -40,7 +38,7 @@ def get_totals(year, mes=12):
 res23,  nores23  = get_totals(2023)
 res22,  nores22  = get_totals(2022)
 
-# Tasas de crecimiento
+# ─── Tasas de crecimiento ─────────────────────────────────────────────────────────
 def tasa(v23, v22):
     return {t: ((v23[t] - v22[t]) / v22[t] * 100) if v22[t] > 0 else 0
             for t in TECNO_PRINCIPALES}
@@ -53,127 +51,173 @@ total_nores = nores23.sum()
 tc_total_res  = (total_res  - res22.sum())  / res22.sum()  * 100
 tc_total_nores = (total_nores - nores22.sum()) / nores22.sum() * 100
 
-# Colores por tecnología
+# ─── Estilos y Colores Institucionales ────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+C_TEXT = '#3c3c3b'
+color_borde_caja = '#D1D1DF'
+color_lineas = '#A0A0B0'
+
 COLORS = {
-    "Fibra óptica":    "#1B3A6B",   # azul oscuro
-    "Cable coaxial":   "#F4956A",   # salmón
-    "DSL":             "#7EC8C8",   # azul claro
-    "Tecnología móvil":"#B0D8E8",   # azul pálido
-    "Satelital":       "#E8E8E8",   # gris claro
+    "Fibra óptica":     "#132b2d",
+    "Cable coaxial":    "#3b6667",
+    "DSL":              "#64a0a1",
+    "Tecnología móvil": "#86adae",
+    "Satelital":        "#afafaf",
 }
-BAR_POS = "#1B3A6B"   # azul para tasas positivas
-BAR_NEG = "#7EC8C8"   # azul claro para tasas negativas
+BAR_POS = "#3b6667"
+BAR_NEG = "#86adae"
 
-# Función: gráfica de pastel + barras de tasas
-def draw_panel(ax_pie, ax_bar, totals, tc, total, tc_total, title):
-    # Pastel
-    sizes  = [totals[t] for t in TECNO_PRINCIPALES]
-    colors = [COLORS[t] for t in TECNO_PRINCIPALES]
-    wedges, _ = ax_pie.pie(
-        sizes, colors=colors, startangle=90,
-        wedgeprops=dict(width=1, edgecolor="white", linewidth=1.5)
-    )
-    ax_pie.set_aspect("equal")
+chip_style = dict(boxstyle="round,pad=0.4", fc="white", ec="#D1D1DF", lw=1.2)
 
-    # Etiquetas radiales
-    label_cfg = {
-        "Fibra óptica":     (0.55, 0.50, "white",  12, "bold"),
-        "Cable coaxial":    (0.70, 0.10, "white",  11, "bold"),
-        "DSL":              (0.75,-0.30, "#333333", 10, "bold"),
-        "Tecnología móvil": (0.85, 0.75, "#333333", 9,  "normal"),
-        "Satelital":        (0.88,-0.65, "#333333", 9,  "normal"),
+# Coordenadas retraídas en X para "Cable coaxial" y "DSL" para evitar colisión con la gráfica de barras
+PIE_LBL_POS = {
+    "Residencial": {
+        "Fibra óptica":     (-1.0, -1.0),
+        "Tecnología móvil": ( 0.5,  1.2),
+        "DSL":              ( 1.0,  0.8),  # Retraído hacia el centro
+        "Cable coaxial":    ( 1.05, 0.2),  # Retraído fuertemente hacia el centro
+        "Satelital":        (-0.8,  1.0)
+    },
+    "No Residencial": {
+        "Fibra óptica":     (-1.0, -1.0),
+        "DSL":              ( 0.9,  0.9),
+        "Cable coaxial":    ( 1.05, 0.1),  # Retraído fuertemente hacia el centro
+        "Satelital":        (-0.8,  1.0)
     }
-    for t, (rx, ry, fc, fs, fw) in label_cfg.items():
-        pct = totals[t] / total * 100
-        if pct < 0.05:
-            continue
-        ax_pie.text(rx, ry, f"{t}\n{pct:.1f}%",
-                    ha="center", va="center",
-                    fontsize=fs, fontweight=fw, color=fc)
+}
 
-    # Total nacional
-    ax_pie.text(0, -1.45, f"Accesos {'residenciales' if 'Res' in title else 'no residenciales'}\na nivel nacional:",
-                ha="center", fontsize=8, color="#555555")
-    ax_pie.text(0, -1.75, f"{int(total):,}",
-                ha="center", fontsize=14, fontweight="bold", color="#1B3A6B")
+# ─── Layout General y Eje de Fondo ────────────────────────────────────────────────
+fig = plt.figure(figsize=(18, 10), facecolor='white')
 
-    # Tasa total
-    ax_pie.text(0, -2.1,
-                f"Tasa de crecimiento\nanual de {tc_total:.1f}%",
-                ha="center", fontsize=8, color="#555555")
+# Eje de fondo para cajas UI
+bg_ax = fig.add_axes([0, 0, 1, 1], zorder=0)
+bg_ax.axis('off')
+bg_ax.set_xlim(0, 1)
+bg_ax.set_ylim(0, 1)
 
-    ax_pie.set_title(title, fontsize=13, fontweight="bold",
-                     color="#1B3A6B", pad=10)
+# ─── Funciones de Dibujo UI ───────────────────────────────────────────────────────
+def draw_pie_with_labels(ax, totals, panel_type):
+    sizes = [totals[t] for t in TECNO_PRINCIPALES]
+    colors = [COLORS[t] for t in TECNO_PRINCIPALES]
+    
+    wedges, _ = ax.pie(sizes, colors=colors, startangle=90, counterclock=True,
+                       wedgeprops=dict(edgecolor="white", linewidth=1.5))
+    ax.set_aspect("equal")
+    ax.patch.set_alpha(0)
+    
+    total = sum(sizes)
+    for i, p in enumerate(wedges):
+        pct = sizes[i] / total * 100
+        if pct < 0.05: continue
+        
+        ang = (p.theta2 - p.theta1)/2. + p.theta1
+        y_edge = np.sin(np.deg2rad(ang))
+        x_edge = np.cos(np.deg2rad(ang))
+        
+        t_name = TECNO_PRINCIPALES[i]
+        x_text, y_text = PIE_LBL_POS[panel_type].get(t_name, (x_edge*1.2, y_edge*1.2))
+        
+        ha = "left" if x_text > 0 else "right"
+        
+        chip_text = f"{pct:.1f}%"
+        ax.annotate(chip_text, xy=(x_edge, y_edge), xytext=(x_text, y_text),
+                    ha=ha, va="center",
+                    arrowprops=dict(arrowstyle="-", color=color_lineas, lw=1.2),
+                    bbox=chip_style, color=COLORS[t_name], fontweight='bold', fontsize=11,
+                    annotation_clip=False)
+        
+        # Posicionamiento inteligente del nombre
+        y_label_offset = 0.22 if y_text > 0 else -0.22
+        va_label = "bottom" if y_text > 0 else "top"
+        
+        ax.text(x_text, y_text + y_label_offset, t_name.replace(" ", "\n"), ha=ha, va=va_label,
+                fontsize=9, fontweight='bold', color='#6C6C85', clip_on=False)
 
-    # Barras de tasas
-    # Solo tecnologías con datos relevantes
-    tecno_bar = [t for t in TECNO_PRINCIPALES
-                 if abs(tc[t]) > 0.05 and totals[t] > 0
-                 and t not in ("Satelital",)]
-    vals  = [tc[t] for t in tecno_bar]
-    cols  = [BAR_POS if v >= 0 else BAR_NEG for v in vals]
-    ypos  = np.arange(len(tecno_bar))
+def draw_bar_chart(ax, data_tc, totals):
+    tecno_bar = [t for t in TECNO_PRINCIPALES if abs(data_tc[t]) > 0.05 and totals[t] > 0 and t != "Satelital"]
+    vals = [data_tc[t] for t in tecno_bar]
+    cols = [BAR_POS if v >= 0 else BAR_NEG for v in vals]
+    
+    x_pos = np.arange(len(tecno_bar))
+    ax.bar(x_pos, vals, color=cols, width=0.45, zorder=3)
+    ax.axhline(0, color='#A0A0B0', linewidth=1, zorder=2)
+    ax.axis('off')
+    
+    y_min, y_max = min(vals + [0]), max(vals + [0])
+    ax.set_ylim(y_min - abs(y_min)*0.4 - 10, y_max + abs(y_max)*0.4 + 10)
+    
+    for i, v in enumerate(vals):
+        offset = 5 if v >= 0 else -18
+        ax.text(i, v + offset, f"{v:.1f}%", ha='center', va='center', 
+                fontweight='bold', fontsize=9, color=C_TEXT, clip_on=False)
+        
+        y_name = -8 if v >= 0 else 8
+        ax.text(i, y_name, tecno_bar[i].replace(" ", "\n"), 
+                ha='center', va='top' if v >= 0 else 'bottom', 
+                fontsize=8, color='#6C6C85', clip_on=False)
 
-    ax_bar.barh(ypos, vals, color=cols, height=0.5, zorder=3)
-    ax_bar.axvline(0, color="#888888", linewidth=0.8, zorder=2)
+def draw_section(offset_x, type_title, totals, tc, tc_total, is_res=True):
+    # Caja principal del panel
+    box_main = patches.FancyBboxPatch((0.02 + offset_x, 0.08), 0.45, 0.78, 
+                                      boxstyle="round,pad=0.02", ec=color_borde_caja, fc="white", lw=1.5)
+    bg_ax.add_patch(box_main)
+    
+    # Chip título
+    w_title = 0.14 if is_res else 0.16
+    t_box = patches.FancyBboxPatch((0.175 + offset_x, 0.85), w_title, 0.05, 
+                                   boxstyle="round,pad=0.02", ec="#EEEEEE", fc="white", lw=1)
+    bg_ax.add_patch(t_box)
+    bg_ax.text(0.175 + w_title/2 + offset_x, 0.875, type_title, 
+               fontsize=16, fontweight='bold', color=C_TEXT, ha='center', va='center')
 
-    for i, (v, t) in enumerate(zip(vals, tecno_bar)):
-        offset = 1.5 if v >= 0 else -1.5
-        ha = "left" if v >= 0 else "right"
-        ax_bar.text(v + offset, i, f"{v:.1f}%",
-                    va="center", ha=ha, fontsize=8, fontweight="bold",
-                    color="#1B3A6B" if v >= 0 else "#7EC8C8")
+    # Burbuja de Totales
+    bubble = patches.FancyBboxPatch((0.28 + offset_x, 0.62), 0.15, 0.08, 
+                                    boxstyle="round,pad=0.01", ec="#EEEEEE", fc="white", lw=1)
+    bg_ax.add_patch(bubble)
+    bg_ax.text(0.355 + offset_x, 0.675, f"Accesos {'residenciales' if is_res else 'no residenciales'}\na nivel nacional:", 
+               fontsize=8, color='#6C6C85', ha='center', va='center')
+    bg_ax.text(0.355 + offset_x, 0.64, f"{int(sum(totals)):,}", 
+               fontsize=18, fontweight='bold', color=C_TEXT, ha='center', va='center')
 
-    ax_bar.set_yticks(ypos)
-    ax_bar.set_yticklabels([t.replace(" ", "\n") for t in tecno_bar], fontsize=8)
-    ax_bar.set_xlim(min(vals) * 1.6, max(vals) * 1.6)
-    ax_bar.set_title("Tasa de crecimiento anual,\ndiciembre 2022 - diciembre 2023",
-                     fontsize=8, color="#555555")
-    ax_bar.spines[["top","right","bottom"]].set_visible(False)
-    ax_bar.tick_params(axis="x", which="both", bottom=False, labelbottom=False)
-    ax_bar.grid(False)
+    # Caja pequeña (Tasa total)
+    box_bot = patches.FancyBboxPatch((0.05 + offset_x, 0.10), 0.14, 0.06, 
+                                     boxstyle="round,pad=0.01", ec="#EEEEEE", fc="white", lw=1)
+    bg_ax.add_patch(box_bot)
+    bg_ax.text(0.12 + offset_x, 0.13, f"Tasa de crecimiento\nanual de {tc_total:.1f}%", 
+               fontsize=9, ha='center', va='center', color='#6C6C85')
 
-# Layout
-fig = plt.figure(figsize=(16, 8))
-fig.patch.set_facecolor("white")
+    # Caja fondo de gráfica de barras
+    box_bar = patches.FancyBboxPatch((0.27 + offset_x, 0.10), 0.17, 0.40, 
+                                     boxstyle="round,pad=0.01", ec=color_borde_caja, fc="white", lw=1)
+    bg_ax.add_patch(box_bar)
+    bg_ax.text(0.355 + offset_x, 0.47, "Tasa de crecimiento anual,\ndic 2022 - dic 2023", 
+               fontsize=10, color='#6C6C85', ha='center', va='center')
 
-# 4 subplots: pastel_res barras_res pastel_nores barras_nores
-gs = fig.add_gridspec(1, 4, width_ratios=[2, 1, 2, 1], wspace=0.35,
-                      left=0.04, right=0.97, top=0.82, bottom=0.08)
+    # Gráfica de Pastel
+    ax_pie = fig.add_axes([0.02 + offset_x, 0.20, 0.22, 0.45], zorder=5)
+    draw_pie_with_labels(ax_pie, totals, type_title)
 
-ax_pie_r  = fig.add_subplot(gs[0])
-ax_bar_r  = fig.add_subplot(gs[1])
-ax_pie_nr = fig.add_subplot(gs[2])
-ax_bar_nr = fig.add_subplot(gs[3])
+    # Gráfica de barras
+    ax_bar = fig.add_axes([0.28 + offset_x, 0.16, 0.15, 0.28], zorder=5)
+    draw_bar_chart(ax_bar, tc, totals)
 
-draw_panel(ax_pie_r,  ax_bar_r,  res23,   tc_res,   total_res,   tc_total_res,   "Residencial")
-draw_panel(ax_pie_nr, ax_bar_nr, nores23, tc_nores, total_nores, tc_total_nores, "No Residencial")
+# Renderizar ambos paneles
+draw_section(0.00, "Residencial", res23, tc_res, tc_total_res, is_res=True)
+draw_section(0.49, "No Residencial", nores23, tc_nores, tc_total_nores, is_res=False)
 
-# Título
-fig.text(0.02, 0.95,
-         "Figura B.16. Distribución de los accesos al servicio fijo de Internet"
-         "por tecnología de conexión y por segmento",
-         fontsize=10, fontweight="bold", color="#1B3A6B", va="top")
+# ─── Encabezado y Pie Institucional (dibujado en el fondo) ────────────────────────
+bg_ax.text(0.028, 0.952, '   ', fontsize=2, va='center',
+         bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+bg_ax.text(0.046, 0.952, 'Figura B.16.', fontsize=13, fontweight='bold', color=C_TEXT, va='center')
+bg_ax.text(0.125, 0.952, 'Distribución de los accesos al servicio fijo de Internet por tecnología de conexión y por segmento', 
+           fontsize=13, color=C_TEXT, va='center')
 
-# Fuente
-fig.text(0.02, 0.02,
-         "Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de 2023.",
-         fontsize=8, color="#666666")
+bg_ax.text(0.040, 0.045, "Fuente:", fontweight='bold', fontsize=8, color=C_TEXT)
+bg_ax.text(0.075, 0.045, "IFT con datos de los operadores de telecomunicaciones a diciembre de 2023.", fontsize=8, color=C_TEXT)
+bg_ax.text(0.040, 0.025, "Nota:", fontweight='bold', fontsize=8, color=C_TEXT)
+bg_ax.text(0.070, 0.025, "Los porcentajes pueden no sumar 100% debido al redondeo.", fontsize=8, color=C_TEXT)
 
-# Guardar salida
-plt.savefig(OUTPUT, dpi=150, bbox_inches="tight", facecolor="white")
+# ─── Guardado ─────────────────────────────────────────────────────────────────────
+plt.savefig(OUTPUT, dpi=200, bbox_inches="tight", facecolor="white", edgecolor='none')
 plt.close()
-print(f"Figura guardada en: {OUTPUT}")
-
-# Verificación
-print("\n── Residencial 2023 ──")
-for t in TECNO_PRINCIPALES:
-    pct = res23[t] / total_res * 100
-    print(f"  {t:25s}: {pct:5.1f}%   tc: {tc_res[t]:+.1f}%")
-print(f"  {'TOTAL':25s}: {total_res:,.0f}   tc: {tc_total_res:+.1f}%")
-
-print("\n── No Residencial 2023 ──")
-for t in TECNO_PRINCIPALES:
-    pct = nores23[t] / total_nores * 100
-    print(f"  {t:25s}: {pct:5.1f}%   tc: {tc_nores[t]:+.1f}%")
-print(f"  {'TOTAL':25s}: {total_nores:,.0f}   tc: {tc_total_nores:+.1f}%")
+print(f"Figura guardada exitosamente en: {OUTPUT}")

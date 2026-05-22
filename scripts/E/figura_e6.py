@@ -1,30 +1,27 @@
 ﻿import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
+# ==========================================
 # 1. CÁLCULO DE DATOS EXACTOS
+# ==========================================
 
-# Cargar la base de datos (ajusta el nombre del archivo si es necesario)
-file_path = PROJECT_ROOT / "datos" / "E.6" / "Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx"
-# Cargar datos
+file_path = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\E.6\Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx"
 df = pd.read_excel(file_path)
 
-# Definir las columnas a utilizar
 vender_internet_col = '¿Cuál de las siguientes actividades realiza a través de Internet? Vender servicios o productos'
 beneficio_col = '¿Cuál es el principal beneficio de que la empresa venda a través de Internet?'
 size_col = 'Clasificación de la empresa por su tamaño'
 factor_col = 'Factor de Expansión Final'
 
-# Filtrar solo las empresas que SÍ venden por internet
 df_vende = df[df[vender_internet_col] == 'Sí']
 
-# Función para calcular los porcentajes ponderados
 def obtener_porcentajes(df_subset):
     peso_total = df_subset[factor_col].sum()
     resultados = {}
@@ -34,13 +31,11 @@ def obtener_porcentajes(df_subset):
         resultados[cat] = (peso_cat / peso_total) * 100
     return resultados
 
-# Calcular para cada segmento
 datos_general = obtener_porcentajes(df_vende)
 datos_micro = obtener_porcentajes(df_vende[df_vende[size_col] == 'Micro'])
 datos_pequena = obtener_porcentajes(df_vende[df_vende[size_col] == 'Pequeña'])
 datos_mediana = obtener_porcentajes(df_vende[df_vende[size_col] == 'Mediana'])
 
-# Categorías que queremos graficar (en el orden de la imagen)
 categorias = [
     'Incremento de ventas', 
     'Ampliar canales de venta', 
@@ -49,7 +44,6 @@ categorias = [
     'Otro'
 ]
 
-# Etiquetas más cortas para el eje X
 etiquetas_x = [
     'Incremento de ventas', 
     'Ampliar canales\nde venta', 
@@ -58,73 +52,106 @@ etiquetas_x = [
     'Otros'
 ]
 
-# Extraer los valores en el orden correcto, si no existe el valor se pone 0
 valores_general = [datos_general.get(cat, 0) for cat in categorias]
 valores_micro = [datos_micro.get(cat, 0) for cat in categorias]
 valores_pequena = [datos_pequena.get(cat, 0) for cat in categorias]
 valores_mediana = [datos_mediana.get(cat, 0) for cat in categorias]
 
-# 2. GENERACI N DE LA GRÁFICA
 
-# Configuración de colores basados en la infografía
-colores = {
-    'General': '#a2d2d9', # Azul claro
-    'Micro': '#f19a9b',   # Salmón
-    'Pequeña': '#297b93', # Azul oscuro
-    'Mediana': '#ea5b60'  # Rojo
-}
+# ==========================================
+# 2. GENERACIÓN DE LA GRÁFICA (Estilo F.16)
+# ==========================================
 
-# Preparar las posiciones de las barras
-x = np.arange(len(categorias))  # Localización de las etiquetas
-ancho_barra = 0.15              # Ancho de cada barra
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Crear grafica
-fig, ax = plt.subplots(figsize=(12, 6))
+# Mismos tonos del "Teal" exacto dictado en F.16 / Guía 
+# General toma el gris de F.16, Micro el claro, Mediana el oscuro y Pequeña un punto medio del Teal
+COLOR_GENERAL = '#afafaf'
+COLOR_MICRO   = '#86adae'
+COLOR_PEQUENA = '#5c9596'
+COLOR_MEDIANA = '#335a5c'
+color_texto   = '#3c3c3b'
 
-# Dibujar las barras para cada segmento
-barras_general = ax.bar(x - ancho_barra*1.5, valores_general, ancho_barra, label='General', color=colores['General'])
-barras_micro = ax.bar(x - ancho_barra*0.5, valores_micro, ancho_barra, label='Micro', color=colores['Micro'])
-barras_pequena = ax.bar(x + ancho_barra*0.5, valores_pequena, ancho_barra, label='Pequeña', color=colores['Pequeña'])
-barras_mediana = ax.bar(x + ancho_barra*1.5, valores_mediana, ancho_barra, label='Mediana', color=colores['Mediana'])
+x = np.arange(len(categorias))
+ancho_barra = 0.20
 
-# Función para añadir las etiquetas de porcentaje encima de cada barra
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
+
+# Dibujar las barras con zorder=2 y bordes invisibles
+barras_general = ax.bar(x - ancho_barra*1.5, valores_general, ancho_barra, label='General', color=COLOR_GENERAL, edgecolor='none', zorder=2)
+barras_micro = ax.bar(x - ancho_barra*0.5, valores_micro, ancho_barra, label='Micro', color=COLOR_MICRO, edgecolor='none', zorder=2)
+barras_pequena = ax.bar(x + ancho_barra*0.5, valores_pequena, ancho_barra, label='Pequeña', color=COLOR_PEQUENA, edgecolor='none', zorder=2)
+barras_mediana = ax.bar(x + ancho_barra*1.5, valores_mediana, ancho_barra, label='Mediana', color=COLOR_MEDIANA, edgecolor='none', zorder=2)
+
+# Etiquetas de datos (Chips estilo F.16)
 def autolabel(rects):
     for rect in rects:
         height = rect.get_height()
-        if height > 0: # Solo mostrar si es mayor a 0
+        bar_color = rect.get_facecolor()
+        if height > 0:
             ax.annotate(f'{height:.1f}%',
                         xy=(rect.get_x() + rect.get_width() / 2, height),
-                        xytext=(0, 3),  # 3 puntos de desplazamiento vertical
+                        xytext=(0, 6),
                         textcoords="offset points",
-                        ha='center', va='bottom', fontsize=9)
+                        ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                        bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
 
 autolabel(barras_general)
 autolabel(barras_micro)
 autolabel(barras_pequena)
 autolabel(barras_mediana)
 
-# Formatear el gráfico
-ax.set_ylabel('Porcentaje (%)')
-ax.set_title('Beneficios de vender a través de Internet fijo')
+# Diseño limpio de Ejes
 ax.set_xticks(x)
-ax.set_xticklabels(etiquetas_x)
-ax.set_ylim(0, 65) # Limite en Y para dar espacio a las etiquetas y coincidir con el 60% de la imagen
+ax.set_xticklabels(etiquetas_x, fontsize=9, fontweight='normal', color=color_texto)
 
-# Añadir leyenda abajo
-ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4, frameon=False)
+ax.set_ylim(0, 75)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
 
-# Ocultar los bordes superior y derecho para un diseño más limpio
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
 
-# Añadir una cuadrícula sutil en el eje Y
-ax.yaxis.grid(True, linestyle='--', alpha=0.7)
-ax.set_axisbelow(True)
+# Títulos Institucionales
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# Ajustar el diseño para que no se corte nada
-fig.suptitle('Figura E.6. Beneficios de vender a través de Internet para las MiPymes', fontsize=14, fontweight='bold', y=1.02)
-plt.tight_layout()
+ax.annotate("Figura E.6.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-# Guardar la gráfica como imagen en lugar de mostrarla
-plt.savefig(PROJECT_ROOT / "output" / "Figura_E6.png", dpi=300, bbox_inches='tight')
-print("¡Cálculo finalizado y Gráfica guardada exitosamente como 'grafica_beneficios_calculada.png'!")
+ax.annotate(" Beneficios de vender a través de Internet fijo", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# Leyenda inferior (idéntica al estilo F.16)
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=4, fontsize=10, frameon=False, handlelength=2.5)
+
+# Notas al pie y Fuente
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.08
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = ('IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (MiPymes).\n'
+               'Para mayor información consultar: https://www.ift.org.mx/usuarios-y-audiencias/')
+fig.text(x_start + 0.032, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+y_nota = 0.04
+fig.text(x_start, y_nota, "Nota: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+nota_text = 'Respuesta múltiple. Segmentos clasificados por tamaño de empresa.'
+fig.text(x_start + 0.025, y_nota, nota_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Ajustar y Guardar
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+plt.savefig(r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_E6.png", dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print("¡Cálculo finalizado y gráfica guardada exitosamente!")

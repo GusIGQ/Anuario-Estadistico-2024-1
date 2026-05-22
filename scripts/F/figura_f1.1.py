@@ -1,23 +1,37 @@
 ﻿import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
 from pathlib import Path
 import sys
+import os
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import numpy as np
+
 import warnings
 warnings.filterwarnings("ignore")
 
-# 1. Cargar y preparar datos
-ruta_datos = PROJECT_ROOT / "datos" / "F.1.1" / "tr_endutih_usuarios_anual_2023.csv"
+# ─── CONFIGURACIÓN DE COLORES Y ESTILOS (GUÍA CRT) ──────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+
+BG_FIG     = "#FFFFFF"
+BG_AXES    = "#F8F8FA"
+CARD_BG    = "#E8EEF2" 
+TEXT_MAIN  = "#3c3c3b"
+TEXT_LIGHT = "#7c7c7c"
+SQUARE_COL = "#4a7d75"
+
+COLOR_MUJERES = "#b35aba"
+COLOR_HOMBRES = "#006157"
+
+# ─── 1. CARGA Y PREPARACIÓN DE DATOS ─────────────────────────────────────────
+ruta_datos = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\F.1.1\tr_endutih_usuarios_anual_2023.csv"
 print("Cargando la base de datos y calculando valores reales...")
-# Cargar datos
 df = pd.read_csv(ruta_datos, low_memory=False)
 df.columns = df.columns.str.upper()
 
-# 2. Filtrar el Universo Base (Usuarios de Internet mediante celular, 6+ años)
+# Filtrar el Universo Base (Usuarios de Internet mediante celular, 6+ años)
 base_celular = df[(pd.to_numeric(df['EDAD'], errors='coerce') >= 6) & 
                   (pd.to_numeric(df['P7_1'], errors='coerce') == 1) &
                   (pd.to_numeric(df['P7_6_4'], errors='coerce') == 1)]
@@ -27,160 +41,161 @@ totales_universo = base_celular.groupby('SEXO')['FAC_PER'].sum()
 total_hombres = totales_universo.get(1, 0)
 total_mujeres = totales_universo.get(2, 0)
 
-# 3. Diccionario de actividades (Actividad : Columna en ENDUTIH)
-# Usamos las que verificamos y aproximaciones para las demás
+# Diccionario de actividades (Actividad : Columna en ENDUTIH)
 diccionario_actividades = {
-    'Mensajería instantánea': 'P7_16_9',       # (Aproximación)
-    'Descargaron aplicaciones': 'P7_11_2',     # (Aproximación)
-    'Acceder a redes sociales': 'P7_35_3',     # MATCH EXACTO
-    'Contenidos de audio y video': 'P7_17_2',  # MATCH EXACTO
-    'Jugar': 'P7_33',                          # (Aproximación)
-    'Adquirir bienes o servicios': 'P7_34_2',  # MATCH EXACTO
-    'Tránsito y navegación': 'P7_32_1',        # (Aproximación)
-    'Acceder a Banca Móvil': 'P7_22_2',        # (Aproximación)
-    'Editar fotos o videos': 'P7_36_3'         # (Aproximación)
+    'Mensajería instantánea': 'P7_16_9',       
+    'Descargaron aplicaciones': 'P7_11_2',     
+    'Acceder a redes sociales': 'P7_35_3',     
+    'Contenidos de audio y video': 'P7_17_2',  
+    'Jugar': 'P7_33',                          
+    'Adquirir bienes o servicios': 'P7_34_2',  
+    'Tránsito y navegación': 'P7_32_1',        
+    'Acceder a Banca Móvil': 'P7_22_2',        
+    'Editar fotos o videos': 'P7_36_3'         
 }
 
-# 4. Cálculo dinámico de porcentajes
-nombres_actividades = []
-pct_mujeres = []
-pct_hombres = []
-
+# Cálculo dinámico de porcentajes
+resultados = {}
 for actividad, columna in diccionario_actividades.items():
     if columna in base_celular.columns:
-        # Filtramos a los que dijeron Sí (1) en la actividad
         positivos = base_celular[pd.to_numeric(base_celular[columna], errors='coerce') == 1]
         sum_pos = positivos.groupby('SEXO')['FAC_PER'].sum()
-
-        # Calculamos el porcentaje real vs el universo
+        
         h_pct = round((sum_pos.get(1, 0) / total_hombres) * 100)
         m_pct = round((sum_pos.get(2, 0) / total_mujeres) * 100)
+        resultados[actividad] = (m_pct, h_pct)
 
-        nombres_actividades.append(actividad)
-        pct_hombres.append(h_pct)
-        pct_mujeres.append(m_pct)
-
-# Invertimos las listas para que el orden en la gráfica sea de arriba hacia abajo
-nombres_actividades.reverse()
-pct_mujeres.reverse()
-pct_hombres.reverse()
-
-# 5. Generar la Gráfica Visual
-import matplotlib.patches as patches
-import textwrap
-import os
-
-# Crear grafica
-fig, ax = plt.subplots(figsize=(16, 9))
-ax.axis('off')
-fig.patch.set_facecolor('#f4f4f4')
-
-def get_pct(name):
-    if name in nombres_actividades:
-        idx = nombres_actividades.index(name)
-        return pct_mujeres[idx], pct_hombres[idx]
-    return 0, 0
-
-def draw_panel(x, y, w, h, title, icon, pct_m, pct_h, bg_color='#FCECE9'):
-    # Fondo del panel
-    box = patches.FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.03", 
-                                 linewidth=0, facecolor=bg_color, edgecolor=None)
+# ─── FUNCIONES AUXILIARES DE INTERFAZ ───────────────────────────────────────
+def add_rounded_box(ax, x, y, w, h, bg_color=CARD_BG, r=0.015, shadow=True, zorder=2):
+    if shadow:
+        shadow_patch = FancyBboxPatch(
+            (x + 0.002, y - 0.003), w, h,
+            boxstyle=f"round,pad=0,rounding_size={r}",
+            facecolor="#000000", alpha=0.08, edgecolor="none", zorder=zorder-1, clip_on=False
+        )
+        ax.add_patch(shadow_patch)
+    
+    box = FancyBboxPatch(
+        (x, y), w, h,
+        boxstyle=f"round,pad=0,rounding_size={r}",
+        facecolor=bg_color, edgecolor="none", zorder=zorder, clip_on=False
+    )
     ax.add_patch(box)
 
-    # Icono principal circular (simulado)
-    circle = patches.Circle((x + 0.04, y + h - 0.04), radius=0.04, color='white', zorder=2)
-    ax.add_patch(circle)
-    circle_shadow = patches.Circle((x + 0.042, y + h - 0.042), radius=0.04, color='gray', alpha=0.1, zorder=1)
-    ax.add_patch(circle_shadow)
+def draw_activity_card(ax, x, y, w, h, title, pct_f, pct_m):
+    add_rounded_box(ax, x, y, w, h, bg_color=CARD_BG, r=0.015)
+    
+    # Título superior
+    ax.text(x + w/2, y + h - 0.035, title, ha='center', va='top', 
+            fontsize=8.5, color=TEXT_MAIN, fontweight='bold', linespacing=1.2)
 
-    ax.text(x + 0.04, y + h - 0.04, icon, ha='center', va='center', fontsize=22, zorder=3, fontfamily='Segoe UI Emoji')
+    # Coordenadas X desplazadas al 65% del ancho de la tarjeta
+    x_text = x + w * 0.65 
 
-    # Título
-    wrapped_title = "\n".join(textwrap.wrap(title, width=28))
-    ax.text(x + 0.10, y + h - 0.04, wrapped_title, ha='left', va='center', fontsize=11, fontweight='bold', color='#1F3864')
+    # Coordenadas Y ajustadas (movidas hacia arriba respecto a la iteración anterior)
+    y_f_label = y + h * 0.58
+    y_f_pct   = y + h * 0.44
+    y_m_label = y + h * 0.28
+    y_m_pct   = y + h * 0.14
 
-    # Mujeres
-    ax.text(x + 0.12, y + 0.08, 'ðŸ‘© Mujeres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
-    ax.text(x + 0.12, y + 0.03, f'{pct_m}%', ha='center', va='center', fontsize=24, fontweight='bold', color='#1F3864')
+    # Bloque Mujeres (Arriba)
+    ax.text(x_text, y_f_label, "Mujeres", ha='center', va='center', fontsize=8, color=TEXT_MAIN, fontweight='medium')
+    ax.text(x_text, y_f_pct, f"{pct_f}%", ha='center', va='center', fontsize=16, color=COLOR_MUJERES, fontweight='bold')
 
-    # Hombres
-    ax.text(x + w - 0.10, y + 0.08, 'ðŸ‘¨ Hombres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
-    ax.text(x + w - 0.10, y + 0.03, f'{pct_h}%', ha='center', va='center', fontsize=24, fontweight='bold', color='#1F3864')
+    # Bloque Hombres (Abajo)
+    ax.text(x_text, y_m_label, "Hombres", ha='center', va='center', fontsize=8, color=TEXT_MAIN, fontweight='medium')
+    ax.text(x_text, y_m_pct, f"{pct_m}%", ha='center', va='center', fontsize=16, color=COLOR_HOMBRES, fontweight='bold')
 
-# Área superior: Título General
-ax.text(0.02, 0.95, "ðŸ”´ Figura F.1. Actividades en Smartphone, Internet, computadora y uso de redes sociales", 
-        fontsize=14, color='#1F3864', fontweight='bold', fontfamily='Segoe UI Emoji')
 
-# Panel izquierdo principal
-box_main = patches.FancyBboxPatch((0.02, 0.72), 0.22, 0.18, boxstyle="round,pad=0.02,rounding_size=0.04", 
-                             linewidth=0, facecolor='white')
-ax.add_patch(box_main)
-ax.text(0.13, 0.81, "Aplicaciones instaladas\nmediante Smartphone", ha='center', va='center', 
-        fontsize=16, fontweight='bold', color='#1F3864', linespacing=1.5)
+# ─── CONFIGURACIÓN DEL LIENZO ───────────────────────────────────────────────
+fig = plt.figure(figsize=(16, 8.5), facecolor=BG_FIG)
+ax = fig.add_axes((0.08, 0.22, 0.84, 0.63), facecolor=BG_AXES)
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.axis("off")
 
-# Panel superior Centro (Usuarios totales)
-box_tot = patches.FancyBboxPatch((0.26, 0.70), 0.42, 0.22, boxstyle="round,pad=0.02,rounding_size=0.03", 
-                             linewidth=0, facecolor='#FCECE9')
-ax.add_patch(box_tot)
+# ─── ENCABEZADO ─────────────────────────────────────────────────────────────
+ax.text(0.0, 1.15, '   ', bbox=dict(boxstyle='round,pad=0.4,rounding_size=0.1', facecolor=SQUARE_COL, edgecolor='none'))
+ax.text(0.025, 1.15, "Figura F.1.", fontweight='bold', fontsize=14, color=TEXT_MAIN, va='center')
+ax.text(0.12, 1.15, "Aplicaciones instaladas mediante Smartphone", fontweight='medium', fontsize=14, color=TEXT_MAIN, va='center')
 
-ax.text(0.47, 0.88, "ðŸ“± Usuarios de Internet mediante Smartphone", ha='center', va='center', 
-        fontsize=12, fontweight='bold', color='#1F3864', fontfamily='Segoe UI Emoji')
+# ─── PANELES SUPERIORES ─────────────────────────────────────────────────────
+# 1. Panel Izquierdo
+add_rounded_box(ax, 0.0, 0.74, 0.20, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.10, 0.88, "Aplicaciones instaladas\nmediante Smartphone", ha='center', va='center', fontsize=12, color=TEXT_MAIN, fontweight='bold', linespacing=1.3)
 
-ax.text(0.33, 0.81, 'ðŸ‘© Mujeres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
-ax.text(0.33, 0.75, f"{int(total_mujeres):,}", ha='center', va='center', fontsize=22, fontweight='bold', color='#1F3864')
-ax.text(0.33, 0.71, "(75% con respecto al total\nde mujeres de 6 años o más)", ha='center', va='center', fontsize=8, color='#666666')
+# 2. Panel Central (Total Usuarios)
+add_rounded_box(ax, 0.22, 0.74, 0.43, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.435, 0.94, "Usuarios de Internet mediante Smartphone", ha='center', va='center', fontsize=11, color=TEXT_MAIN, fontweight='bold')
 
-ax.text(0.61, 0.81, 'ðŸ‘¨ Hombres', ha='center', va='center', fontsize=10, color='#1F3864', fontfamily='Segoe UI Emoji')
-ax.text(0.61, 0.75, f"{int(total_hombres):,}", ha='center', va='center', fontsize=22, fontweight='bold', color='#1F3864')
-ax.text(0.61, 0.71, "(73% con respecto al total\nde hombres de 6 años o más)", ha='center', va='center', fontsize=8, color='#666666')
+ax.text(0.33, 0.89, "Mujeres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.33, 0.82, f"{int(total_mujeres):,}", ha='center', va='center', fontsize=18, color=COLOR_MUJERES, fontweight='bold')
 
-# Panel superior Derecho
-pm, ph = get_pct('Descargaron aplicaciones')
-draw_panel(0.70, 0.70, 0.28, 0.22, "Descargaron aplicaciones", "ðŸ“¥", pm, ph, bg_color='#FCECE9')
+ax.text(0.54, 0.89, "Hombres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.54, 0.82, f"{int(total_hombres):,}", ha='center', va='center', fontsize=18, color=COLOR_HOMBRES, fontweight='bold')
 
-# Paneles Fila del Medio
-w_m, h_m = 0.31, 0.22
-y_mid = 0.43
-pm, ph = get_pct('Mensajería instantánea')
-draw_panel(0.02, y_mid, w_m, h_m, "Mensajería instantánea\n(WhatsApp, Messenger, Twitter, etcétera)", "ðŸ’¬", pm, ph)
+# 3. Panel Derecho (Descargas)
+add_rounded_box(ax, 0.67, 0.74, 0.33, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.835, 0.94, "Descargaron aplicaciones", ha='center', va='center', fontsize=11, color=TEXT_MAIN, fontweight='bold', linespacing=1.2)
 
-pm, ph = get_pct('Acceder a redes sociales')
-draw_panel(0.35, y_mid, w_m, h_m, "Acceder a redes sociales\n(Facebook, Instagram, etcétera)", "ðŸ‘¥", pm, ph)
+m_desc, h_desc = resultados.get('Descargaron aplicaciones', (0, 0))
+ax.text(0.76, 0.85, "Mujeres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.76, 0.80, f"{m_desc}%", ha='center', va='center', fontsize=18, color=COLOR_MUJERES, fontweight='bold')
 
-pm, ph = get_pct('Contenidos de audio y video')
-draw_panel(0.68, y_mid, 0.30, h_m, "Contenidos de audio y video\n(YouTube, Spotify, etc.)", "ðŸŽµ", pm, ph)
+ax.text(0.91, 0.85, "Hombres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.91, 0.80, f"{h_desc}%", ha='center', va='center', fontsize=18, color=COLOR_HOMBRES, fontweight='bold')
 
-# Paneles Fila Inferior
-w_b, h_b = 0.18, 0.25
-y_bot = 0.10
-spacing = 0.016
 
-pm, ph = get_pct('Jugar')
-draw_panel(0.02, y_bot, w_b, h_b, "Jugar (Pokémon go, Candy Crush)", "ðŸŽ®", pm, ph)
+# ─── CUADRÍCULA DE ACTIVIDADES ──────────────────────────────────────────────
+actividades_grid = [
+    ("Mensajería instantánea\n(WhatsApp, Messenger,\netcétera)", 'Mensajería instantánea'),
+    ("Acceder a redes sociales\n(Facebook, Instagram,\netcétera)", 'Acceder a redes sociales'),
+    ("Contenidos de audio y video\n(YouTube, Spotify,\netcétera)", 'Contenidos de audio y video'),
+    ("Jugar\n(Pokémon go, Candy Crush)", 'Jugar'),
+    ("Tránsito y navegación\n(Google Maps)", 'Tránsito y navegación'),
+    ("Adquirir bienes o servicios\n(Uber, Rappi)", 'Adquirir bienes o servicios'),
+    ("Acceder a Banca Móvil\n(BBVA, Banamex)", 'Acceder a Banca Móvil'),
+    ("Editar fotos o videos", 'Editar fotos o videos')
+]
 
-pm, ph = get_pct('Tránsito y navegación')
-draw_panel(0.02 + 1*(w_b+spacing), y_bot, w_b, h_b, "Tránsito y navegación\n(Google Maps)", "ðŸ—ºï¸", pm, ph)
+ROW1_Y = 0.37
+ROW1_H = 0.35
+ROW2_Y = 0.00
+ROW2_H = 0.35
+GAP = 0.02
 
-pm, ph = get_pct('Adquirir bienes o servicios')
-draw_panel(0.02 + 2*(w_b+spacing), y_bot, w_b, h_b, "Adquirir bienes/servicios (Uber, Rappi)", "ðŸ›ï¸", pm, ph)
+# Ancho para 4 tarjetas
+w_total_grid = 1.0 - (GAP * 3)
+w_card = w_total_grid / 4
 
-pm, ph = get_pct('Acceder a Banca Móvil')
-draw_panel(0.02 + 3*(w_b+spacing), y_bot, w_b, h_b, "Acceder a Banca Móvil (BBVA, Banamex)", "ðŸ¦", pm, ph)
+for i in range(4):
+    # Fila 1
+    titulo1, clave1 = actividades_grid[i]
+    pf1, pm1 = resultados.get(clave1, (0, 0))
+    cx1 = i * (w_card + GAP)
+    draw_activity_card(ax, cx1, ROW1_Y, w_card, ROW1_H, titulo1, pf1, pm1)
 
-pm, ph = get_pct('Editar fotos o videos')
-draw_panel(0.02 + 4*(w_b+spacing), y_bot, w_b, h_b, "Editar fotos o videos", "ðŸ“¸", pm, ph)
+    # Fila 2
+    titulo2, clave2 = actividades_grid[i + 4]
+    pf2, pm2 = resultados.get(clave2, (0, 0))
+    cx2 = i * (w_card + GAP)
+    draw_activity_card(ax, cx2, ROW2_Y, w_card, ROW2_H, titulo2, pf2, pm2)
 
-# Fuente al pie
-ax.text(0.02, 0.04, "Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.", fontsize=9, color='#666666')
-ax.text(0.02, 0.01, "Nota: Todos los usuarios se refieren a personas de 6 años o más.", fontsize=9, color='#666666')
 
-# Guardar y mostrar
-output_dir = PROJECT_ROOT / "output"
+# ─── PIE DE PÁGINA ──────────────────────────────────────────────────────────
+fig.text(0.08, 0.12, "Fuente:", fontweight='bold', fontsize=8, color=TEXT_MAIN)
+fig.text(0.115, 0.12, "IFT con datos de la ENDUTIH 2023, del INEGI. Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/", fontweight='normal', fontsize=8, color=TEXT_MAIN)
+
+fig.text(0.08, 0.09, "Notas:", fontweight='bold', fontsize=8, color=TEXT_MAIN)
+fig.text(0.115, 0.09, "Todos los usuarios se refieren a personas de 6 años o más.", fontweight='normal', fontsize=8, color=TEXT_MAIN)
+
+
+# ─── GUARDAR Y MOSTRAR ──────────────────────────────────────────────────────
+output_dir = r"C:\Users\ivan-\Documents\GitHub\anuario\output"
 os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, "figura_f1.1.png")
-# Guardar salida
-fig.suptitle('Figura F.1.1. Actividades en Smartphone, Internet, computadora y uso de redes sociales', fontsize=14, fontweight='bold', y=1.02)
-plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor=fig.get_facecolor())
-print(f"Infografía guardada en: {output_path}")
+
+plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor=BG_FIG, edgecolor='none')
+print(f"✅ Infografía de aplicaciones generada con diseño CRT en: {output_path}")
 
 plt.show()

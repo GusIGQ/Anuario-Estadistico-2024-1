@@ -1,35 +1,23 @@
-﻿"""
+"""
 Figura D.3 — Horas promedio de uso de internet por grupos de edad
-Fuente: ENDUTIH 2023, INEGI
-
-Variable clave: P7_4 — "En promedio, ¿cuántas horas al día utiliza Internet?"
-  Valores: 01 = 1 hora o menos, 02 = 2 horas, ..., 12 = 12 horas o más
-  IMPORTANTE: el valor ya es numérico (horas), no hay que convertir.
-
-Factor de expansión: FAC_PER
-Edad: EDAD
-
-Archivo a usar: tr_endutih_usuarios_anual_2023.csv
-  (Solo contiene personas que SÍ declararon usar internet — P7_1 == 1)
+Fuente: IFT con datos de la ENDUTIH 2023, del INEGI. Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/.
 """
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
 
+# ───────────────────────────────────────────────────────────────────────
 # 1. LEER DATOS
+# ───────────────────────────────────────────────────────────────────────
+RUTA = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\D.3\tr_endutih_usuarios_anual_2023.csv"
 
-# Ajusta esta ruta a donde tienes el archivo en tu máquina
-RUTA = PROJECT_ROOT / "datos" / "D.3" / "tr_endutih_usuarios_anual_2023.csv"
-
-# Cargar datos
 df = pd.read_csv(RUTA, low_memory=False)
 
 print("Columnas disponibles:", df.columns.tolist())
@@ -37,19 +25,21 @@ print(f"Total de registros: {len(df):,}")
 print(f"\nDistribución de P7_4 (horas de uso):\n{df['P7_4'].value_counts().sort_index()}")
 print(f"\nRango de edades: {df['EDAD'].min()} a {df['EDAD'].max()}")
 
+# ───────────────────────────────────────────────────────────────────────
 # 2. LIMPIAR Y PREPARAR
+# ───────────────────────────────────────────────────────────────────────
+df_valido = pd.DataFrame({
+    'horas': pd.to_numeric(df['P7_4'], errors='coerce'),
+    'edad': pd.to_numeric(df['EDAD'], errors='coerce'),
+    'factor': pd.to_numeric(df['FAC_PER'], errors='coerce')
+})
 
-# P7_4 viene como string 01 , 02 , etc. convertir a número
-df['horas'] = pd.to_numeric(df['P7_4'], errors='coerce')
-df['edad']  = pd.to_numeric(df['EDAD'], errors='coerce')
-df['factor'] = pd.to_numeric(df['FAC_PER'], errors='coerce')
-
-# Eliminar registros sin horas o sin factor válido
-df_valido = df.dropna(subset=['horas', 'edad', 'factor']).copy()
+df_valido = df_valido.dropna(subset=['horas', 'edad', 'factor']).copy()
 print(f"\nRegistros válidos para cálculo: {len(df_valido):,}")
 
-# 3. DEFINIR GRUPOS DE EDAD (exactamente como el Anuario)
-
+# ───────────────────────────────────────────────────────────────────────
+# 3. DEFINIR GRUPOS DE EDAD
+# ───────────────────────────────────────────────────────────────────────
 bins   = [5, 11, 17, 24, 34, 44, 54, 64, 999]
 labels = ['6 a 11', '12 a 17', '18 a 24', '25 a 34',
           '35 a 44', '45 a 54', '55 a 64', '65 o más']
@@ -61,8 +51,9 @@ df_valido['grupo_edad'] = pd.cut(
     right=True
 )
 
+# ───────────────────────────────────────────────────────────────────────
 # 4. CALCULAR PROMEDIO PONDERADO POR GRUPO
-
+# ───────────────────────────────────────────────────────────────────────
 def promedio_ponderado(grupo):
     return np.average(grupo['horas'], weights=grupo['factor'])
 
@@ -79,91 +70,91 @@ resultado['horas_promedio'] = resultado['horas_promedio'].round(1)
 print("\n=== RESULTADOS ===")
 print(resultado.to_string(index=False))
 
-print("\n=== VALORES ESPERADOS DEL ANUARIO ===")
-esperados = {
-    '18 a 24': 5.9, '25 a 34': 5.6, '12 a 17': 4.7,
-    '35 a 44': 4.5, '45 a 54': 3.8, '55 a 64': 3.3,
-    '65 o más': 2.9, '6 a 11': 2.5
-}
-for g, v in esperados.items():
-    calculado = resultado[resultado['grupo'] == g]['horas_promedio'].values
-    calc_str = f"{calculado[0]}" if len(calculado) > 0 else "N/A"
-    match = "âœ…" if len(calculado) > 0 and abs(calculado[0] - v) < 0.15 else "âš ï¸"
-    print(f"  {g:10s}: esperado={v}, calculado={calc_str} {match}")
-
-# 5. CALCULAR EL 71.4% (usuarios de internet / población 6+)
-
-# Para esto necesitas TAMBI N el archivo de residentes (que incluye NO usuarios)
-# tr_endutih_residentes_anual_2023.csv tiene TODA la población
-
-# RUTA_RESIDENTES r C: ruta a tr_endutih_residentes_anual_2023.csv
-# df_res pd.read_csv(RUTA_RESIDENTES, low_memory False)
-# df_res edad pd.to_numeric(df_res EDAD , errors coerce )
-# df_res factor pd.to_numeric(df_res FAC_PER , errors coerce )
-
-# total_6mas df_res df_res edad 6 factor .sum()
-# usuarios_6mas df_valido df_valido edad 6 factor .sum()
-# pct_usuarios (usuarios_6mas / total_6mas) 100
-# print(f n% usuarios de internet (6+): pct_usuarios:.1f % ) esperado 71.4%
-
-# 6. GRAFICAR igual que el Anuario
-
-# Orden descendente por horas (como en el Anuario)
+# ───────────────────────────────────────────────────────────────────────
+# 5. GRAFICAR CON ESTILO INSTITUCIONAL (Ref: Figura F.16 + Colores CRT)
+# ───────────────────────────────────────────────────────────────────────
 orden_anuario = ['18 a 24', '25 a 34', '12 a 17', '35 a 44',
                  '45 a 54', '55 a 64', '65 o más', '6 a 11']
-
 res_ordenado = resultado.set_index('grupo').reindex(orden_anuario).reset_index()
 
-colores = [
-    '#E05A4E',  # 18-24  rojo coral oscuro
-    '#F08070',  # 25-34  coral claro
-    '#2B4E7A',  # 12-17  azul marino
-    '#1E6B8A',  # 35-44  azul medio
-    '#7EC8C8',  # 45-54  teal claro
-    '#5B6EA8',  # 55-64  azul violáceo
-    '#7B8DC8',  # 65+    lavanda
-    '#48B8C8',  # 6-11   celeste
-]
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Crear grafica
-fig, ax = plt.subplots(figsize=(12, 7))
-bars = ax.bar(
-    res_ordenado['grupo'],
-    res_ordenado['horas_promedio'],
-    color=colores,
-    width=0.6,
-    zorder=3
-)
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-# Etiquetas encima de cada barra
-for bar, val in zip(bars, res_ordenado['horas_promedio']):
-    ax.text(
-        bar.get_x() + bar.get_width() / 2,
-        bar.get_height() + 0.05,
-        f'{val}%',
-        ha='center', va='bottom',
-        fontsize=11, fontweight='bold', color='#333333'
-    )
+# Paleta de colores solicitada
+COLORES_CRT = ['#86adae', '#64a0a1', '#5c9596', '#4c7d7e', '#3b6667', '#335a5c', '#234244', '#132b2d']
+color_texto = '#3c3c3b'
 
-ax.set_ylim(0, 7)
-ax.set_yticks(range(0, 8))
-ax.set_ylabel('Horas promedio', fontsize=12)
-ax.set_xlabel('')
-ax.set_title(
-    'Figura D.3. Porcentaje de horas promedio de uso de internet por grupos de edad',
-    fontsize=13, fontweight='bold', loc='left', pad=15
-)
-ax.grid(axis='y', linestyle='--', alpha=0.4, zorder=0)
-ax.spines[['top', 'right']].set_visible(False)
+x = np.arange(len(res_ordenado['grupo']))
+width = 0.55
 
-# Leyenda
-leyenda = [mpatches.Patch(color=c, label=g)
-           for c, g in zip(colores, orden_anuario)]
-ax.legend(handles=leyenda, ncol=8, loc='upper right',
-          fontsize=9, frameon=False, bbox_to_anchor=(1, 1.08))
+# Dibujar las barras con la paleta iterada de CRT
+bars = ax.bar(x, res_ordenado['horas_promedio'], width, color=COLORES_CRT, edgecolor='none', zorder=2)
 
-plt.tight_layout()
-# Guardar salida
-plt.savefig('output/Figura_D3.png', dpi=150, bbox_inches='tight')
-print("\nGuardada: Figura_D3.png")
-plt.show()
+# Etiquetas de datos (Chips estilo F.16) con borde dinámico
+for rect in bars:
+    height = rect.get_height()
+    bar_color = rect.get_facecolor() # Extrae el color individual de cada barra para el borde del chip
+    ax.annotate(f'{height:.1f}',
+                xy=(rect.get_x() + rect.get_width() / 2, height),
+                xytext=(0, 6),
+                textcoords="offset points",
+                ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
+
+# Diseño limpio de Ejes conforme a F.16
+ax.set_xticks(x)
+ax.set_xticklabels([])
+ax.tick_params(axis='x', length=0, pad=8)
+
+for idx, (group, color) in enumerate(zip(res_ordenado['grupo'], COLORES_CRT)):
+    # Cuadrado de color
+    ax.annotate('   ', xy=(idx - 0.20, -0.04), xycoords=ax.get_xaxis_transform(),
+                bbox=dict(boxstyle="round,pad=0.2,rounding_size=0.4", facecolor=color, edgecolor='none'),
+                ha='center', va='center')
+    # Etiqueta de texto
+    ax.annotate(group, xy=(idx - 0.10, -0.04), xycoords=ax.get_xaxis_transform(),
+                fontsize=9, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.set_ylim(0, max(res_ordenado['horas_promedio']) * 1.25)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
+
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
+
+# Títulos
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+
+ax.annotate("Figura D.3.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" Horas promedio de uso de internet por grupos de edad", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(100, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# Notas al pie
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.08
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = 'IFT con datos de la ENDUTIH 2023, del INEGI. Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/.'
+fig.text(x_start + 0.032, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Guardar
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+ruta_salida = Path(r'C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_D3.png')
+ruta_salida.parent.mkdir(parents=True, exist_ok=True)
+plt.savefig(ruta_salida, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"¡Figura D.3 construida y validada con estilo institucional y colores CRT en {ruta_salida}!")

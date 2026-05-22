@@ -1,90 +1,128 @@
-﻿import pandas as pd
+﻿# -*- coding: utf-8 -*-
+import os
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import numpy as np
-import textwrap
 import re
+import textwrap
 
-# 1. RUTA AL ARCHIVO EXCEL (Ajusta la carpeta F.9 si es necesario)
-ruta_archivo = PROJECT_ROOT / "datos" / "F.9" / "mociba2023_tabulados.xlsx"
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
-# 2. LEER LA TABLA
+# ==============================================================================
+# 1. CARGA DE DATOS MOCIBA 2023
+# ==============================================================================
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'F.9')
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+ruta_archivo = os.path.join(BASE, 'mociba2023_tabulados.xlsx')
+if not os.path.exists(ruta_archivo):
+    ruta_archivo = r'C:\Users\ivan-\Documents\GitHub\anuario\datos\F.9\mociba2023_tabulados.xlsx'
+
 df = pd.read_excel(ruta_archivo, sheet_name='1.50')
 
 medidas = []
 porcentajes = []
 
-# 3. EXTRACCI N DINÁMICA DE DATOS
-# En esta hoja, la palabra Relativos está en la fila 15 (índice 15 de pandas)
 for col in range(len(df.columns)):
     if str(df.iloc[15, col]).strip() == 'Relativos':
-        # El nombre de la medida está en la fila 14, una o dos columnas a la izquierda
         nombre = str(df.iloc[14, col-1]).strip()
-
         if nombre.lower() == 'nan':
             nombre = str(df.iloc[14, col-2]).strip()
-
-        # Limpiar nombre de numeritos de referencias del INEGI (ej. Ninguna12 )
+            
         nombre = re.sub(r'\d+$', '', nombre).strip()
-
-        # El valor porcentual nacional está en la fila 17
         valor = df.iloc[17, col]
-
+        
         if pd.notna(valor) and str(valor).strip() != 'NS':
-            # Ajustar textos largos para la gráfica (max 35 caracteres por línea)
-            nombre_wrap = textwrap.fill(nombre, width=35) 
+            nombre_wrap = textwrap.fill(nombre, width=45) 
             medidas.append(nombre_wrap)
             porcentajes.append(float(valor))
 
-# 4. PREPARAR DATOS (Ordenar de MENOR a MAYOR para la gráfica horizontal)
 df_res = pd.DataFrame({'Medida': medidas, 'Porcentaje': porcentajes})
 df_res = df_res.sort_values(by='Porcentaje', ascending=True).reset_index(drop=True)
 
-# 5. CREAR LA GRÁFICA ESTILO ANUARIO (Barras Horizontales)
-fig, ax = plt.subplots(figsize=(10, 8))
-fig.patch.set_facecolor('#ffffff')
+# ==============================================================================
+# 2. GRÁFICA ESTILO A.7
+# ==============================================================================
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-color_barras = '#8AD2D1' # Aqua/Teal del IFT
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
+
+# Color institucional replicado
+COLOR_BAR = '#335a5c'  # Teal oscuro (mismo que Hombres/Total en A.7)
+color_texto = '#3c3c3b'
 
 y = np.arange(len(df_res))
-height = 0.6 # Grosor de las barras
+bar_width = 0.5
 
-# Dibujar barras
-bars = ax.barh(y, df_res['Porcentaje'], height, color=color_barras, edgecolor='none')
+# Barras horizontales
+bars = ax.barh(y, df_res['Porcentaje'], bar_width, color=COLOR_BAR, edgecolor='none', zorder=2)
 
-# Configurar el Eje Y
+# Ejes
 ax.set_yticks(y)
-ax.set_yticklabels(df_res['Medida'], fontsize=10, color='#404040')
+ax.set_yticklabels(df_res['Medida'], fontsize=9, fontweight='normal', color=color_texto)
 
-# Estilo ultra limpio (sin bordes arriba, derecha, abajo)
+ax.set_xlim(0, df_res['Porcentaje'].max() * 1.15) 
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+ax.tick_params(axis='x', labelsize=9, colors=color_texto)
+
+# Grid y bordes A.7
+ax.grid(axis='x', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_visible(False)
-ax.spines['left'].set_color('#cccccc')
-ax.set_xticks([]) # Ocultar los números del eje X
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
 
-# Etiquetas con el porcentaje exacto al final de cada barra
-ax.bar_label(bars, fmt='%.1f%%', padding=5, color='#404040', fontweight='bold', fontsize=10)
+# Agregar los % al final de las barras
+for i in range(len(df_res)):
+    ax.text(df_res['Porcentaje'][i] + 0.5, y[i], f"{df_res['Porcentaje'][i]:.1f}%",
+            va='center', ha='left', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
 
-# Título de la gráfica
-plt.title('Medidas tomadas contra el ciberacoso experimentado', 
-          fontsize=16, fontweight='bold', color='#404040', pad=20)
+# ==============================================================================
+# 3. ENCABEZADO Y NOTAS (BLOQUE INSTITUCIONAL)
+# ==============================================================================
+# Títulos
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# Ajustar márgenes y guardar
-fig.suptitle('Figura F.9. Acciones de los usuarios de Internet que vivieron ciberacoso', fontsize=14, fontweight='bold', y=1.02)
-plt.tight_layout()
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "figura_f9.png", dpi=300, bbox_inches='tight')
+ax.annotate("Figura F.9.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-# Mostrar los datos extraídos en consola (Ordenados de mayor a menor para leerlos fácil)
-print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÓN ---")
-for index, row in df_res.sort_values(by='Porcentaje', ascending=False).iterrows():
-    print(f"{row['Medida'].replace(chr(10), ' ')}: {row['Porcentaje']:.1f}%")
+ax.annotate(" Medidas tomadas contra el ciberacoso experimentado", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
 
-print("\n¡Gráfica generada con éxito como 'figura_f9.png'!")
-plt.show()
+# Notas al pie
+font_size_notes = 8
+x_start = 0.08
+
+y_fuente = 0.06
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+note1_content = 'INEGI. Módulo sobre Ciberacoso (MOCIBA) 2023.'
+ax.annotate(note1_content, xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Ajustes de layout (Aumentado el margen 'left' para los textos largos del eje Y)
+fig.subplots_adjust(left=0.28, right=0.92, top=0.85, bottom=0.15)
+
+# Guardar
+output_path = os.path.join(OUTPUT_DIR, 'figura_f9.png')
+plt.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"Figura guardada en: {output_path}")
+plt.close(fig)

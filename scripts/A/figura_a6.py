@@ -1,12 +1,7 @@
-﻿# /usr/bin/env python3
-# - - coding: utf-8 - -
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Figura A.6 - Ingresos, egresos y margen en el sector de telecomunicaciones.
-
-Calculos:
-- Ingresos = suma trimestral de INGRESOS_TOTAL_E / 1,000,000,000
-- Margen$ = Ingresos * Margen%
-- Egresos = Ingresos - Margen$
 """
 
 from pathlib import Path
@@ -14,11 +9,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
+import textwrap
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
+
+# Ajusta la importación del logger según la estructura original
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
 def to_number(value: object) -> float:
     if pd.isna(value):
@@ -32,7 +32,6 @@ def to_number(value: object) -> float:
         return 0.0
 
 def build_series(data_file: Path) -> pd.DataFrame:
-    # Cargar datos
     df = pd.read_csv(data_file, encoding="latin1", low_memory=False)
     df.columns = [c.strip() for c in df.columns]
 
@@ -71,44 +70,52 @@ def build_series(data_file: Path) -> pd.DataFrame:
     return ingresos
 
 def make_chart(df: pd.DataFrame, output_png: Path) -> None:
-    egresos_color = "#2C6F96"
-    margen_color = "#A9CFD5"
-    text_color = "#3A4670"
+    # ── Colores estándar Guia_colores.md ──
+    egresos_color = "#335a5c"   # teal oscuro
+    margen_color  = "#86adae"   # teal claro (el verde exacto de las barras de A.1)
+    text_color    = "#3c3c3b"   # gris institucional
+
+    plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
     x = np.arange(len(df))
-    width = 0.78
+    width = 0.72  # Ajustado a 0.72 como en la referencia canónica A.1
 
-    # Crear grafica
-    fig, ax = plt.subplots(figsize=(14.5, 9.0))
-    fig.patch.set_facecolor("#F3F4F6")
-    ax.set_facecolor("#F3F4F6")
+    # Mismo tamaño de figura y fondo que A.1
+    fig, ax = plt.subplots(figsize=(16, 8.5))
+    fig.patch.set_facecolor('white')
+    ax.set_facecolor('#F8F8FA')
 
-    ax.bar(x, df["egresos_bn"], width=width, color=egresos_color, linewidth=0, label="Egresos")
-    ax.bar(
+    bars_egresos = ax.bar(x, df["egresos_bn"], width=width, color=egresos_color, edgecolor='none', label="Egresos", zorder=2)
+    bars_margen = ax.bar(
         x,
         df["margen_bn"],
         width=width,
         bottom=df["egresos_bn"],
         color=margen_color,
-        linewidth=0,
+        edgecolor='none',
         label="Margen",
+        zorder=2
     )
 
     # Etiquetas de porcentaje de margen y valor total de ingresos.
     for i, row in df.iterrows():
         y_margin_center = row["egresos_bn"] + row["margen_bn"] / 2
+        # Chip del porcentaje igual a A.1
         ax.text(
             i,
             y_margin_center,
             f"{int(row['margen_pct'])}%",
             ha="center",
             va="center",
-            fontsize=10,
+            fontsize=8,
             color=text_color,
             fontweight="bold",
-            bbox=dict(boxstyle="round,pad=0.25", fc="#EEF0F5", ec="none"),
+            bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8",
+                      facecolor='white', edgecolor=egresos_color, linewidth=0.8),
+            zorder=3
         )
 
+        # Etiqueta de cantidad superior (cambiada de bold a normal)
         ax.text(
             i,
             row["ingresos_bn"] + 1.2,
@@ -116,23 +123,30 @@ def make_chart(df: pd.DataFrame, output_png: Path) -> None:
             rotation=90,
             ha="center",
             va="bottom",
-            fontsize=8.5,
-            color="#5C6B91",
+            fontsize=9,
+            fontweight="normal",
+            color=text_color,
         )
 
-    ax.set_ylim(0, float(df["ingresos_bn"].max() * 1.22))
+    # Ajustamos el límite superior para dar espacio al texto
+    ax.set_ylim(0, float(df["ingresos_bn"].max() * 1.25))
 
-    # Eje X: trimestre en cada barra y ano centrado por bloque de cuatro trimestres.
+    # Eje X: trimestre en cada barra y año centrado por bloque de cuatro trimestres.
     trim_labels = ["I", "II", "III", "IV"] * 7
     ax.set_xticks(x)
-    ax.set_xticklabels(trim_labels, fontsize=10, color=text_color)
+    
+    # Nivel superior: trimestres
+    ax.set_xticklabels(trim_labels, fontsize=8, fontweight='normal', color=text_color)
+    ax.tick_params(axis='x', length=3, pad=4, colors=text_color)
 
+    # Nivel inferior: años centrados debajo de los trimestres
     years = sorted(df["ANIO"].unique())
     for idx, year in enumerate(years):
         center = idx * 4 + 1.5
+        # Offset relativo al data Y para colocar los años debajo
         ax.text(
             center,
-            -8.5,
+            -9,
             str(year),
             ha="center",
             va="top",
@@ -142,51 +156,72 @@ def make_chart(df: pd.DataFrame, output_png: Path) -> None:
             clip_on=False,
         )
 
-    ax.set_yticks([])
-    ax.tick_params(left=False, bottom=False)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
+    # Eje Y (Estilo A.1)
+    ax.set_ylabel('Miles de millones de pesos', fontsize=11, fontweight='medium',
+                  color=text_color, labelpad=15)
+    ax.tick_params(axis='y', labelsize=9, colors=text_color)
 
-    fig.text(0.03, 0.952, "Figura A.6. ", fontsize=16, fontweight="bold", color=text_color)
-    fig.text(
-        0.145,
-        0.952,
-        "Ingresos, egresos y margen en el sector de telecomunicaciones",
-        fontsize=16,
-        color=text_color,
-    )
+    # Grid y bordes (Bordes ocultos arriba y derecha, grises abajo e izquierda)
+    ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_color('#7c7c7c')
+    ax.spines['left'].set_color('#7c7c7c')
 
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.09),
-        ncol=2,
-        frameon=False,
-        fontsize=11,
-        labelcolor=text_color,
-        handlelength=1.3,
-        handletextpad=0.5,
-    )
+    # --- Títulos (Estilo Guia_colores.md como en A.1) ---
+    # Cuadrado decorativo (#4a7d75)
+    ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+                 xytext=(0, 30), textcoords='offset points',
+                 va='center', ha='left', fontsize=2,
+                 bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', 
+                           facecolor='#4a7d75', edgecolor='none'))
 
-    fig.text(
-        0.03,
-        0.06,
-        "Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de 2023.",
-        fontsize=10.5,
-        color=text_color,
-        fontweight="bold",
-    )
-    fig.text(
-        0.03,
-        0.04,
-        "Notas: Cifras en miles de millones de pesos (pesos corrientes de cada ano).",
-        fontsize=10.5,
-        color=text_color,
-    )
+    ax.annotate("Figura A.6.", xy=(0, 1), xycoords='axes fraction', 
+                 xytext=(15, 30), textcoords='offset points',
+                 fontsize=14, fontweight='bold', color=text_color, ha='left', va='center')
 
-    fig.subplots_adjust(left=0.05, right=0.99, top=0.9, bottom=0.19)
+    ax.annotate(" Ingresos, egresos y margen en el sector de telecomunicaciones", 
+                 xy=(0, 1), xycoords='axes fraction', 
+                 xytext=(100, 30), textcoords='offset points',
+                 fontsize=14, fontweight='medium', color=text_color, ha='left', va='center')
+
+    # --- Leyenda centrada en la figura (Estilo A.1) ---
+    handles, labels = ax.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center',
+               bbox_to_anchor=(0.5, 0.08), ncol=2, fontsize=10,
+               frameon=False, handlelength=2.5)
+
+    # --- Notas al pie (Mismo esquema riguroso de A.1) ---
+    font_size_notes = 8
+    color_notes = '#3c3c3b'
+    x_start = 0.08
+    l_space = 1.5
+
+    # Fuente
+    y_fuente = 0.06
+    ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+                 fontsize=font_size_notes, fontweight='bold', color=color_notes, ha='left', va='top')
+
+    note1_content = 'IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de 2023.'
+    ax.annotate(note1_content, xy=(x_start, y_fuente), xycoords='figure fraction',
+                 xytext=(35, 0), textcoords='offset points',
+                 fontsize=font_size_notes, fontweight='normal', color=color_notes, ha='left', va='top')
+
+    # Notas
+    y_notas = 0.042
+    ax.annotate("Notas: ", xy=(x_start, y_notas), xycoords='figure fraction',
+                 fontsize=font_size_notes, fontweight='bold', color=color_notes, ha='left', va='top')
+
+    note2_content = 'Cifras en miles de millones de pesos (pesos corrientes de cada año).'
+    ax.annotate(note2_content, xy=(x_start, y_notas), xycoords='figure fraction',
+                 xytext=(32, 0), textcoords='offset points',
+                 fontsize=font_size_notes, fontweight='normal', color=color_notes, ha='left', va='top', linespacing=l_space)
+
+    # Ajuste de márgenes (Mismos valores que la referencia canónica A.1)
+    fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+    
     output_png.parent.mkdir(parents=True, exist_ok=True)
-    # Guardar salida
-    fig.savefig(output_png, dpi=240, facecolor=fig.get_facecolor(), bbox_inches="tight")
+    fig.savefig(output_png, dpi=200, facecolor='white', edgecolor='none', bbox_inches="tight")
     plt.close(fig)
 
 def main() -> None:
@@ -194,11 +229,12 @@ def main() -> None:
     data_file = repo_root / "datos" / "A.6" / "TD_INGRESOS_TELECOM_ITE_VA.csv"
     output_png = repo_root / "output" / "Figura_A6.png"
 
-    series_df = build_series(data_file)
-    make_chart(series_df, output_png)
-
-    print("Figura generada:", output_png)
-    print(series_df[["ANIO", "TRIM", "ingresos_bn", "margen_pct", "margen_bn", "egresos_bn"]].to_string(index=False))
+    try:
+        series_df = build_series(data_file)
+        make_chart(series_df, output_png)
+        print("Figura generada:", output_png)
+    except FileNotFoundError:
+        print("Error: No se encontró el archivo de datos. Verifica la ruta.")
 
 if __name__ == "__main__":
     main()

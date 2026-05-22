@@ -2,26 +2,24 @@
 Figura B.2 — Distribución de los Servicios Fijos con respecto del total
 de hogares en las zonas rurales.
 Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.
-
-Cómo correr:
-    python figura_b2.py
-
-Requisitos:
-    pip install dbfread pandas matplotlib
 """
 
 import os
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch
 from dbfread import DBF
 
 # ── 1. RUTA AL ARCHIVO ──────────────────────────────────────────────────────
 DBF_PATH = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\b.2\tic_2023_hogares.DBF"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_PATH = os.path.join(OUTPUT_DIR, 'Figura_B2.png')
 
 # ── 2. CARGA Y PREPARACIÓN ───────────────────────────────────────────────────
-print("Cargando DBF...")
+print("Cargando DBF (Rural)...")
 records = list(DBF(DBF_PATH, encoding="latin-1"))
 df = pd.DataFrame(records)
 
@@ -36,168 +34,170 @@ df["num_servicios"] = df["internet_fijo"] + df["tv_paga"] + df["tel_fija"]
 
 # ── 3. FILTRO RURAL ──────────────────────────────────────────────────────────
 rural = df[df["DOMINIO"] == "R"].copy()
-total = rural["FAC_HOG"].sum()
-
-print(f"Total hogares rurales ponderados: {total:,.0f}")
+TOTAL_HOG = rural["FAC_HOG"].sum()
 
 # ── 4. CÁLCULO DE VALORES ────────────────────────────────────────────────────
 def pct(mask):
-    return rural.loc[mask, "FAC_HOG"].sum() / total * 100
+    return rural.loc[mask, "FAC_HOG"].sum() / TOTAL_HOG * 100
 
-v = {}
+v = {
+    "tres":    pct(rural["num_servicios"] == 3),
+    "dos":     pct(rural["num_servicios"] == 2),
+    "uno":     pct(rural["num_servicios"] == 1),
+    "ninguno": pct(rural["num_servicios"] == 0),
+}
 
-# Nivel 1
-v["tres"]    = pct(rural["num_servicios"] == 3)
-v["dos"]     = pct(rural["num_servicios"] == 2)
-v["uno"]     = pct(rural["num_servicios"] == 1)
-v["ninguno"] = pct(rural["num_servicios"] == 0)
+un_srv = {
+    'Solo\nTV Rest.': pct((rural["tv_paga"]==1) & (rural["internet_fijo"]==0) & (rural["tel_fija"]==0)),
+    'Solo\nTelefonía': pct((rural["tel_fija"]==1) & (rural["internet_fijo"]==0) & (rural["tv_paga"]==0)),
+    'Solo\nInternet': pct((rural["internet_fijo"]==1) & (rural["tv_paga"]==0) & (rural["tel_fija"]==0))
+}
 
-# Desglose un servicio
-v["solo_tv"]  = pct((rural["tv_paga"]==1)        & (rural["internet_fijo"]==0) & (rural["tel_fija"]==0))
-v["solo_tel"] = pct((rural["tel_fija"]==1)        & (rural["internet_fijo"]==0) & (rural["tv_paga"]==0))
-v["solo_int"] = pct((rural["internet_fijo"]==1)   & (rural["tv_paga"]==0)      & (rural["tel_fija"]==0))
+dos_srv = {
+    'Internet +\nTelefonía': pct((rural["internet_fijo"]==1) & (rural["tel_fija"]==1) & (rural["tv_paga"]==0)),
+    'TV Rest. +\nInternet': pct((rural["tv_paga"]==1) & (rural["internet_fijo"]==1) & (rural["tel_fija"]==0)),
+    'TV Rest. +\nTelefonía': pct((rural["tv_paga"]==1) & (rural["tel_fija"]==1) & (rural["internet_fijo"]==0))
+}
 
-# Desglose dos servicios
-v["int_tel"]  = pct((rural["internet_fijo"]==1) & (rural["tel_fija"]==1) & (rural["tv_paga"]==0))
-v["tv_int"]   = pct((rural["tv_paga"]==1)       & (rural["internet_fijo"]==1) & (rural["tel_fija"]==0))
-v["tv_tel"]   = pct((rural["tv_paga"]==1)       & (rural["tel_fija"]==1) & (rural["internet_fijo"]==0))
+# ── 5. ESTILOS (Misma paleta Teal de Figura B.1) ─────────────────────────────
+C_TRES    = '#132b2d'
+C_DOS     = '#3b6667'
+C_UNO     = '#64a0a1'
+C_NINGUNO = '#86adae'
+C_TEXT    = '#3c3c3b'
 
-# Imprimir para verificación
-print("\n── Valores calculados ──")
-for k, val in v.items():
-    print(f"  {k:12s}: {val:.1f}%")
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+fig = plt.figure(figsize=(16, 9), facecolor='white')
 
-# ── 5. FIGURA ────────────────────────────────────────────────────────────────
-# Colores del Anuario IFT
-C_NINGUNO = "#1B4F72"   # azul oscuro
-C_UNO     = "#85C1E9"   # azul claro
-C_DOS     = "#E74C3C"   # rojo/salmon
-C_TRES    = "#F1948A"   # rosa claro
-C_ACCENT  = "#E74C3C"
+# ══════════════════════════════════════════════════════════════════════════════
+# HELPER: nube de dialogo con cola triangular
+# ══════════════════════════════════════════════════════════════════════════════
+def draw_bubble(ax, bx, by, bw, bh, side='left', fc='white', ec='#b0b0b0', lw=1.0, zorder=5, corner=0.07, tail_frac=0.22):
+    mid_x, mid_y = bx + bw / 2, by + bh / 2
+    tw, td = min(bw, bh) * tail_frac, min(bw, bh) * 0.28
 
-fig = plt.figure(figsize=(16, 9), facecolor="white")
+    if side == 'left':
+        p1, p2, tip  = (bx, mid_y + tw / 2), (bx, mid_y - tw / 2), (bx - td, mid_y)
+    elif side == 'right':
+        p1, p2, tip  = (bx + bw, mid_y - tw / 2), (bx + bw, mid_y + tw / 2), (bx + bw + td, mid_y)
+    elif side == 'bottom':
+        p1, p2, tip  = (mid_x - tw / 2, by), (mid_x + tw / 2, by), (mid_x, by - td)
+    else:  # top
+        p1, p2, tip  = (mid_x + tw / 2, by + bh), (mid_x - tw / 2, by + bh), (mid_x, by + bh + td)
 
-# ── Pastel principal ─────────────────────────────────────────────────────────
-ax_pie = fig.add_axes([0.22, 0.15, 0.38, 0.72])
+    rect = FancyBboxPatch((bx, by), bw, bh, boxstyle=f'round,pad=0.0,rounding_size={corner}',
+                          linewidth=lw, edgecolor=ec, facecolor=fc, zorder=zorder)
+    ax.add_patch(rect)
+    ax.add_patch(plt.Polygon([p1, tip, p2], closed=True, facecolor=fc, edgecolor=ec, linewidth=lw, zorder=zorder))
+    ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color=fc, lw=lw + 1.2, zorder=zorder + 1)
+    return tip
 
-sizes  = [v["ninguno"], v["uno"],   v["dos"],   v["tres"]]
-colors = [C_NINGUNO,    C_UNO,      C_DOS,      C_TRES]
-labels = ["Ninguno",    "Un\nservicio", "Dos\nservicios", "Tres\nservicios"]
+# ══════════════════════════════════════════════════════════════════════════════
+# ENCABEZADO
+# ══════════════════════════════════════════════════════════════════════════════
+fig.text(0.028, 0.952, '   ', fontsize=2, va='center',
+         bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+fig.text(0.046, 0.952, 'Figura B.2.', fontsize=13, fontweight='bold', color=C_TEXT, va='center')
+fig.text(0.130, 0.952, 'Distribución de los Servicios Fijos con respecto del total de hogares en las zonas rurales',
+         fontsize=13, color=C_TEXT, va='center')
 
-wedges, texts = ax_pie.pie(
-    sizes,
-    colors=colors,
-    startangle=90,
-    counterclock=False,
-    wedgeprops=dict(linewidth=1.5, edgecolor="white"),
+# ══════════════════════════════════════════════════════════════════════════════
+# PASTEL
+# ══════════════════════════════════════════════════════════════════════════════
+ax_pie = fig.add_axes([0.00, 0.11, 0.53, 0.78])
+ax_pie.set_aspect('equal')
+ax_pie.set_xlim(-1.65, 1.65)
+ax_pie.set_ylim(-1.38, 1.38)
+ax_pie.axis('off')
+
+# Imagen de fondo (Mapa de México)
+bg_path = r"C:\Users\ivan-\Documents\GitHub\anuario\Mapa_de_México_verde_background_202605131702.jpeg"
+if os.path.exists(bg_path):
+    img = plt.imread(bg_path)
+    ax_pie.imshow(img, extent=[-1.65, 1.65, -1.38, 1.38], aspect='auto', zorder=0, alpha=0.6)
+
+r_pie = 0.68
+sizes      = [v["tres"], v["dos"], v["uno"], v["ninguno"]]
+colors_pie = [C_TRES, C_DOS, C_UNO, C_NINGUNO]
+
+wedges, _ = ax_pie.pie(
+    sizes, colors=colors_pie, explode=(0.03,)*4,
+    startangle=90, counterclock=False, radius=r_pie,
+    wedgeprops=dict(linewidth=2.0, edgecolor='white')
 )
 
-# Etiquetas dentro del pastel
-offsets = {
-    "Ninguno":          (0.38,  0.10),
-    "Un\nservicio":     (0.25, -0.38),
-    "Dos\nservicios":   (-0.25,-0.28),
-    "Tres\nservicios":  (-0.30, 0.20),
-}
-valores_pct = {
-    "Ninguno":          v["ninguno"],
-    "Un\nservicio":     v["uno"],
-    "Dos\nservicios":   v["dos"],
-    "Tres\nservicios":  v["tres"],
-}
-for label, (ox, oy) in offsets.items():
-    val = valores_pct[label]
-    ax_pie.text(ox, oy, f"{val:.0f}%", ha="center", va="center",
-                fontsize=22, fontweight="bold", color="white")
-    ax_pie.text(ox, oy - 0.13, label, ha="center", va="center",
-                fontsize=9, color="white")
-
-ax_pie.axis("equal")
-
-# ── Caja central con total ───────────────────────────────────────────────────
-ax_pie.text(0, 0.04, "Total de hogares en zonas",
-            ha="center", va="center", fontsize=8, color="#1B4F72")
-ax_pie.text(0, -0.07, "rurales en México:",
-            ha="center", va="center", fontsize=8, color="#1B4F72")
-ax_pie.text(0, -0.22, f"{total:,.0f}",
-            ha="center", va="center", fontsize=14, fontweight="bold", color="#1B4F72")
-
-# ── Panel "Un servicio" (derecha arriba) ─────────────────────────────────────
-ax_un = fig.add_axes([0.62, 0.52, 0.36, 0.38])
-ax_un.set_xlim(0, 1)
-ax_un.set_ylim(0, 1)
-ax_un.axis("off")
-
-# Borde del panel
-rect = FancyBboxPatch((0.01, 0.01), 0.97, 0.97,
-                       boxstyle="round,pad=0.02",
-                       linewidth=1.5, edgecolor="#85C1E9",
-                       facecolor="white")
-ax_un.add_patch(rect)
-ax_un.text(0.5, 0.88, "Un servicio", ha="center", va="center",
-           fontsize=11, fontweight="bold", color="#1B4F72")
-
-# Tres mini-barras
-datos_un = [
-    ("Solo TV\nRestringida", v["solo_tv"],  C_UNO),
-    ("Solo\nTelefonía",      v["solo_tel"], C_UNO),
-    ("Solo Internet",        v["solo_int"], C_ACCENT),
+bubble_cfg = [
+    (0.60,  0.54,  0.62,  0.52, 'left',  f'{v["tres"]:.0f}%', 'Tres servicios\n(Telefonia Fija +\nTV Restringida + Internet)'),
+    (0.60, -0.68,  0.50,  0.38, 'left',  f'{v["dos"]:.0f}%',  'Dos servicios'),
+    (-1.23, -0.56, 0.50,  0.38, 'right', f'{v["uno"]:.0f}%',  'Un servicio'),
+    (-1.23,  0.24, 0.50,  0.32, 'right', f'{v["ninguno"]:.0f}%','Ninguno'),
 ]
-xs = [0.18, 0.50, 0.82]
-for (lbl, val, col), x in zip(datos_un, xs):
-    # Círculo de color
-    circ = plt.Circle((x, 0.58), 0.10, color=col, zorder=3)
-    ax_un.add_patch(circ)
-    ax_un.text(x, 0.58, f"{val:.0f}%",
-               ha="center", va="center", fontsize=12,
-               fontweight="bold", color="white", zorder=4)
-    ax_un.text(x, 0.30, lbl, ha="center", va="center",
-               fontsize=8, color="#555555", multialignment="center")
 
-# ── Panel "Dos servicios" (derecha abajo) ────────────────────────────────────
-ax_dos = fig.add_axes([0.62, 0.10, 0.36, 0.38])
-ax_dos.set_xlim(0, 1)
-ax_dos.set_ylim(0, 1)
-ax_dos.axis("off")
+for bx, by, bw, bh, side, pct_txt, lbl in bubble_cfg:
+    draw_bubble(ax_pie, bx, by, bw, bh, side=side, fc='white', ec='#b0b0b0', lw=0.9, corner=0.06, zorder=5)
+    ax_pie.text(bx + bw/2, by + bh * 0.68, pct_txt, ha='center', va='center', fontsize=21, fontweight='bold', color=C_TEXT, zorder=7)
+    ax_pie.text(bx + bw/2, by + bh * 0.26, lbl, ha='center', va='center', fontsize=7.0, color=C_TEXT, linespacing=1.3, zorder=7)
 
-rect2 = FancyBboxPatch((0.01, 0.01), 0.97, 0.97,
-                        boxstyle="round,pad=0.02",
-                        linewidth=1.5, edgecolor="#E74C3C",
-                        facecolor="white")
-ax_dos.add_patch(rect2)
-ax_dos.text(0.5, 0.88, "Dos servicios", ha="center", va="center",
-            fontsize=11, fontweight="bold", color="#1B4F72")
+# Callout "Total de hogares"
+tbx, tby, tbw, tbh = -1.22, -1.22, 0.82, 0.38
+ax_pie.add_patch(FancyBboxPatch((tbx, tby), tbw, tbh, boxstyle='round,pad=0.0,rounding_size=0.06',
+                                linewidth=0.9, edgecolor='#b0b0b0', facecolor='white', zorder=5))
+ax_pie.text(tbx + tbw/2, tby + tbh * 0.72, 'Total de hogares en zonas rurales:', ha='center', va='center', fontsize=7.5, color=C_TEXT, zorder=7)
+ax_pie.text(tbx + tbw/2, tby + tbh * 0.28, f'{TOTAL_HOG:,.0f}', ha='center', va='center', fontsize=12.5, fontweight='bold', color=C_TEXT, zorder=7)
 
-datos_dos = [
-    ("Internet +\nTelefonía",           v["int_tel"],  C_DOS),
-    ("TV Restringida\n+ Internet",      v["tv_int"],   C_DOS),
-    ("TV Restringida\n+ Telefonía",     v["tv_tel"],   C_DOS),
-]
-for (lbl, val, col), x in zip(datos_dos, xs):
-    circ = plt.Circle((x, 0.58), 0.10, color=col, zorder=3)
-    ax_dos.add_patch(circ)
-    ax_dos.text(x, 0.58, f"{val:.0f}%",
-                ha="center", va="center", fontsize=12,
-                fontweight="bold", color="white", zorder=4)
-    ax_dos.text(x, 0.30, lbl, ha="center", va="center",
-                fontsize=8, color="#555555", multialignment="center")
+# ══════════════════════════════════════════════════════════════════════════════
+# PANELES LATERALES DE BARRAS
+# ══════════════════════════════════════════════════════════════════════════════
+def draw_panel_bubble(fig, left, bottom, width, height, cats, vals, bar_colors, title, title_color):
+    ax_bg = fig.add_axes([left, bottom, width, height], zorder=2)
+    ax_bg.set_xlim(0, 1); ax_bg.set_ylim(0, 1); ax_bg.axis('off'); ax_bg.patch.set_visible(False)
+    ax_bg.add_patch(FancyBboxPatch((0, 0), 1, 1, boxstyle='round,pad=0.0,rounding_size=0.012', linewidth=1.0, edgecolor='#c0c0c0', facecolor='#F8F8FA', transform=ax_bg.transAxes, zorder=1, clip_on=False))
 
-# ── Título y fuente ──────────────────────────────────────────────────────────
-fig.text(0.50, 0.94,
-         "Figura B.2. Distribución de los Servicios Fijos con respecto\n"
-         "del total de hogares en las zonas rurales",
-         ha="center", va="center", fontsize=13, fontweight="bold", color="#1B4F72")
+    mid_y, tw_ax, td_adj = 0.50, 0.09, 0.046 * (height / width)
+    p1, p2, tip = (0.0, mid_y + tw_ax / 2), (0.0, mid_y - tw_ax / 2), (-td_adj, mid_y)
+    ax_bg.add_patch(plt.Polygon([p1, tip, p2], closed=True, facecolor='#F8F8FA', edgecolor='#c0c0c0', linewidth=1.0, transform=ax_bg.transAxes, zorder=1, clip_on=False))
+    ax_bg.plot([0, 0], [p1[1], p2[1]], color='#F8F8FA', lw=2.5, transform=ax_bg.transAxes, zorder=2, clip_on=False)
 
-fig.text(0.05, 0.02,
-         "Fuente: IFT con datos de la ENDUTIH 2023, del INEGI. "
-         "Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/\n"
-         "Nota: Los porcentajes pueden no sumar 100% debido al redondeo.",
-         ha="left", va="center", fontsize=7, color="#555555")
+    fig.text(left + width * 0.07, bottom + height * 0.91, title, fontsize=10, color=title_color, fontweight='bold', ha='left', va='center', zorder=10)
 
-# ── Guardar ──────────────────────────────────────────────────────────────────
-os.makedirs("output", exist_ok=True)
-plt.savefig("output/Figura_B2.png", dpi=150, bbox_inches="tight",
-            facecolor="white")
-#plt.savefig("output/Figura_B2.pdf", bbox_inches="tight", facecolor="white")
-print("\nGuardado: output/Figura_B2.png y output/Figura_B2.pdf")
-plt.show()
+    pad_l, pad_r, pad_b, pad_t = 0.10, 0.04, 0.24, 0.24
+    ax = fig.add_axes([left + width * pad_l, bottom + height * pad_b, width * (1 - pad_l - pad_r), height * (1 - pad_b - pad_t)], zorder=3)
+    ax.set_facecolor('none')
+
+    xs, bar_width = np.arange(len(cats)), 0.45
+    bars = ax.bar(xs, vals, color=bar_colors, width=bar_width, edgecolor='white', linewidth=1.2, zorder=3)
+
+    y_max = max(vals) if max(vals) > 0 else 1
+    ax.set_ylim(0, y_max * 1.80)
+
+    for bar, v_val in zip(bars, vals):
+        cx_, cy_ = bar.get_x() + bar.get_width() / 2, bar.get_height()
+        ax.text(cx_, cy_ + y_max * 0.05, f'{v_val:.0f}%', ha='center', va='bottom', fontsize=11, fontweight='bold', color=C_TEXT, zorder=6,
+                bbox=dict(boxstyle='round,pad=0.25,rounding_size=0.4', facecolor='white', edgecolor=title_color, linewidth=0.9))
+
+    ax.tick_params(left=False, bottom=False, labelleft=False)
+    for sp in ax.spines.values(): sp.set_visible(False)
+    ax.set_xticks(xs); ax.set_xticklabels(cats, fontsize=8.0, color=C_TEXT, linespacing=1.2)
+    ax.tick_params(axis='x', pad=4, length=0); ax.set_xlim(-0.65, len(cats) - 1 + 0.65)
+
+# Paneles
+draw_panel_bubble(fig, left=0.527, bottom=0.510, width=0.448, height=0.388,
+                  cats=list(un_srv.keys()), vals=list(un_srv.values()), bar_colors=['#5c9596', '#64a0a1', '#86adae'], title='Un servicio', title_color=C_UNO)
+
+draw_panel_bubble(fig, left=0.527, bottom=0.103, width=0.448, height=0.388,
+                  cats=list(dos_srv.keys()), vals=list(dos_srv.values()), bar_colors=['#234244', '#3b6667', '#4c7d7e'], title='Dos servicios', title_color=C_DOS)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NOTAS Y FUENTE
+# ══════════════════════════════════════════════════════════════════════════════
+fig.text(0.040, 0.055, "Fuente:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.083, 0.055, "IFT con datos de la ENDUTIH 2023, del INEGI. Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/.", fontsize=8, color=C_TEXT)
+fig.text(0.040, 0.033, "Nota:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.073, 0.033, "Los porcentajes pueden no sumar 100% debido al redondeo.", fontsize=8, color=C_TEXT)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# GUARDADO
+# ══════════════════════════════════════════════════════════════════════════════
+plt.savefig(OUTPUT_PATH, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"Figura guardada en: {OUTPUT_PATH}")
+plt.close()

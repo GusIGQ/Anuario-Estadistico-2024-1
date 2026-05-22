@@ -1,119 +1,178 @@
 ﻿import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
 from pathlib import Path
 import sys
+import os
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import numpy as np
-import os
 
-# 1. CARGA Y PREPARACI N DE DATOS
+import warnings
+warnings.filterwarnings("ignore")
 
-ruta_csv = r'datos/F.1.3/tr_endutih_usuarios_anual_2023.csv'
-print("Cargando la base de datos...")
-# Cargar datos
-df = pd.read_csv(ruta_csv, low_memory=False)
+# ─── CONFIGURACIÓN DE COLORES Y ESTILOS (GUÍA CRT) ──────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Diccionario de habilidades mapeando la descripción con su columna en la ENDUTIH
-mapa_habilidades = {
-    'Enviar y recibir correo electrónico': 'P6_8_1',
-    'Descargar contenidos de Internet': 'P6_8_2',
-    'Crear archivos de texto': 'P6_8_4',
-    'Copiar archivos entre directorios (carpetas)': 'P6_8_3',
-    'Crear presentaciones': 'P6_8_6',
-    'Crear hojas de cálculo': 'P6_8_5',
-    'Instalar dispositivos periféricos': 'P6_8_7',
-    'Crear o usar bases de datos': 'P6_8_8',
-    'Programar en lenguaje especializado': 'P6_8_9'
-}
+BG_FIG     = "#FFFFFF"
+BG_AXES    = "#F8F8FA"
+CARD_BG    = "#E8EEF2" 
+TEXT_MAIN  = "#3c3c3b"
+TEXT_LIGHT = "#7c7c7c"
+SQUARE_COL = "#4a7d75"
 
-# Filtros base: 6 años o más Y que sí usan computadora (P6_1 1)
+COLOR_MUJERES = "#b35aba"
+COLOR_HOMBRES = "#006157"
+
+# ─── 1. CARGA Y PREPARACIÓN DE DATOS ─────────────────────────────────────────
+ruta_datos = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\F.1.3\tr_endutih_usuarios_anual_2023.csv"
+print("Cargando la base de datos y calculando valores reales para F.1.3...")
+df = pd.read_csv(ruta_datos, low_memory=False)
+
 filtro_base = (df['EDAD'] >= 6) & (df['P6_1'] == 1)
 filtro_mujeres = filtro_base & (df['SEXO'] == 2)
 filtro_hombres = filtro_base & (df['SEXO'] == 1)
 
-# Totales poblacionales
 total_mujeres_compu = df.loc[filtro_mujeres, 'FAC_PER'].sum()
 total_hombres_compu = df.loc[filtro_hombres, 'FAC_PER'].sum()
 
-# Listas dinámicas para guardar los resultados
-nombres_habilidades = list(mapa_habilidades.keys())
-pct_mujeres = []
-pct_hombres = []
+def get_pct(col):
+    suma_mujeres = df.loc[filtro_mujeres & (df[col] == 1), 'FAC_PER'].sum()
+    suma_hombres = df.loc[filtro_hombres & (df[col] == 1), 'FAC_PER'].sum()
+    m_pct = round((suma_mujeres / total_mujeres_compu) * 100)
+    h_pct = round((suma_hombres / total_hombres_compu) * 100)
+    return m_pct, h_pct
 
-print("\nCalculando porcentajes...")
-for nombre, columna in mapa_habilidades.items():
-    # Suma de factores de expansión para quienes respondieron Sí (1) a la habilidad
-    suma_mujeres = df.loc[filtro_mujeres & (df[columna] == 1), 'FAC_PER'].sum()
-    suma_hombres = df.loc[filtro_hombres & (df[columna] == 1), 'FAC_PER'].sum()
+# Panel destacado superior derecho
+pct_f_email, pct_m_email = get_pct('P6_8_1')
 
-    # Cálculo de porcentajes (redondeados a 0 decimales como en el Anuario)
-    pct_m = round((suma_mujeres / total_mujeres_compu) * 100)
-    pct_h = round((suma_hombres / total_hombres_compu) * 100)
+# Fila 1 (4 tarjetas)
+actividades_row1 = [
+    ("Descargar contenidos\nde Internet", 'P6_8_2'),
+    ("Crear archivos\nde texto", 'P6_8_4'),
+    ("Copiar archivos entre\ndirectorios (carpetas)", 'P6_8_3'),
+    ("Crear\npresentaciones", 'P6_8_6')
+]
+row1_data = [(t, *get_pct(c)) for t, c in actividades_row1]
 
-    pct_mujeres.append(pct_m)
-    pct_hombres.append(pct_h)
+# Fila 2 (4 tarjetas)
+actividades_row2 = [
+    ("Crear hojas\nde cálculo", 'P6_8_5'),
+    ("Instalar dispositivos\nperiféricos", 'P6_8_7'),
+    ("Crear o usar\nbases de datos", 'P6_8_8'),
+    ("Programar en lenguaje\nespecializado", 'P6_8_9')
+]
+row2_data = [(t, *get_pct(c)) for t, c in actividades_row2]
 
-# 2. CREACI N DE LA GRÁFICA
+# ─── FUNCIONES AUXILIARES DE INTERFAZ ───────────────────────────────────────
+def add_rounded_box(ax, x, y, w, h, bg_color=CARD_BG, r=0.015, shadow=True, zorder=2):
+    if shadow:
+        shadow_patch = FancyBboxPatch(
+            (x + 0.002, y - 0.003), w, h,
+            boxstyle=f"round,pad=0,rounding_size={r}",
+            facecolor="#000000", alpha=0.08, edgecolor="none", zorder=zorder-1, clip_on=False
+        )
+        ax.add_patch(shadow_patch)
+    
+    box = FancyBboxPatch(
+        (x, y), w, h,
+        boxstyle=f"round,pad=0,rounding_size={r}",
+        facecolor=bg_color, edgecolor="none", zorder=zorder, clip_on=False
+    )
+    ax.add_patch(box)
 
-# Invertir listas para que la primera habilidad (Correo) aparezca hasta arriba en la gráfica
-nombres_habilidades.reverse()
-pct_mujeres.reverse()
-pct_hombres.reverse()
+def draw_activity_card(ax, x, y, w, h, title, pct_f, pct_m):
+    add_rounded_box(ax, x, y, w, h, bg_color=CARD_BG, r=0.015)
+    
+    ax.text(x + w/2, y + h - 0.035, title, ha='center', va='top', 
+            fontsize=8.5, color=TEXT_MAIN, fontweight='bold', linespacing=1.2)
 
-# Configuración del lienzo
-fig, ax = plt.subplots(figsize=(12, 8))
-x = np.arange(len(nombres_habilidades))
-width = 0.35  # Grosor de las barras
+    x_text = x + w * 0.65 
+    y_f_label = y + h * 0.58
+    y_f_pct   = y + h * 0.44
+    y_m_label = y + h * 0.28
+    y_m_pct   = y + h * 0.14
 
-# Dibujar las barras horizontales
-rects1 = ax.barh(x + width/2, pct_mujeres, width, label='Mujeres', color='#8B3A62') # Color guinda IFT
-rects2 = ax.barh(x - width/2, pct_hombres, width, label='Hombres', color='#B4B4B4') # Color gris
+    ax.text(x_text, y_f_label, "Mujeres", ha='center', va='center', fontsize=8, color=TEXT_MAIN, fontweight='medium')
+    ax.text(x_text, y_f_pct, f"{pct_f}%", ha='center', va='center', fontsize=16, color=COLOR_MUJERES, fontweight='bold')
 
-# Personalización del diseño
-ax.set_xlabel('Porcentaje (%)', fontsize=11)
-ax.set_title('Figura F.1.3. Habilidades en la computadora\n(Porcentaje con respecto del total de usuarios de computadora)', 
-             pad=20, fontsize=14, fontweight='bold')
-ax.set_yticks(x)
-ax.set_yticklabels(nombres_habilidades, fontsize=11)
-ax.legend(loc='lower right', frameon=False, fontsize=11)
+    ax.text(x_text, y_m_label, "Hombres", ha='center', va='center', fontsize=8, color=TEXT_MAIN, fontweight='medium')
+    ax.text(x_text, y_m_pct, f"{pct_m}%", ha='center', va='center', fontsize=16, color=COLOR_HOMBRES, fontweight='bold')
 
-# Estética: Quitar bordes para un diseño más limpio
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['left'].set_color('#cccccc')
-ax.spines['bottom'].set_color('#cccccc')
-ax.set_xlim(0, 100)
 
-# Función para poner los números en las barras
-def autolabel(rects):
-    for rect in rects:
-        width_val = rect.get_width()
-        # Colocamos la etiqueta a la derecha de la barra
-        ax.annotate(f'{int(width_val)}%',
-                    xy=(width_val, rect.get_y() + rect.get_height() / 2),
-                    xytext=(15, 0),  # 15 puntos de separación
-                    textcoords="offset points",
-                    ha='center', va='center',
-                    fontsize=10, fontweight='bold', color='#333333')
+# ─── CONFIGURACIÓN DEL LIENZO ───────────────────────────────────────────────
+fig = plt.figure(figsize=(16, 8.5), facecolor=BG_FIG)
+ax = fig.add_axes((0.08, 0.22, 0.84, 0.63), facecolor=BG_AXES)
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.axis("off")
 
-autolabel(rects1)
-autolabel(rects2)
+# ─── ENCABEZADO ─────────────────────────────────────────────────────────────
+ax.text(0.0, 1.15, '   ', bbox=dict(boxstyle='round,pad=0.4,rounding_size=0.1', facecolor=SQUARE_COL, edgecolor='none'))
+ax.text(0.025, 1.15, "Figura F.1.", fontweight='bold', fontsize=14, color=TEXT_MAIN, va='center')
+ax.text(0.12, 1.15, "Habilidades en la computadora", fontweight='medium', fontsize=14, color=TEXT_MAIN, va='center')
 
-# Ajustar márgenes para que los textos no se corten
-fig.suptitle('Figura F.1.3. Habilidades en la computadora', fontsize=14, fontweight='bold', y=1.02)
-fig.tight_layout()
+# ─── PANELES SUPERIORES ─────────────────────────────────────────────────────
+# 1. Panel Izquierdo
+add_rounded_box(ax, 0.0, 0.74, 0.20, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.10, 0.88, "Habilidades en\nla computadora", ha='center', va='center', fontsize=12, color=TEXT_MAIN, fontweight='bold', linespacing=1.3)
 
-print("Generando Gráfica...")
+# 2. Panel Central
+add_rounded_box(ax, 0.22, 0.74, 0.43, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.435, 0.94, "Usuarios de computadora", ha='center', va='center', fontsize=11, color=TEXT_MAIN, fontweight='bold')
 
-# Guardar la gráfica en la carpeta de salida
-output_dir = PROJECT_ROOT / "output"
+ax.text(0.33, 0.89, "Mujeres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.33, 0.82, f"{int(total_mujeres_compu):,}", ha='center', va='center', fontsize=18, color=COLOR_MUJERES, fontweight='bold')
+
+ax.text(0.54, 0.89, "Hombres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.54, 0.82, f"{int(total_hombres_compu):,}", ha='center', va='center', fontsize=18, color=COLOR_HOMBRES, fontweight='bold')
+
+# 3. Panel Derecho
+add_rounded_box(ax, 0.67, 0.74, 0.33, 0.28, bg_color=CARD_BG, r=0.02)
+ax.text(0.835, 0.94, "Enviar y recibir\ncorreo electrónico", ha='center', va='center', fontsize=11, color=TEXT_MAIN, fontweight='bold', linespacing=1.2)
+
+ax.text(0.76, 0.85, "Mujeres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.76, 0.80, f"{pct_f_email}%", ha='center', va='center', fontsize=18, color=COLOR_MUJERES, fontweight='bold')
+
+ax.text(0.91, 0.85, "Hombres", ha='center', va='center', fontsize=9, color=TEXT_MAIN, fontweight='medium')
+ax.text(0.91, 0.80, f"{pct_m_email}%", ha='center', va='center', fontsize=18, color=COLOR_HOMBRES, fontweight='bold')
+
+
+# ─── CUADRÍCULA DE ACTIVIDADES (4x2) ────────────────────────────────────────
+ROW1_Y = 0.37
+ROW1_H = 0.35
+ROW2_Y = 0.00
+ROW2_H = 0.35
+GAP = 0.02
+
+w_total_grid = 1.0 - (GAP * 3)
+w_card = w_total_grid / 4
+
+# Fila 1
+for i, (title, pf, pm) in enumerate(row1_data):
+    cx = i * (w_card + GAP)
+    draw_activity_card(ax, cx, ROW1_Y, w_card, ROW1_H, title, pf, pm)
+
+# Fila 2
+for i, (title, pf, pm) in enumerate(row2_data):
+    cx = i * (w_card + GAP)
+    draw_activity_card(ax, cx, ROW2_Y, w_card, ROW2_H, title, pf, pm)
+
+# ─── PIE DE PÁGINA ──────────────────────────────────────────────────────────
+fig.text(0.08, 0.12, "Fuente:", fontweight='bold', fontsize=8, color=TEXT_MAIN)
+fig.text(0.115, 0.12, "IFT con datos de la ENDUTIH 2023, del INEGI. Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/", fontweight='normal', fontsize=8, color=TEXT_MAIN)
+
+fig.text(0.08, 0.09, "Notas:", fontweight='bold', fontsize=8, color=TEXT_MAIN)
+fig.text(0.115, 0.09, "Todos los usuarios se refieren a personas de 6 años o más.", fontweight='normal', fontsize=8, color=TEXT_MAIN)
+
+
+# ─── GUARDAR Y MOSTRAR ──────────────────────────────────────────────────────
+output_dir = r"C:\Users\ivan-\Documents\GitHub\anuario\output"
 os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, "figura_f1.3.png")
-# Guardar salida
-plt.savefig(output_path, dpi=300, bbox_inches='tight')
-print(f"Gráfica guardada en: {output_path}")
+
+plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor=BG_FIG, edgecolor='none')
+print(f"✅ Infografía F.1.3 generada con diseño CRT en: {output_path}")
 
 plt.show()

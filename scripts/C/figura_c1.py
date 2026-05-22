@@ -10,86 +10,65 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
-from matplotlib.patches import FancyBboxPatch
+# from _plot_data_logger import enable_plot_data_logging
+# enable_plot_data_logging()
+from matplotlib.patches import Rectangle
 import numpy as np
 import os
 
-# Rutas
-INPUT  = PROJECT_ROOT / "datos" / "C.1" / "TD_DIST_ESPECTRO_VA.csv"
-OUTPUT = PROJECT_ROOT / "output" / "Figura_C1.png"
-os.makedirs(PROJECT_ROOT / "output", exist_ok=True)
+# Importar estilos centralizados
+from estilos import PALETAS, CONFIG_GRAFICA
 
-# Leer CSV y filtrar ago-24
-df = pd.read_csv(INPUT)
-row = df[df["ESTADO"] == "ago-24"].iloc[0]
+# ── Configuración de Tipografía y Colores Globales ────────────────────
+# Se fuerza el uso de Noto Sans y el color general oscuro de la guía
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-bandas = {
-    "Banda de\n2500 MHz": ("B_2_5_GHZ", "#E07A5F"),   # rojo/salmón
-    "Banda AWS":           ("B_AWS",     "#E07A5F"),   # rojo/salmón (más claro)
-    "Banda de\n700 MHz":  ("B_700_MHZ", "#3D405B"),   # azul marino oscuro
-    "Banda de\n3500 MHz": ("B_3_5_GHZ", "#3D405B"),   # azul marino oscuro
-    "Banda PCS":           ("B_PCS",     "#2196a0"),   # teal
-    "Banda de\n3300 MHz": ("B_3_3_GHZ", "#2196a0"),   # teal
-    "Banda de\n850 MHz":  ("B_850_MHZ", "#5b9fc9"),   # azul medio
-    "Banda de\n800 MHz":  ("B_800_MHZ", "#5b9fc9"),   # azul medio
-}
+# ── Rutas ─────────────────────────────────────────────────────────────
+INPUT  = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\C.1\TD_DIST_ESPECTRO_VA.csv"
+OUTPUT = r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_C1.png"
+os.makedirs(r"C:\Users\ivan-\Documents\GitHub\anuario\output", exist_ok=True)
 
-valores = {}
-colores = {}
-for k, (col, c) in bandas.items():
-    valores[k] = int(row[col]) if not pd.isna(row[col]) else 0
-    colores[k] = c
+# ── Leer CSV y filtrar ago-24 ─────────────────────────────────────────
+try:
+    df = pd.read_csv(INPUT)
+    row = df[df["ESTADO"] == "ago-24"].iloc[0]
+    total = int(row["B_700_MHZ"] + row["B_800_MHZ"] + row["B_850_MHZ"] +
+                row["B_PCS"] + row["B_AWS"] + row["B_2_5_GHZ"] +
+                row["B_3_3_GHZ"] + row["B_3_5_GHZ"])
+except FileNotFoundError:
+    print("CSV no encontrado en esta ruta. Usando total de 645 para renderizar el gráfico.")
+    total = 645
 
-total = int(row["B_700_MHZ"] + row["B_800_MHZ"] + row["B_850_MHZ"] +
-            row["B_PCS"] + row["B_AWS"] + row["B_2_5_GHZ"] +
-            row["B_3_3_GHZ"] + row["B_3_5_GHZ"])
-
-# Layout manual del treemap (posiciones relativas al PDF)
-# Cada cuadro: (x, y, ancho, alto) en unidades normalizadas 0,1
-# El tamaño es proporcional a los MHz
-# Layout visual del Anuario (2 columnas grandes + 2 columnas derecha)
-
-# 2500 MHz AWS 3500 MHz PCS 3300
-# 2500 MHz AWS 700 MHz 850 800
-
-fig, ax = plt.subplots(figsize=(13, 7))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+# ── Layout manual del treemap (posiciones relativas al PDF) ───────────
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor(CONFIG_GRAFICA["facecolor_figure"])
+ax.set_facecolor(CONFIG_GRAFICA["facecolor_axes"])
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
 ax.axis("off")
 
-# Definir celdas manualmente (x0, y0, w, h) proporcionales a MHz
-# Columna 1: 2500 MHz (140) ocupa toda la altura
-# Columna 2: AWS (130) ocupa toda la altura
-# Columna 3: 3500 (100) arriba + 700 (90) abajo
-# Columna 4: PCS (68) arriba + 850 (47) abajo
-# Columna 5: 3300 (50) arriba + 800 (20) abajo
+PAD = 0.005 # Espacio fino entre cuadros (gap)
 
-PAD = 0.008
+# Paleta monocromática teal de la guía, asignada de mayor a menor MHz
+teal = PALETAS["teal"]
 
 celdas = [
     # (nombre, x0, y0, w, h, color)
-    ("Banda de\n2500 MHz\n140",  0.00,  0.00, 0.210, 1.00, "#E8735A"),
-    ("Banda AWS\n130",           0.215, 0.00, 0.195, 1.00, "#F0956A"),
-    ("Banda de\n3500 MHz\n100",  0.415, 0.53, 0.245, 0.47, "#2F4A6D"),
-    ("Banda de\n700 MHz\n90",    0.415, 0.00, 0.245, 0.52, "#3D5A80"),
-    ("Banda PCS\n68",            0.665, 0.40, 0.195, 0.60, "#2196A0"),
-    ("Banda de\n850 MHz\n47",    0.665, 0.00, 0.195, 0.39, "#4AABB5"),
-    ("Banda de\n3300 MHz\n50",   0.865, 0.40, 0.135, 0.60, "#17768A"),
-    ("Banda de\n800 MHz\n20",    0.865, 0.00, 0.135, 0.39, "#5BBDD6"),
+    ("Banda de\n2500 MHz\n140",  0.00,  0.00, 0.210, 1.00, teal[0]),
+    ("Banda AWS\n130",           0.215, 0.00, 0.195, 1.00, teal[1]),
+    ("Banda de\n3500 MHz\n100",  0.415, 0.53, 0.245, 0.47, teal[2]),
+    ("Banda de\n700 MHz\n90",    0.415, 0.00, 0.245, 0.52, teal[3]),
+    ("Banda PCS\n68",            0.665, 0.40, 0.195, 0.60, teal[4]),
+    ("Banda de\n850 MHz\n47",    0.665, 0.00, 0.195, 0.39, teal[6]),
+    ("Banda de\n3300 MHz\n50",   0.865, 0.40, 0.135, 0.60, teal[5]),
+    ("Banda de\n800 MHz\n20",    0.865, 0.00, 0.135, 0.39, teal[7]),
 ]
 
 for (label, x0, y0, w, h, color) in celdas:
-    # Rectángulo con padding
-    rect = FancyBboxPatch(
+    # Rectángulo con esquinas rectas como el treemap original
+    rect = Rectangle(
         (x0 + PAD, y0 + PAD),
         w - 2*PAD, h - 2*PAD,
-        boxstyle="round,pad=0.005",
         linewidth=0,
         facecolor=color,
         zorder=2
@@ -101,50 +80,53 @@ for (label, x0, y0, w, h, color) in celdas:
     cy = y0 + h / 2
 
     lines = label.strip().split("\n")
-    # sltima línea número MHz (negrita grande), resto nombre banda
     nombre = "\n".join(lines[:-1])
     mhz    = lines[-1]
 
-    # Tamaño de fuente proporcional al área de la celda
-    area = w * h
-    fs_nombre = max(7, min(13, area * 120))
-    fs_mhz    = max(10, min(22, area * 200))
-
+    # Etiquetas de datos: Ambas en negritas para cumplir con la legibilidad y la guía
     ax.text(cx, cy + h * 0.10, nombre,
-            ha="center", va="center", fontsize=fs_nombre,
-            color="white", fontweight="normal",
+            ha="center", va="center", fontsize=10,
+            color="white", fontweight="bold",
             multialignment="center", zorder=3)
     ax.text(cx, cy - h * 0.14, mhz,
-            ha="center", va="center", fontsize=fs_mhz,
+            ha="center", va="center", fontsize=16,
             color="white", fontweight="bold", zorder=3)
 
-# Título y fuente
-fig.text(0.01, 0.97,
-         "Figura C.1. Espectro radioeléctrico (MHz) asignado por banda de frecuencia",
-         fontsize=12, fontweight="bold", va="top")
+# ── Título y fuente ───────────────────────────────────────────────────
+# Cuadrado decorativo
+ax.annotate(' ', xy=(0, 1), xycoords='axes fraction',
+            xytext=(0, 30), textcoords='offset points',
+            fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-fig.text(0.01, 0.01,
-         f"Fuente: IFT con datos a agosto de 2024.  |  Total asignado: {total} MHz\n"
-         "Nota: El tamaño de los cuadros corresponde a los MHz asignados por banda de frecuencia.\n"
-         "La banda AWS corresponde a las bandas de 1.7/2.1 GHz; la banda PCS corresponde a la banda de 1900 MHz.",
-         fontsize=7.5, color="#555555", va="bottom")
+# Número de figura
+ax.annotate('Figura C.1.', xy=(0, 1), xycoords='axes fraction',
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color='#3c3c3b')
 
-plt.tight_layout(rect=[0, 0.07, 1, 0.94])
-# Guardar gráfica en formatos PNG y SVG
-output_dir = PROJECT_ROOT / "output"
-os.makedirs(output_dir, exist_ok=True)
-output_png = output_dir / "Figura_C1.png"
-output_svg = output_dir / "Figura_C1.svg"
+# Título
+ax.annotate('Espectro radioeléctrico (MHz) asignado por banda de frecuencia', xy=(0, 1), xycoords='axes fraction',
+            xytext=(100, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color='#3c3c3b')
 
-plt.rcParams['svg.fonttype'] = 'none'
+# ── Notas al pie ──────────────────────────────────────────────────────────
+ax.annotate('Fuente:', xy=(0.08, 0.06), xycoords='figure fraction',
+            fontsize=8, fontweight='bold', color='#3c3c3b', va='top')
+ax.annotate('IFT con datos a agosto de 2024.',
+            xy=(0.08, 0.06), xycoords='figure fraction',
+            xytext=(38, 0), textcoords='offset points',
+            fontsize=8, fontweight='normal', color='#3c3c3b', va='top')
 
-# Guardar salida PNG (alta resolución)
-plt.savefig(output_png, dpi=300, bbox_inches="tight", facecolor='white', edgecolor='none')
-print(f"Gráfica guardada en versión PNG de alta resolución: {output_png}")
+ax.annotate('Nota:', xy=(0.08, 0.038), xycoords='figure fraction',
+            fontsize=8, fontweight='bold', color='#3c3c3b', va='top')
+ax.annotate('El tamaño de los cuadros corresponde a los Megahertz asignados por banda de frecuencia. La banda AWS, Advanced Wireless Systems, por sus siglas en inglés corresponde a las bandas\n'
+            'de 1.7/2.1 GHz, mientras que la banda PCS, Personal Communications Service, corresponde a la banda de 1900 MHz.',
+            xy=(0.08, 0.038), xycoords='figure fraction',
+            xytext=(28, 0), textcoords='offset points',
+            fontsize=8, fontweight='normal', color='#3c3c3b', va='top')
 
-# Guardar salida SVG (vectorial escalable)
-plt.savefig(output_svg, format='svg', bbox_inches="tight", facecolor='white', edgecolor='none')
-print(f"Gráfica guardada en versión vectorial SVG editable: {output_svg}")
-
-plt.close()
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+fig.savefig(OUTPUT, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+plt.close(fig)
+print(f"Guardado: {OUTPUT}")
 print(f"Total MHz (ago-24): {total}")

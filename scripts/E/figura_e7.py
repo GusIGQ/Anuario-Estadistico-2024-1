@@ -1,23 +1,22 @@
 ﻿import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
 import os
 
-# 1. RUTAS Y CARGA DE DATOS (DINÁMICO)
-
-# Importante Asegúrate de que estas rutas coincidan con la ubicación en tu PC
-ruta_2022 = PROJECT_ROOT / "datos" / "E.7" / "Base de datos_Cuarta Encuesta 2022_MiPymes.xlsx"
-ruta_2023 = PROJECT_ROOT / "datos" / "E.7" / "Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx"
+# ==========================================
+# 1. RUTAS Y CARGA DE DATOS
+# ==========================================
+ruta_2022 = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\E.7\Base de datos_Cuarta Encuesta 2022_MiPymes.xlsx"
+ruta_2023 = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\E.7\Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx"
 
 try:
-    # Usar openpyxl como motor para leer xlsx
     df_2022 = pd.read_excel(ruta_2022, engine='openpyxl')
     df_2023 = pd.read_excel(ruta_2023, engine='openpyxl')
     print("¡Bases de datos cargadas exitosamente!")
@@ -25,12 +24,11 @@ except Exception as e:
     print(f"Error fatal al cargar archivos Excel: {e}")
     exit()
 
-# 2. CONFIGURACI N Y FUNCIONES DE CÁLCULO
-
-# Categorías estándar para el eje X
+# ==========================================
+# 2. CONFIGURACIÓN Y FUNCIONES DE CÁLCULO
+# ==========================================
 categorias = ['General', 'Micro', 'Pequeña', 'Mediana']
 
-# Configuración de los 6 dispositivos (Título en PDF y Palabra clave en Excel)
 configuracion_dispositivos = [
     {"titulo": "Teléfonos móviles inteligentes\n(Smartphones)", "clave": "Smartphone"},
     {"titulo": "Computadoras de escritorio", "clave": "escritorio"},
@@ -40,156 +38,137 @@ configuracion_dispositivos = [
     {"titulo": "Servidores de almacenamiento\nde información", "clave": "Servidores"}
 ]
 
-# Función para calcular porcentaje ponderado
 def calcular_pct_ponderado(df, col_val, col_peso):
-    # Asegurarnos de que no hay valores vacíos antes de calcular
     df_valido = df[df[col_val].notna()]
     if df_valido.empty: return 0.0
-    # Sumamos los pesos de los que contestaron que Sí (empiezan con la S)
     peso_si = df_valido.loc[df_valido[col_val].astype(str).str.startswith('S', na=False), col_peso].sum()
     peso_total = df_valido[col_peso].sum()
     return (peso_si / peso_total) * 100 if peso_total > 0 else 0
 
-# --- PROCESO DE CÁLCULO DINÁMICO ---
 print("\nIniciando cálculo de datos al vuelo...")
-
-# Estructura para guardar resultados: resultados Smartphone 2023 Gral, Micro, Peq, Med
 resultados = {} 
 
 for df, anio in [(df_2022, 2022), (df_2023, 2023)]:
-    # Identificar columnas clave dinámicamente en esta base
     col_tam = [c for c in df.columns if 'tama' in c.lower() or 'tam' in c.lower()][0]
     col_fac = [c for c in df.columns if 'factor' in c.lower() or 'expans' in c.lower()][0]
-
+    
     for dev in configuracion_dispositivos:
         titulo = dev['titulo']
         if titulo not in resultados: resultados[titulo] = {}
-
-        # Encontrar la columna exacta para este dispositivo en esta base
+        
         col_dev = [c for c in df.columns if dev['clave'].lower() in c.lower()][0]
-
-        # Calcular los 4 valores
+        
         lista_pcts = []
-        # 1. General
         lista_pcts.append(calcular_pct_ponderado(df, col_dev, col_fac))
-        # 2-4. Por tamaño
         for cat in categorias[1:]:
-            # Buscar el nombre real en la columna (ej. Pequeña, Peque f a)
             nombre_real = [t for t in df[col_tam].dropna().unique() if cat[:4].lower() in t.lower()][0]
             df_tam = df[df[col_tam] == nombre_real]
             lista_pcts.append(calcular_pct_ponderado(df_tam, col_dev, col_fac))
-
+            
         resultados[titulo][anio] = lista_pcts
 
-print("¡Cálculos completados! Generando Gráfica...")
+print("¡Cálculos completados! Generando gráfica...")
 
-# 3. GENERACI N DE LA GRÁFICA MULTIPANEL
+# ==========================================
+# 3. GENERACIÓN DE LA GRÁFICA MULTIPANEL (Estilo F.16)
+# ==========================================
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Configurar el lienzo (2 filas x 3 columnas 6 gráficas)
 fig, axes = plt.subplots(2, 3, figsize=(18, 11), dpi=150)
-fig.patch.set_facecolor('#F8FBFA') # Fondo sutil azulado del PDF
+fig.patch.set_facecolor('white')
 
-# Colores fila superior (índices 0, 1, 2)
-color_2022_top = '#AEE0D8' # Verde agua claro
-color_2023_top = '#297285' # Azul/Teal oscuro
-
-# Colores fila inferior (índices 3, 4, 5)
-color_2022_bot = '#F5A18B' # Naranja claro
-color_2023_bot = '#EA5D4E' # Rojo oscuro
+# Colores institucionales alineados a F.16
+COLOR_2022 = '#86adae'  # Teal claro
+COLOR_2023 = '#335a5c'  # Teal oscuro
+color_texto = '#3c3c3b'
 
 x = np.arange(len(categorias))
-width = 0.3  # Ancho de las barras
-
-# Título Principal
-fig.text(0.02, 0.94, '■', fontsize=12, color='#E8604B', fontweight='bold', ha='left')
-fig.text(0.03, 0.94, 'Figura E.7. Dispositivos que usan las MiPymes para realizar sus actividades (2022-2023)', 
-         fontsize=14, fontweight='bold', color='#5D6778', ha='left')
+width = 0.35 
 
 axes_planos = axes.flatten()
 
 for i, ax in enumerate(axes_planos):
     config = configuracion_dispositivos[i]
     titulo = config['titulo']
-
+    
     data_2022 = resultados[titulo][2022]
     data_2023 = resultados[titulo][2023]
 
-    c_2022 = color_2022_top if i < 3 else color_2022_bot
-    c_2023 = color_2023_top if i < 3 else color_2023_bot
-
-    # Fondo redondeado de cada panel
-    bbox = mpatches.FancyBboxPatch(
-        (0, 0), 1, 1,
-        boxstyle="round,pad=0.08,rounding_size=0.04",
-        transform=ax.transAxes,
-        facecolor='#F0F6F5',
-        edgecolor='none',
-        zorder=0
-    )
-    ax.add_patch(bbox)
-    ax.set_facecolor('none')
-
+    ax.set_facecolor('#F8F8FA')
+    
     # Pintar las barras
-    rects1 = ax.bar(x - width/2 - 0.02, data_2022, width, label='2022', color=c_2022, zorder=3)
-    rects2 = ax.bar(x + width/2 + 0.02, data_2023, width, label='2023', color=c_2023, zorder=3)
-
-    # Titulo del panel (evitando set_title para posicionar dentro de la tarjeta)
-    ax.text(0.05, 0.92, titulo, transform=ax.transAxes, fontsize=12, fontweight='bold', color='#3B4252',
-            va='top', ha='left')
-
+    rects1 = ax.bar(x - width/2, data_2022, width, label='2022', color=COLOR_2022, edgecolor='none', zorder=2)
+    rects2 = ax.bar(x + width/2, data_2023, width, label='2023', color=COLOR_2023, edgecolor='none', zorder=2)
+    
+    ax.set_title(titulo, fontsize=11, fontweight='bold', color=color_texto, pad=15)
+    
+    # Diseño limpio de Ejes
     ax.set_xticks(x)
-    ax.set_xticklabels(categorias, fontsize=10, fontweight='bold', color='#7A8593')
-
-    # Limpieza visual
-    ax.get_yaxis().set_visible(False)
-    for spine in ax.spines.values(): 
-        spine.set_visible(False)
-    ax.tick_params(axis='x', length=0, pad=8)
-
-    # Etiquetas de datos
-    def autolabel(rects, ax):
+    ax.set_xticklabels(categorias, fontsize=10, fontweight='normal', color=color_texto)
+    
+    max_h = max(max(data_2022), max(data_2023))
+    ax.set_ylim(0, max_h * 1.35)
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+    ax.tick_params(axis='y', labelsize=9, colors=color_texto)
+    
+    ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#7c7c7c')
+    ax.spines['bottom'].set_color('#7c7c7c')
+    
+    # Etiquetas de datos (Chips estilo F.16)
+    def autolabel(rects, ax_target):
         for rect in rects:
             height = rect.get_height()
             if height > 0:
-                ax.annotate(f'{height:.1f}%',
+                bar_color = rect.get_facecolor()
+                ax_target.annotate(f'{height:.1f}%',
                             xy=(rect.get_x() + rect.get_width() / 2, height),
-                            xytext=(0, 5), 
+                            xytext=(0, 6), 
                             textcoords="offset points",
-                            ha='center', va='bottom', fontsize=9, fontweight='bold', color='#4C566A')
+                            ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                            bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
 
     autolabel(rects1, ax)
     autolabel(rects2, ax)
 
-    max_h = max(data_2022 + data_2023)
-    ax.set_ylim(0, max_h + 30) # Espacio para el título y leyendas
+# 4. Títulos Globales (Estilo F.16)
+fig.text(0.04, 0.94, '   ', fontsize=2,
+         bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-    # Mini leyenda por panel
-    patch_2022 = mpatches.Patch(color=c_2022, label='2022')
-    patch_2023 = mpatches.Patch(color=c_2023, label='2023')
-    ax.legend(handles=[patch_2022, patch_2023], loc='lower center', bbox_to_anchor=(0.5, -0.25),
-               ncol=2, frameon=False, fontsize=10, handlelength=1.5, handleheight=0.6)
+fig.text(0.05, 0.94, "Figura E.7.", 
+         fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-# Ajuste global
-plt.subplots_adjust(wspace=0.15, hspace=0.45, top=0.85, bottom=0.2, left=0.03, right=0.97)
+fig.text(0.11, 0.94, " Dispositivos que usan las MiPymes para realizar sus actividades (2022-2023)", 
+         fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
 
-# Textos inferiores (Footer)
-footer_y = 0.08
-fig.text(0.02, footer_y, 'Fuente: ', fontsize=10, fontweight='bold', color='#3B4252', ha='left')
-fig.text(0.06, footer_y, 'IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeñas y medianas empresas).', 
-         fontsize=10, color='#3B4252', ha='left')
+# 5. Leyenda Global Centralizada
+handles = [mpatches.Patch(color=COLOR_2022, label='2022'), mpatches.Patch(color=COLOR_2023, label='2023')]
+fig.legend(handles=handles, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=2, fontsize=11, frameon=False, handlelength=2.5)
 
-fig.text(0.02, footer_y - 0.025, 'Para más información consultar: ', fontsize=10, color='#3B4252', ha='left')
-fig.text(0.165, footer_y - 0.025, 'https://www.ift.org.mx/usuarios-y-audiencias/encuestas-trimestrales.', 
-         fontsize=10, color='#3B4252', ha='left', style='italic')
+# 6. Notas al pie
+font_size_notes = 8
+x_start = 0.04
+y_fuente = 0.08
 
-fig.text(0.02, footer_y - 0.05, 'Nota: ', fontsize=10, fontweight='bold', color='#3B4252', ha='left')
-fig.text(0.05, footer_y - 0.05, 'Respuesta múltiple, por lo que la suma no da 100%. Es importante señalar que los resultados pueden presentar variaciones que pueden ser explicadas por el error teórico de cada encuesta.', 
-         fontsize=10, color='#3B4252', ha='left')
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = ('IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeñas y medianas empresas).\n'
+               'Para más información consultar: https://www.ift.org.mx/usuarios-y-audiencias/encuestas-trimestrales.')
+fig.text(x_start + 0.028, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
 
-ruta_salida_dir = PROJECT_ROOT / "output"
-nombre_imagen = "figura_E7.png"
+y_nota = 0.04
+fig.text(x_start, y_nota, "Nota: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+nota_text = 'Respuesta múltiple, por lo que la suma no da 100%. Los resultados pueden presentar variaciones explicadas por el error teórico de cada encuesta.'
+fig.text(x_start + 0.022, y_nota, nota_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# 7. Ajuste y Guardar
+plt.subplots_adjust(wspace=0.15, hspace=0.35, top=0.88, bottom=0.22, left=0.04, right=0.96)
+
+ruta_salida_dir = r"C:\Users\ivan-\Documents\GitHub\anuario\output"
+nombre_imagen = "figura_e7.png"
 ruta_completa = os.path.join(ruta_salida_dir, nombre_imagen)
 os.makedirs(ruta_salida_dir, exist_ok=True)
-# Guardar salida
-plt.savefig(ruta_completa, facecolor=fig.get_facecolor(), bbox_inches='tight', dpi=150)
-print(f"¡Gráfica completa y réplica exportada exitosamente en: {ruta_completa}!")
+
+plt.savefig(ruta_completa, facecolor='white', edgecolor='none', bbox_inches='tight', dpi=300)
+print(f"¡Figura E.7 construida y validada con el estilo F.16 en: {ruta_completa}!")

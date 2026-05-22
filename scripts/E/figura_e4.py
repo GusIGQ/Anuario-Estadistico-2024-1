@@ -6,68 +6,67 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-# 1. Cargar bases de datos históricas
-df22 = pd.read_excel(PROJECT_ROOT / "datos" / "E.4" / "Base de datos_Cuarta Encuesta 2022_MiPymes.xlsx")
-df23 = pd.read_excel(PROJECT_ROOT / "datos" / "E.4" / "Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx")
+# 1. Cargar bases de datos histÃ³ricas
+df22 = pd.read_excel(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\E.4\Base de datos_Cuarta Encuesta 2022_MiPymes.xlsx")
+df23 = pd.read_excel(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\E.4\Base de datos_Cuarta Encuesta 2023_MiPymes.xlsx")
 
 # 2. Definir las preguntas (columnas) exactas de los servicios contratados
 cols = {
-    'Internet Fijo': 'Hablando exclusivamente de la empresa o negocio ¿cuáles de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? Conexión a Internet fijo (incluye conexión Wi-Fi)',
-    'Telefonía Fija': 'Hablando exclusivamente de la empresa o negocio ¿cuáles de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? Telefonía fija',
-    'Telefonía Móvil': 'Hablando exclusivamente de la empresa o negocio ¿cuáles de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? Telefonía móvil',
-    'Datos Móviles': 'Hablando exclusivamente de la empresa o negocio ¿cuáles de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? Conexión a Internet por datos móviles (por red de telefonía móvil)',
-    'Televisión de Paga': 'Hablando exclusivamente de la empresa o negocio ¿cuáles de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? Televisión de paga'
+    'Internet Fijo': 'Hablando exclusivamente de la empresa o negocio Â¿cuÃ¡les de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? ConexiÃ³n a Internet fijo (incluye conexiÃ³n Wi-Fi)',
+    'TelefonÃ­a Fija': 'Hablando exclusivamente de la empresa o negocio Â¿cuÃ¡les de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? TelefonÃ­a fija',
+    'TelefonÃ­a MÃ³vil': 'Hablando exclusivamente de la empresa o negocio Â¿cuÃ¡les de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? TelefonÃ­a mÃ³vil',
+    'Datos MÃ³viles': 'Hablando exclusivamente de la empresa o negocio Â¿cuÃ¡les de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? ConexiÃ³n a Internet por datos mÃ³viles (por red de telefonÃ­a mÃ³vil)',
+    'TelevisiÃ³n de Paga': 'Hablando exclusivamente de la empresa o negocio Â¿cuÃ¡les de los siguientes servicios se tienen contratados para poder llevar a cabo las actividades laborales? TelevisiÃ³n de paga'
 }
 
-sizes = ['General', 'Micro', 'Pequeña', 'Mediana']
+sizes = ['General', 'Micro', 'PequeÃ±a', 'Mediana']
 results = []
 
-# 3. Función matemática para calcular porcentajes usando el Factor de Expansión
+# 3. FunciÃ³n matemÃ¡tica para calcular porcentajes usando el Factor de ExpansiÃ³n
 def calc_percentages(df, year):
-    peso = 'Factor de Expansión Final'
+    peso = 'Factor de ExpansiÃ³n Final'
     if peso not in df.columns:
-         peso = 'Factor de Expansión Final Normalizado' # Fallback por si cambia el nombre
-
+         peso = 'Factor de ExpansiÃ³n Final Normalizado' # Fallback por si cambia el nombre
+         
     for svc_name, col_name in cols.items():
         if col_name in df.columns:
             # Filtrar valores nulos
-            df_filtered = df[[col_name, peso, 'Clasificación de la empresa por su tamaño']].dropna(subset=[col_name, peso])
-
-            # Calcular para el rubro General
+            df_filtered = df[[col_name, peso, 'ClasificaciÃ³n de la empresa por su tamaÃ±o']].dropna(subset=[col_name, peso])
+            
+            # Calcular para el rubro "General"
             total_weight = df_filtered[peso].sum()
-            yes_weight = df_filtered[df_filtered[col_name] == 'Sí'][peso].sum()
+            yes_weight = df_filtered[df_filtered[col_name] == 'SÃ­'][peso].sum()
             results.append({'Service': svc_name, 'Year': year, 'Size': 'General', 'Percentage': (yes_weight/total_weight)*100})
-
-            # Calcular segmentado por tamaño (Micro, Pequeña, Mediana)
-            for size in ['Micro', 'Pequeña', 'Mediana']:
-                df_size = df_filtered[df_filtered['Clasificación de la empresa por su tamaño'] == size]
+            
+            # Calcular segmentado por tamaÃ±o (Micro, PequeÃ±a, Mediana)
+            for size in ['Micro', 'PequeÃ±a', 'Mediana']:
+                df_size = df_filtered[df_filtered['ClasificaciÃ³n de la empresa por su tamaÃ±o'] == size]
                 size_total = df_size[peso].sum()
-                size_yes = df_size[df_size[col_name] == 'Sí'][peso].sum()
+                size_yes = df_size[df_size[col_name] == 'SÃ­'][peso].sum()
                 if size_total > 0:
                     results.append({'Service': svc_name, 'Year': year, 'Size': size, 'Percentage': (size_yes/size_total)*100})
 
-# Ejecutar cálculos para ambos años
+# Ejecutar cÃ¡lculos para ambos aÃ±os
 calc_percentages(df22, 2022)
 calc_percentages(df23, 2023)
 df_results = pd.DataFrame(results)
 
-# 4. Construir la interfaz de la tabla tipo infografía (Reemplazando los gráficos de barras)
+# 4. Construir la interfaz de la tabla tipo infografÃ­a (Reemplazando los grÃ¡ficos de barras)
 fig, ax = plt.subplots(figsize=(15, 8))
 plt.subplots_adjust(left=0.05, right=0.95, top=0.9, bottom=0.15)
 ax.set_xlim(0, 11.5)
-ax.set_ylim(-1.5, 7.5) # Expandir para acomodar título y notas
+ax.set_ylim(-1.5, 7.5) # Expandir para acomodar tÃ­tulo y notas
 ax.axis('off')
 
-# Título de la figura
-ax.text(0, 7.3, "■", color='#EA746A', fontsize=12, ha='left', va='center')
-ax.text(0.2, 7.3, "Figura E.4. ", fontweight='bold', color='#636E7B', fontsize=14, ha='left', va='center')
+# TÃ­tulo de la figura
+ax.text(0, 7.3, "â– ", color='#EA746A', fontsize=12, ha='left', va='center')
+ax.text(0.2, 7.3, "Figura E.4.", fontweight='bold', color='#636E7B', fontsize=14, ha='left', va='center')
 ax.text(1.3, 7.3, "Servicios de telecomunicaciones que contratan las MiPymes (2022-2023)", color='#636E7B', fontsize=14, ha='left', va='center')
 
 import matplotlib.patches as patches
 
-# Definir colores de celdas según el año y tipo de empresa
+# Definir colores de celdas segÃºn el aÃ±o y tipo de empresa
 colors = {
     'Header_2022': '#D8E8E2',
     'Header_2023': '#F0F5F8',
@@ -75,13 +74,13 @@ colors = {
     ('General', 2023): '#F0F5F8',
     ('Micro', 2022): '#F9DFD6',
     ('Micro', 2023): '#F4AE9D',
-    ('Pequeña', 2022): '#F4BCAD',
-    ('Pequeña', 2023): '#EC7C6F',
+    ('PequeÃ±a', 2022): '#F4BCAD',
+    ('PequeÃ±a', 2023): '#EC7C6F',
     ('Mediana', 2022): '#C0D5E0',
     ('Mediana', 2023): '#80A8BA'
 }
 
-# Función para dibujar celdas (fondo y texto)
+# FunciÃ³n para dibujar celdas (fondo y texto)
 def draw_cell(x, y, w, h, bg_color, text='', font_weight='normal', font_size=11, text_color='#5B6770', align='center'):
     if bg_color:
         rect = patches.Rectangle((x, y), w, h, facecolor=bg_color, edgecolor='none', zorder=1)
@@ -95,30 +94,30 @@ def draw_cell(x, y, w, h, bg_color, text='', font_weight='normal', font_size=11,
 # Dibujar cabeceras
 draw_cell(0, 4.6, 1.5, 2.1, 'white', 'Tipo de\nempresa', 'bold', 11, '#636E7B')
 
-services_keys = ['Internet Fijo', 'Telefonía Fija', 'Telefonía Móvil', 'Datos Móviles', 'Televisión de Paga']
+services_keys = ['Internet Fijo', 'TelefonÃ­a Fija', 'TelefonÃ­a MÃ³vil', 'Datos MÃ³viles', 'TelevisiÃ³n de Paga']
 services_display = [
     'Internet fijo',
-    'Telefonía fija',
-    'Telefonía móvil',
-    'Conexión a Internet\npor datos móviles\n(por red de telefonía móvil)',
-    'Televisión de paga'
+    'TelefonÃ­a fija',
+    'TelefonÃ­a mÃ³vil',
+    'ConexiÃ³n a Internet\npor datos mÃ³viles\n(por red de telefonÃ­a mÃ³vil)',
+    'TelevisiÃ³n de paga'
 ]
 
-# Dibujar fila de encabezados de Servicios (Row 0) y fila de Años (Row 1)
+# Dibujar fila de encabezados de Servicios (Row 0) y fila de AÃ±os (Row 1)
 for i, (s_key, s_disp) in enumerate(zip(services_keys, services_display)):
     x_start = 1.5 + i * 2.0
-    # Fondo blanco e iconos se dibujarán arriba
+    # Fondo blanco e iconos se dibujarÃ¡n arriba
     draw_cell(x_start, 5.2, 2.0, 1.5, 'white')
-    # Texto un poco más abajo
+    # Texto un poco mÃ¡s abajo
     ty = 5.6 if i != 3 else 5.7
     ax.text(x_start + 1.0, ty - 0.2, s_disp, ha='center', va='center', fontsize=10, fontweight='bold', color='#636E7B', zorder=3)
-
-    # Años
+    
+    # AÃ±os
     draw_cell(x_start, 4.6, 1.0, 0.6, colors['Header_2022'], '2022', 'bold', 10, '#636E7B')
     draw_cell(x_start + 1.0, 4.6, 1.0, 0.6, colors['Header_2023'], '2023', 'bold', 10, '#636E7B')
 
 # Filas de datos
-row_labels = ['General', 'Micro', 'Pequeña', 'Mediana']
+row_labels = ['General', 'Micro', 'PequeÃ±a', 'Mediana']
 y_starts = [3.6, 2.4, 1.2, 0]
 heights = [1.0, 1.2, 1.2, 1.2]
 
@@ -126,25 +125,25 @@ for r_idx, (r_label, y_pos, h) in enumerate(zip(row_labels, y_starts, heights)):
     draw_cell(0, y_pos, 1.5, h, 'white', r_label if r_label == 'General' else '', 'bold' if r_label == 'General' else 'normal', 11, '#636E7B', align='top-center' if r_label != 'General' else 'center')
     if r_label != 'General':
         ax.text(0.75, y_pos + h - 0.2, r_label, ha='center', va='top', fontsize=11, fontweight='bold', color='#636E7B', zorder=3)
-
+        
     for c_idx, svc in enumerate(services_keys):
         x_base = 1.5 + c_idx * 2.0
-
+        
         # 2022
         val22 = df_results[(df_results['Service'] == svc) & (df_results['Year'] == 2022) & (df_results['Size'] == r_label)]['Percentage'].values
         val22_str = f"{val22[0]:.1f}%" if len(val22) > 0 else "-"
         draw_cell(x_base, y_pos, 1.0, h, colors[(r_label, 2022)], val22_str, 'bold', 11, '#333333')
-
+        
         # 2023
         val23 = df_results[(df_results['Service'] == svc) & (df_results['Year'] == 2023) & (df_results['Size'] == r_label)]['Percentage'].values
         val23_str = f"{val23[0]:.1f}%" if len(val23) > 0 else "-"
         draw_cell(x_base + 1.0, y_pos, 1.0, h, colors[(r_label, 2023)], val23_str, 'bold', 11, '#333333')
 
-# DIBUJO DE ICONOS
+# DIBUJO DE ICONOS #
 # Iconos de Tipos de Empresa
 def draw_building(ax, x, y, tipo):
     if tipo == 'Micro': cols, rows, w, h, color = 2, 2, 0.4, 0.5, '#F19584'
-    elif tipo == 'Pequeña': cols, rows, w, h, color = 2, 3, 0.4, 0.65, '#EA7C6B'
+    elif tipo == 'PequeÃ±a': cols, rows, w, h, color = 2, 3, 0.4, 0.65, '#EA7C6B'
     else: cols, rows, w, h, color = 4, 3, 0.8, 0.65, '#EE9886'
     bx, by = x - w/2, y - h/2 - 0.1
     ax.add_patch(patches.Rectangle((bx, by), w, h, facecolor=color, zorder=5))
@@ -160,10 +159,10 @@ def draw_building(ax, x, y, tipo):
             ax.add_patch(patches.Rectangle((wx, wy), win_w, win_h, facecolor='#C1D7E3', zorder=6))
 
 draw_building(ax, 0.75, 2.4 + 0.5, 'Micro')
-draw_building(ax, 0.75, 1.2 + 0.5, 'Pequeña')
+draw_building(ax, 0.75, 1.2 + 0.5, 'PequeÃ±a')
 draw_building(ax, 0.75, 0 + 0.5, 'Mediana')
 
-# Dibujar símbolos simples para los Servicios
+# Dibujar sÃ­mbolos simples para los Servicios
 def draw_router(ax, x, y):
     ax.add_patch(patches.Rectangle((x-0.2, y-0.1), 0.4, 0.15, facecolor='#F39B8B', zorder=5))
     ax.add_patch(patches.Rectangle((x-0.08, y-0.03), 0.16, 0.02, facecolor='white', zorder=6)) # luces
@@ -205,20 +204,20 @@ draw_mobile(ax, 6.5, 6.2)
 draw_mobile_data(ax, 8.5, 6.1)
 draw_tv(ax, 10.5, 6.2)
 
-# LÍNEAS DIVISORIAS (Cuadrícula interactiva y bordes)
+# LÃNEAS DIVISORIAS (CuadrÃ­cula interactiva y bordes) #
 line_color = '#C9CED3'
 line_width = 1.0
 
-# Líneas horizontales
+# LÃ­neas horizontales
 ax.plot([0, 11.5], [6.7, 6.7], color=line_color, lw=line_width, zorder=4) # Top general
 ax.plot([1.5, 11.5], [5.2, 5.2], color=line_color, lw=line_width, zorder=4) # Debajo de iconos
-ax.plot([0, 11.5], [4.6, 4.6], color=line_color, lw=line_width, zorder=4) # Debajo de años
+ax.plot([0, 11.5], [4.6, 4.6], color=line_color, lw=line_width, zorder=4) # Debajo de aÃ±os
 ax.plot([0, 11.5], [3.6, 3.6], color=line_color, lw=line_width, zorder=4) # Debajo de General
 ax.plot([0, 11.5], [2.4, 2.4], color=line_color, lw=line_width, zorder=4) # Debajo de Micro
-ax.plot([0, 11.5], [1.2, 1.2], color=line_color, lw=line_width, zorder=4) # Debajo de Pequeña
+ax.plot([0, 11.5], [1.2, 1.2], color=line_color, lw=line_width, zorder=4) # Debajo de PequeÃ±a
 ax.plot([0, 11.5], [0, 0], color=line_color, lw=line_width, zorder=4)     # Bottom
 
-# Líneas verticales
+# LÃ­neas verticales
 ax.plot([0, 0], [0, 6.7], color=line_color, lw=line_width, zorder=4) # Borde izquierdo
 ax.plot([1.5, 1.5], [0, 6.7], color=line_color, lw=line_width, zorder=4) # Post Tipo empresa
 ax.plot([11.5, 11.5], [0, 6.7], color=line_color, lw=line_width, zorder=4) # Borde derecho
@@ -227,7 +226,7 @@ ax.plot([11.5, 11.5], [0, 6.7], color=line_color, lw=line_width, zorder=4) # Bor
 for x_sep in [3.5, 5.5, 7.5, 9.5]:
     ax.plot([x_sep, x_sep], [0, 6.7], color=line_color, lw=line_width, zorder=4)
 
-# Separadores de Años (solo dentro de datos de servicio, hasta la cabecera)
+# Separadores de AÃ±os (solo dentro de datos de servicio, hasta la cabecera)
 for x_sep in [2.5, 4.5, 6.5, 8.5, 10.5]:
     ax.plot([x_sep, x_sep], [0, 5.2], color=line_color, lw=line_width, zorder=4)
 
@@ -236,13 +235,14 @@ outer_rect = patches.FancyBboxPatch((0, 0), 11.5, 6.7, boxstyle="round,pad=0.02,
                                     edgecolor=line_color, facecolor='none', lw=line_width, zorder=5)
 ax.add_patch(outer_rect)
 
-# PIE DE PÁGINA
+# PIE DE PÃGINA #
 footer_y = -0.5
 ax.text(0, footer_y, "Fuente:", fontweight='bold', color='#4A5C6A', fontsize=9, ha='left', va='top')
-ax.text(0.65, footer_y, "IFT con información de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeñas y medianas empresas).", color='#4A5C6A', fontsize=9, ha='left', va='top')
-ax.text(0, footer_y - 0.25, "Para más información consultar: https://www.ift.org.mx/usuarios-y-audiencias/encuestas-trimestrales.", color='#4A5C6A', fontsize=9, ha='left', va='top')
+ax.text(0.65, footer_y, "IFT con informaciÃ³n de la Cuarta Encuesta 2023, Usuarios de Servicios de Telecomunicaciones (micro, pequeÃ±as y medianas empresas).", color='#4A5C6A', fontsize=9, ha='left', va='top')
+ax.text(0, footer_y - 0.25, "Para mÃ¡s informaciÃ³n consultar: https://www.ift.org.mx/usuarios-y-audiencias/encuestas-trimestrales.", color='#4A5C6A', fontsize=9, ha='left', va='top')
 ax.text(0, footer_y - 0.5, "Nota:", fontweight='bold', color='#4A5C6A', fontsize=9, ha='left', va='top')
-ax.text(0.45, footer_y - 0.5, "Respuesta múltiple, por lo que la suma no da 100%. Es importante señalar que los resultados pueden presentar variaciones que pueden ser explicadas por el error teórico de cada encuesta.", color='#4A5C6A', fontsize=9, ha='left', va='top')
+ax.text(0.45, footer_y - 0.5, "Respuesta mÃºltiple, por lo que la suma no da 100%. Es importante seÃ±alar que los resultados pueden presentar variaciones que pueden ser explicadas por el error teÃ³rico de cada encuesta.", color='#4A5C6A', fontsize=9, ha='left', va='top')
 
-# Guardar la gráfica en el output
-plt.savefig(PROJECT_ROOT / "output" / "Figura_E4.png", dpi=300, bbox_inches='tight')
+# Guardar la grÃ¡fica en el output
+plt.savefig(r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_E4.png", dpi=300, bbox_inches='tight')
+

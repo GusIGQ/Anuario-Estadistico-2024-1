@@ -1,5 +1,6 @@
 ﻿import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
@@ -33,63 +34,88 @@ val_fija_2022 = [means_fija_2022.get(x, 0) for x in order]
 val_int_2023 = [means_int_2023.get(x, 0) for x in order]
 val_fija_2023 = [means_fija_2023.get(x, 0) for x in order]
 
-# 5. Configurar el lienzo (1 fila, 2 columnas)
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-x = np.arange(len(order))
-width = 0.35
+# 5. Configuración de Gráfica UI (Estilo A.9/F.16)
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Colores (Gris para 2022, Naranja/Azul para 2023)
-color_2022 = '#D3D3D3'
-color_int_2023 = '#F79A8D' 
-color_fija_2023 = '#2874A6'
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+
+# Colores institucionales
+color_2022 = '#afafaf'  # Gris verde
+color_2023 = '#86adae'  # Teal claro
+color_texto = '#3c3c3b'
+
+x = np.arange(len(order))
+width = 0.25
+gap = 0.02
 
 # --- Gráfica 1: Internet Fijo ---
-rects1_2022 = ax1.bar(x - width/2, val_int_2022, width, label='2022', color=color_2022)
-rects1_2023 = ax1.bar(x + width/2, val_int_2023, width, label='2023', color=color_int_2023)
+ax1.set_facecolor('#F8F8FA')
+rects1_2022 = ax1.bar(x - width/2 - gap/2, val_int_2022, width, label='2022', color=color_2022, edgecolor='none', zorder=2)
+rects1_2023 = ax1.bar(x + width/2 + gap/2, val_int_2023, width, label='2023', color=color_2023, edgecolor='none', zorder=2)
 
-def autolabel(ax, rects):
+# --- Gráfica 2: Telefonía Fija ---
+ax2.set_facecolor('#F8F8FA')
+rects2_2022 = ax2.bar(x - width/2 - gap/2, val_fija_2022, width, label='2022', color=color_2022, edgecolor='none', zorder=2)
+rects2_2023 = ax2.bar(x + width/2 + gap/2, val_fija_2023, width, label='2023', color=color_2023, edgecolor='none', zorder=2)
+
+# Función de Chips UI
+def autolabel(ax_obj, rects):
     for rect in rects:
         height = rect.get_height()
-        ax.annotate(f'{height:.1f}',
+        bar_color = rect.get_facecolor()
+        ax_obj.annotate(f'{height:.1f}',
                     xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 3),  
+                    xytext=(0, 6),
                     textcoords="offset points",
-                    ha='center', va='bottom', fontweight='bold', color='black', fontsize=11)
+                    ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                    bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=bar_color, linewidth=0.8))
 
 autolabel(ax1, rects1_2022)
 autolabel(ax1, rects1_2023)
-
-# Limpieza visual Ax1
-ax1.set_xticks(x)
-ax1.set_xticklabels(order, fontweight='bold', fontsize=12)
-ax1.spines['top'].set_visible(False)
-ax1.spines['right'].set_visible(False)
-ax1.spines['left'].set_visible(False)
-ax1.spines['bottom'].set_visible(False)
-ax1.yaxis.set_visible(False)
-ax1.set_title('Internet Fijo', fontweight='bold', fontsize=14, pad=15)
-ax1.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
-
-# --- Gráfica 2: Telefonía Fija ---
-rects2_2022 = ax2.bar(x - width/2, val_fija_2022, width, label='2022', color=color_2022)
-rects2_2023 = ax2.bar(x + width/2, val_fija_2023, width, label='2023', color=color_fija_2023)
-
 autolabel(ax2, rects2_2022)
 autolabel(ax2, rects2_2023)
 
-# Limpieza visual Ax2
-ax2.set_xticks(x)
-ax2.set_xticklabels(order, fontweight='bold', fontsize=12)
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-ax2.spines['left'].set_visible(False)
-ax2.spines['bottom'].set_visible(False)
-ax2.yaxis.set_visible(False)
-ax2.set_title('Telefonía Fija', fontweight='bold', fontsize=14, pad=15)
-ax2.legend(loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=11)
+# Limpieza visual y configuración de ambos Ejes
+max_val = max(max(val_int_2022), max(val_int_2023), max(val_fija_2022), max(val_fija_2023))
 
-# Guardar la gráfica sin valores hardcodeados
-fig.suptitle('Figura E.3. Servicios de telecomunicaciones contratados por las MiPymes', fontsize=14, fontweight='bold', y=1.02)
-plt.tight_layout()
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "Figura_E3.png", dpi=300, bbox_inches='tight')
+for ax, title in zip([ax1, ax2], ['Internet Fijo', 'Telefonía Fija']):
+    ax.set_xticks(x)
+    ax.set_xticklabels(order, fontsize=9, fontweight='normal', color=color_texto)
+    
+    ax.set_ylim(0, max_val * 1.25)
+    ax.tick_params(axis='y', labelsize=9, colors=color_texto)
+    
+    ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#7c7c7c')
+    ax.spines['bottom'].set_color('#7c7c7c')
+    
+    # Subtítulos de los ejes
+    ax.set_title(title, fontweight='bold', fontsize=11, color=color_texto, pad=15)
+
+# Títulos Generales (anclados al primer eje, ax1)
+ax1.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 55), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+
+ax1.annotate("Figura E.3.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 55), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax1.annotate(" Servicios de telecomunicaciones contratados por las MiPymes", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 55), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# Leyenda unificada
+handles, labels = ax1.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=2, fontsize=10, frameon=False, handlelength=2.5)
+
+# Guardar y ajustar márgenes
+fig.subplots_adjust(left=0.08, right=0.92, top=0.80, bottom=0.22, wspace=0.15)
+plt.savefig(PROJECT_ROOT / "output" / "Figura_E3.png", dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print("¡Figura E.3 construida y validada con la nueva UI!")
+print(PROJECT_ROOT / "output" / "Figura_E3.png")

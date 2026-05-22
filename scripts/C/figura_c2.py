@@ -1,44 +1,29 @@
-﻿"""
-Figura C.2 — Distribución del espectro radioeléctrico por operador y por banda de frecuencia
-Fuente: IFT con datos a agosto de 2024.
-Archivo de entrada: datos/C.2/TD_ESPECTRO_BANDA_VA.csv
-Salida: output/Figura_C2.png
-"""
-
-import pandas as pd
+﻿import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.patches as mpatches
 import numpy as np
 import os
 
-# Rutas
-INPUT  = PROJECT_ROOT / "datos" / "C.2" / "TD_ESPECTRO_BANDA_VA.csv"
-OUTPUT = PROJECT_ROOT / "output" / "Figura_C2.png"
-os.makedirs("output", exist_ok=True)
+# ─── Configuración del Logger ─────────────────────────────────────────────────────
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+try:
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
-# Leer CSV
+# ─── Rutas ────────────────────────────────────────────────────────────────────────
+INPUT  = r"C:\Users\ivan-\Documents\GitHub\anuario\datos\C.2\TD_ESPECTRO_BANDA_VA.csv"
+OUTPUT = r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_C2.png"
+os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
+
+# ─── Leer CSV ─────────────────────────────────────────────────────────────────────
 df = pd.read_csv(INPUT)
 df = df.set_index("OPERADOR")
 
-# Mapeo columnas CSV etiquetas del eje X (igual que el Anuario)
-BANDAS = {
-    "B_700_MHZ": "700 MHZ",
-    "B_800_MHZ": "800 MHZ",
-    "B_850_MHZ": "850 MHZ",
-    "B_PCS":     "1900 MHZ",   # B_PCS corresponde a 1900 MHz en la figura
-    "B_AWS":     "B_PCS",      # AWS aparece como "B_PCS" en el eje del Anuario
-    "B_2_5_GHZ": "AWS",        # 2.5 GHz aparece como "AWS" en el eje
-    "B_3_5_GHZ": "3500 MHZ",
-}
-# Nota: B_3_3_GHZ y la columna 2500 MHZ del Anuario:
-# En el PDF el eje muestra: 700 / 800 / 850 / 1900 / B_PCS / AWS / 2500 / 3500
-# Revisando los datos: Telcel tiene 1.0 en B_3_3_GHZ esa es la banda 2500 MHZ
+# ─── Mapeo columnas CSV → etiquetas ───────────────────────────────────────────────
 BANDAS_FINAL = {
     "B_700_MHZ": "700 MHZ",
     "B_800_MHZ": "800 MHZ",
@@ -51,82 +36,107 @@ BANDAS_FINAL = {
 }
 
 OPERADORES = ["TELCEL", "AT&T", "ALTAN"]
-
-# Construir tabla de porcentajes por banda
-# Los valores en el CSV ya son fracciones (0.65 65%). NaN 0% en esa banda.
 cols = list(BANDAS_FINAL.keys())
 etiquetas = list(BANDAS_FINAL.values())
-
 data = df.reindex(OPERADORES)[cols].fillna(0)
 
-# Verificación: suma por columna debe ser 1.0 (o 0 si nadie tiene esa banda)
-# print(data.sum()) descomentar para debug
+# ─── Colores y Estilo ─────────────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+C_TEXT = '#3c3c3b'
 
-# Colores (igual al Anuario: azul claro Telcel, azul oscuro AT&T, marino Altán)
 COLORES = {
-    "TELCEL": "#8ECAE6",   # azul claro
-    "AT&T":   "#1D3557",   # azul oscuro / marino
-    "ALTAN":  "#264653",   # azul muy oscuro / casi negro
+    "TELCEL": "#753d6a",   
+    "AT&T":   "#667489",   
+    "ALTAN":  "#8e244d",   
 }
 
-# Figura
-fig, ax = plt.subplots(figsize=(14, 7))
-fig.patch.set_facecolor("white")
-ax.set_facecolor("white")
+# ─── Figura ───────────────────────────────────────────────────────────────────────
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA') 
 
 x = np.arange(len(etiquetas))
-bar_w = 0.55
+width = 0.45
 
 bottoms = np.zeros(len(etiquetas))
 bar_containers = {}
 
 for op in OPERADORES:
     vals = data.loc[op].values.astype(float)
-    bars = ax.bar(x, vals, bar_w, bottom=bottoms, color=COLORES[op], label=op)
+    bars = ax.bar(x, vals, width, bottom=bottoms, color=COLORES[op], label=op, 
+                  edgecolor='white', linewidth=0.5, zorder=3)
     bar_containers[op] = (bars, vals, bottoms.copy())
     bottoms += vals
 
-# Etiquetas de porcentaje dentro de cada segmento
-for op in OPERADORES:
-    bars, vals, bots = bar_containers[op]
-    for i, (v, b) in enumerate(zip(vals, bots)):
-        if v > 0.02:   # solo etiquetar si el segmento es visible
-            pct = int(round(v * 100))
-            y_pos = b + v / 2
-            color_txt = "white" if op in ("AT&T", "ALTAN") else "#1a1a2e"
-            ax.text(x[i], y_pos, f"{pct}%", ha="center", va="center",
-                    fontsize=10, fontweight="bold", color=color_txt)
+# ─── Chips con Líneas Cuadradas ───────────────────────────────────────────────────
+chip_style = dict(boxstyle="round,pad=0.3,rounding_size=0.6", fc="white", ec="#D1D1DF", lw=1.2)
+min_dist = 0.05 # 5% en escala de 0.0 a 1.0 para evitar cruces
 
-# Ejes y estilo
+for i, x_val in enumerate(x):
+    last_y = -0.1
+    
+    for j, op in enumerate(OPERADORES):
+        bars, vals, bots = bar_containers[op]
+        v = vals[i]
+        
+        if v >= 0.01: # Renderizar solo si >= 1%
+            y_center = bots[i] + (v / 2)
+            
+            # Apilar hacia arriba si choca con el chip anterior
+            y_text = max(y_center, last_y + min_dist)
+            last_y = y_text
+            
+            # Geometría de la línea
+            x_text = x_val - (width / 2) - 0.12
+            x_target = x_val - (width / 2)
+            x_elbow = x_text + 0.02 + (j * 0.008)
+            
+            # Línea escalonada
+            ax.plot([x_text, x_elbow, x_elbow, x_target], 
+                    [y_text, y_text, y_center, y_center], 
+                    color="#A0A0B0", lw=1.2, zorder=3)
+            
+            # Caja de texto (Chip)
+            pct_val = int(round(v * 100))
+            chip_text = f"{pct_val}%"
+            ax.annotate(chip_text, xy=(x_text, y_text),
+                        ha="right", va="center",
+                        bbox=chip_style, color=COLORES[op], fontweight='bold', fontsize=10,
+                        zorder=4)
+
+# ─── Ejes y estilo ────────────────────────────────────────────────────────────────
 ax.set_xticks(x)
-ax.set_xticklabels(etiquetas, fontsize=11)
-ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
-ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"], fontsize=10)
+ax.set_xticklabels(etiquetas, fontsize=10, fontweight='bold', color=C_TEXT)
+ax.tick_params(axis='x', length=0, pad=8) 
+
 ax.set_ylim(0, 1.15)
-ax.yaxis.grid(True, linestyle="--", alpha=0.4)
-ax.set_axisbelow(True)
-for spine in ["top", "right", "left"]:
-    ax.spines[spine].set_visible(False)
-ax.spines["bottom"].set_color("#cccccc")
+ax.set_yticks([]) 
 
-# Leyenda
-patches = [mpatches.Patch(color=COLORES[op], label=op.title()) for op in OPERADORES]
-ax.legend(handles=patches, loc="upper right", frameon=False,
-          fontsize=10, ncol=3,
-          bbox_to_anchor=(1.0, 1.12))
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['bottom'].set_linewidth(1)
 
-# Título y fuente
-fig.text(0.01, 0.97,
-         "Figura C.2. Distribución del espectro radioeléctrico por operador y por banda de frecuencia",
-         fontsize=12, fontweight="bold", va="top")
+# ─── Encabezado ───────────────────────────────────────────────────────────────────
+fig.text(0.08, 0.92, '   ', fontsize=2, va='center',
+         bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+fig.text(0.095, 0.92, 'Figura C.2.', fontsize=14, fontweight='bold', color=C_TEXT, va='center')
+fig.text(0.155, 0.92, 'Distribución del espectro radioeléctrico por operador y por banda de frecuencia', 
+           fontsize=14, fontweight='medium', color=C_TEXT, va='center')
 
-fig.text(0.01, 0.02,
-         "Fuente: IFT con datos a agosto de 2024.\n"
-         "Nota: La banda AWS corresponde a las bandas de 1.7/2.1 GHz; la banda PCS corresponde a la banda de 1900 MHz.",
-         fontsize=8, color="#555555", va="bottom")
+# ─── Leyenda ──────────────────────────────────────────────────────────────────────
+patches = [mpatches.Patch(color=COLORES[op], label="Altán" if op == "ALTAN" else op.title()) for op in OPERADORES]
+fig.legend(handles=patches, loc='lower center', bbox_to_anchor=(0.5, 0.08),
+           ncol=3, frameon=False, prop={'weight': 'bold', 'size': 10}, labelcolor=C_TEXT)
 
-plt.tight_layout(rect=[0, 0.06, 1, 0.95])
-# Guardar salida
-plt.savefig(OUTPUT, dpi=150, bbox_inches="tight")
-plt.close()
+# ─── Pie de página ────────────────────────────────────────────────────────────────
+fig.text(0.08, 0.05, "Fuente:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.115, 0.05, "IFT con datos a agosto de 2024.", fontsize=8, color=C_TEXT)
+fig.text(0.08, 0.03, "Nota:", fontweight='bold', fontsize=8, color=C_TEXT)
+fig.text(0.108, 0.03, "La banda AWS corresponde a las bandas de 1.7/2.1 GHz; la banda PCS corresponde a la banda de 1900 MHz.", fontsize=8, color=C_TEXT)
+
+plt.subplots_adjust(left=0.10, right=0.92, top=0.85, bottom=0.18)
+
+plt.savefig(OUTPUT, dpi=200, bbox_inches='tight', facecolor='white')
 print(f"Guardado: {OUTPUT}")

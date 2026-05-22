@@ -1,143 +1,185 @@
-import pandas as pd
+﻿import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-import matplotlib.patches as patches
 import os
-import matplotlib.colors as mcolors
+import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 
-# Create directory
-output_dir = os.path.join(os.path.dirname(__file__), "..", "..", 'output')
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
+
+# Configuración de fuente general basada en Guia_colores.md
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
+
+# ── 1. Preparar rutas de entrada y salida ────────────────────────────────────
+base_dir = os.path.dirname(__file__)
+output_dir = os.path.join(base_dir, "..", "..", 'output')
 os.makedirs(output_dir, exist_ok=True)
 
-# Load data
-df = pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "..", 'datos', 'A.2', 'datos_a2_extracted.csv'))
-# Calculate totals
+data_path = os.path.join(base_dir, "..", "..", 'datos', 'A.2', 'datos_a2_extracted.csv')
+
+# ── 2. Leer y procesar datos ──────────────────────────────────────────────────
+try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: No se encontró el archivo en {data_path}. Asegúrate de que la ruta sea correcta.")
+    sys.exit(1)
+
+# Calcular porcentajes
 df['total'] = df['telecom'] + df['radio']
 df['pct_telecom'] = (df['telecom'] / df['total']) * 100
 df['pct_radio'] = (df['radio'] / df['total']) * 100
 
-# Colors
-color_tel = '#29618C' # Telecomunicaciones (dark blue)
-color_tel_bot = '#1D4E72' # Darker at bottom
-color_rad = '#ADE5E7' # Radiodifusión (light green/blue)
-color_rad_bot = '#8BC6CA' # Darker at bottom
+# ── 3. Configuración de colores (Idénticos a figura_a6.py) ──────────────────
+color_tel = '#335a5c'  # Teal oscuro (Egresos en A.6)
+color_rad = '#86adae'  # Teal claro (Margen en A.6)
+color_texto = '#3c3c3b'
 
-# Crear grafica
-fig, ax = plt.subplots(figsize=(15, 8.5))
-fig.patch.set_facecolor('#FDFDFD')
-ax.set_facecolor('#FDFDFD')
+# ── 4. Generar gráfica estilo IFT/CRT ─────────────────────────────────────────
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-x = np.arange(len(df))
-width = 0.5
+n = len(df)
+x = np.arange(n)
+bar_width = 0.72
 
-# We will draw gradient stacked bars using small segments
+# --- Barras apiladas sólidas ---
+ax.bar(x, df['pct_telecom'], width=bar_width, color=color_tel, 
+       edgecolor='none', zorder=2, label='Telecomunicaciones')
+ax.bar(x, df['pct_radio'], bottom=df['pct_telecom'], width=bar_width, 
+       color=color_rad, edgecolor='none', zorder=2, label='Radiodifusión')
+
+# --- Etiquetas de datos (Chips estilo A.6) y Totales ---
 for i, row in df.iterrows():
     p_tel = row['pct_telecom']
     p_rad = row['pct_radio']
-
-    # Draw telecom gradient (bottom to top)
-    n_seg = 30
-    h_seg = p_tel / n_seg
-    for s in range(n_seg):
-        frac = s / n_seg
-        c = np.array(mcolors.to_rgb(color_tel_bot)) * (1 - frac) + np.array(mcolors.to_rgb(color_tel)) * frac
-        # To make rounded bottom, we can draw a FancyBboxPatch instead, but simpler with a small shift or just let it be flat
-        ax.bar(x[i], h_seg, bottom=s*h_seg, width=width, color=c, edgecolor='none', zorder=2)
-
-    # Draw radio gradient
-    h_seg2 = p_rad / n_seg
-    for s in range(n_seg):
-        frac = s / n_seg
-        c2 = np.array(mcolors.to_rgb(color_rad_bot)) * (1 - frac) + np.array(mcolors.to_rgb(color_rad)) * frac
-        ax.bar(x[i], h_seg2, bottom=p_tel + s*h_seg2, width=width, color=c2, edgecolor='none', zorder=2)
-
-    # Rounded bottom effect (a semicircle patch at bottom)
-    circ = patches.Ellipse((x[i], 0), width, 4, color=color_tel_bot, zorder=1)
-    ax.add_patch(circ)
-
-    # Callouts
-    val_tel_pct = f"{p_tel:.1f}%"
-    val_rad_pct = f"{p_rad:.1f}%"
-
-    # Left callout for telecom
-    ax.annotate(val_tel_pct, 
-                xy=(x[i] - width/2, p_tel / 2),
-                xytext=(-15, 0), textcoords="offset points",
-                ha='right', va='center',
-                fontsize=9, fontweight='heavy', color='#47476F',
-                bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="none", alpha=1.0, zorder=5), zorder=6)
-
-    # Right callout for radio
-    ax.annotate(val_rad_pct, 
-                xy=(x[i] + width/2, p_tel + p_rad / 2),
-                xytext=(15, 0), textcoords="offset points",
-                ha='left', va='center',
-                fontsize=9, fontweight='heavy', color='#47476F',
-                bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="none", alpha=1.0, zorder=5), zorder=6)
-
-    # Total over the bar
     total_val = row['total']
-    ax.text(x[i], 103, f"{total_val:,.0f}",
-            ha='center', va='bottom', fontsize=8, color='#AAAAAA', fontweight='bold', zorder=4)
 
-# Custom X axis
+    # Chip Telecomunicaciones (inferior)
+    ax.text(
+        x[i], p_tel / 2, f"{int(round(p_tel))}%",
+        ha="center", va="center", fontsize=8, color=color_texto, fontweight="bold",
+        bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=color_tel, linewidth=0.8),
+        zorder=3
+    )
+
+    # Chip Radiodifusión (superior)
+    ax.text(
+        x[i], p_tel + (p_rad / 2), f"{int(round(p_rad))}%",
+        ha="center", va="center", fontsize=8, color=color_texto, fontweight="bold",
+        bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=color_tel, linewidth=0.8),
+        zorder=3
+    )
+
+    # Población Total Ocupada (sobre la barra, estilo cantidad superior A.6)
+    ax.text(
+        x[i], 102, f"{int(round(total_val)):,}",
+        rotation=90, ha="center", va="bottom", fontsize=9, fontweight="normal", color=color_texto
+    )
+
+# --- Eje Y: Configuración y estilos ---
+ax.set_ylabel('Distribución porcentual del empleo', fontsize=11, fontweight='medium', color=color_texto, labelpad=15)
+ax.set_ylim(0, 125)  # Margen superior ajustado para el texto rotado
+ax.yaxis.set_major_locator(mticker.MultipleLocator(20))
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{int(v)}%'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
+
+# --- Eje X: Etiquetas trimestre y año (Estilo A.6) ---
 quarter_labels = []
-for idx, q in enumerate(df['quarter']):
-    if q == 1: quarter_labels.append("I")
-    elif q == 2: quarter_labels.append("II")
-    elif q == 3: quarter_labels.append("III")
-    elif q == 4: quarter_labels.append("IV")
+for q in df['quarter']:
+    if q == 1: quarter_labels.append('I')
+    elif q == 2: quarter_labels.append('II')
+    elif q == 3: quarter_labels.append('III')
+    elif q == 4: quarter_labels.append('IV')
+    else: quarter_labels.append('')
 
 ax.set_xticks(x)
-ax.set_xticklabels(quarter_labels, fontsize=10, fontweight='bold', color='#888888')
+ax.set_xticklabels(quarter_labels, fontsize=8, fontweight='normal', color=color_texto)
+ax.tick_params(axis='x', length=3, pad=4, colors=color_texto)
 
-# Draw vertical lines between years
-years = df['year'].values
-for i in range(1, len(years)):
-    if years[i] != years[i-1]:
-        ax.axvline(x=i-0.5, ymin=0, ymax=0.03, color='#888888', lw=1.5, clip_on=False)
+# Nivel inferior: años centrados debajo de los trimestres
+prev_year = None
+year_positions = []
+for i, row in df.iterrows():
+    yr = int(row['year'])
+    if yr != prev_year:
+        year_start = i
+        prev_year = yr
+    next_yr = int(df.iloc[i + 1]['year']) if i + 1 < n else -1
+    if next_yr != yr:
+        center = (year_start + i) / 2
+        year_positions.append((center, yr))
 
-# Draw Years
-unique_years = df['year'].unique()
-for y in unique_years:
-    idx = df.index[df['year'] == y].tolist()
-    if len(idx) > 1:
-        mid_x = (idx[0] + idx[-1]) / 2
-    else:
-        mid_x = idx[0]
-    ax.text(mid_x, -10, str(y), ha='center', va='top', fontsize=10, fontweight='bold', color='#555555')
+for cx, yr in year_positions:
+    ax.text(cx, -9, str(yr), ha='center', va='top', fontsize=10, fontweight='bold', color=color_texto, clip_on=False)
 
-ax.set_ylim(0, 115)
-for spine in ax.spines.values():
-    spine.set_visible(False)
-ax.set_yticks([])
+# --- Títulos (Bloque Institucional A.6) ---
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# Title
-fig.text(0.04, 0.94, '■ ', fontsize=12, color='#EDA396', fontweight='bold', va='top')
-fig.text(0.06, 0.94, 'Figura A.2. ', fontsize=13, color='#555577', fontweight='bold', va='top')
-fig.text(0.12, 0.94, 'Empleo en los sectores de telecomunicaciones y radiodifusión', 
-         fontsize=13, color='#777799', va='top')
+ax.annotate("Figura A.2.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-# Legend
-fig.text(0.40, 0.15, '■ ', fontsize=14, color=color_tel, fontweight='bold', va='center')
-fig.text(0.42, 0.15, 'Telecomunicaciones', fontsize=11, color='#444455', fontweight='bold', va='center')
-fig.text(0.55, 0.15, '■ ', fontsize=14, color=color_rad, fontweight='bold', va='center')
-fig.text(0.57, 0.15, 'Radiodifusión', fontsize=11, color='#444455', fontweight='bold', va='center')
+ax.annotate(" Empleo en los sectores de telecomunicaciones y radiodifusión", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
 
-# Note
-note1 = "Fuente: IFT con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) del INEGI, con cifras a junio 2024.\nDatos disponibles en https://www.inegi.org.mx/programas/enoe/15ymas/default.html#Microdatos\nNotas: Para el año 2020 se considera la información al primer y cuarto trimestre."
-fig.text(0.04, 0.03, note1, fontsize=9, color='#777777', va='bottom', linespacing=1.5)
+# --- Leyenda centrada en la figura ---
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.08), ncol=2, fontsize=10, frameon=False, handlelength=2.5)
 
-# Y-axis label
-fig.text(0.03, 0.5, "POBLACIÓN OCUPADA EN TYR Y DISTRIBUCIÓN POR SECTOR", 
-         rotation=90, va='center', ha='center', fontsize=9, color='#888888', fontweight='bold')
+# --- Notas al pie (Riguroso estilo A.6) ---
+font_size_notes = 8
+color_notes = '#3c3c3b'
+x_start = 0.08
+l_space = 1.5
 
-plt.subplots_adjust(bottom=0.25, left=0.08, right=0.95, top=0.88)
-# Guardar salida
-plt.savefig(os.path.join(output_dir, "Figura_A2.png"), dpi=300, facecolor='#FDFDFD')
-print("Figura A.2 generada en output/Figura_A2.png")
+# Fuente
+y_fuente = 0.06
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_notes, ha='left', va='top')
+
+note1_content = ('IFT con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) del INEGI, con cifras a junio 2024. '
+                 'Datos disponibles en: https://www.inegi.org.mx/programas/enoe/15ymas/default.html#Microdatos')
+ax.annotate(note1_content, xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_notes, ha='left', va='top')
+
+# Notas
+y_notas = 0.042
+ax.annotate("Notas: ", xy=(x_start, y_notas), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_notes, ha='left', va='top')
+
+note2_content = 'Para el año 2020 se considera la información al primer y cuarto trimestre.'
+ax.annotate(note2_content, xy=(x_start, y_notas), xycoords='figure fraction',
+            xytext=(32, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_notes, ha='left', va='top', linespacing=l_space)
+
+# --- Ajustes visuales de Ejes y Grid ---
+ax.set_xlim(-0.8, n - 0.2)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
+
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+
+# Ajuste de márgenes A.6
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+
+# --- Guardar ---
+output_path = os.path.join(output_dir, 'Figura_A2.png')
+fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"\nGráfica guardada en: {output_path}")
+plt.close(fig)

@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
@@ -7,171 +7,165 @@ from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
 import matplotlib.ticker as mticker
 import numpy as np
+from matplotlib.patches import FancyBboxPatch
 
-# 1. Lectura
-df = pd.read_csv(
-    'datos/C.5/TD_LINEAS_HIST_TELMOVIL_ITE_VA.csv',
-    encoding='cp1252'
-)
-
-# 2. Filtrar diciembre de cada año
+# ── 1. Lectura ────────────────────────────────────────────────────────────────
+df = pd.read_csv('datos/C.5/TD_LINEAS_HIST_TELMOVIL_ITE_VA.csv', encoding='cp1252')
 df_dic = df[df['MES'] == 12].copy()
 
-# 3. Agrupar por año y sumar líneas
-cols = [
-    'L_PREPAGO_E',
-    'L_POSPAGO_E',
-    'L_POSPAGOC_E',       # pospago controlado
-    'L_POSPAGOL_E',       # pospago libre
-    'L_NO_ESPECIFICADO_E',
-    'L_TOTAL_E',
-]
+cols = ['L_PREPAGO_E', 'L_POSPAGO_E', 'L_POSPAGOC_E', 'L_POSPAGOL_E', 'L_NO_ESPECIFICADO_E', 'L_TOTAL_E']
 df_anual = df_dic.groupby('ANIO')[cols].sum().reset_index()
-
-# 4. Filtrar 1990 2023
 df_anual = df_anual[(df_anual['ANIO'] >= 1990) & (df_anual['ANIO'] <= 2023)].copy()
 
-# 5. Convertir a millones
 for c in cols:
     df_anual[c] = df_anual[c] / 1_000_000
 
-# 6. Verificación rápida
-check = {1990: 0.1, 2000: 14.1, 2013: 101.4, 2023: 144.7}
-print("── Verificación ──")
-for yr, expected in check.items():
-    row = df_anual[df_anual['ANIO'] == yr]
-    if not row.empty:
-        calc = round(row['L_TOTAL_E'].values[0], 1)
-        status = "âœ…" if calc == expected else f"âš  esperado {expected}"
-        print(f"  {yr}: {calc}M  {status}")
-
-# 7. Paleta (igual al Anuario)
-COLOR_PREPAGO   = '#7EC8C8'   # azul/verde claro
-COLOR_POSPAGO   = '#2E6FA3'   # azul medio
-COLOR_POSPC     = '#1A3A5C'   # azul oscuro (controlado)
-COLOR_POSPL     = '#F4845F'   # salmón/naranja (libre)
-COLOR_NOESP     = '#A8C8E0'   # gris azulado (sin segmento)
-COLOR_TOTAL     = '#E63946'   # rojo (línea total)
+# ── 2. Paleta Monocromática Teal (Mismos verdes estilo F.16) ──────────────────
+COLOR_PREPAGO   = '#86adae'
+COLOR_POSPAGO   = '#64a0a1'
+COLOR_POSPC     = '#5c9596'
+COLOR_POSPL     = '#4c7d7e'
+COLOR_NOESP     = '#3b6667'
+COLOR_TOTAL     = '#132b2d'  # Verde oscuro casi negro para la línea
+color_texto     = '#3c3c3b'
 
 anios  = df_anual['ANIO'].values
 prepago = df_anual['L_PREPAGO_E'].values
 pospc   = df_anual['L_POSPAGOC_E'].values
 pospl   = df_anual['L_POSPAGOL_E'].values
-pospago = df_anual['L_POSPAGO_E'].values   # pospago genérico (años <2017)
+pospago = df_anual['L_POSPAGO_E'].values   
 noesp   = df_anual['L_NO_ESPECIFICADO_E'].values
 total   = df_anual['L_TOTAL_E'].values
 
-# 8. Figura
-fig, ax = plt.subplots(figsize=(14, 7))
-fig.patch.set_facecolor('white')
-ax.set_facecolor('white')
+# ── 3. Configuración de Gráfica (Estilo F.16) ─────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Área rellena apilada: prepago + pospago genérico + controlado + libre + sin seg
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
+
+# Área rellena apilada
 ax.stackplot(
-    anios,
-    prepago, pospago, pospc, pospl, noesp,
+    anios, prepago, pospago, pospc, pospl, noesp,
     labels=[
-        'Líneas Prepago',
-        'Líneas Pospago',
-        'Líneas Pospago controlado',
-        'Líneas Pospago libre',
-        'Líneas sin segmento especificado',
+        'Líneas Prepago', 'Líneas Pospago', 'Líneas Pospago controlado',
+        'Líneas Pospago libre', 'Líneas sin segmento especificado'
     ],
     colors=[COLOR_PREPAGO, COLOR_POSPAGO, COLOR_POSPC, COLOR_POSPL, COLOR_NOESP],
-    alpha=0.85
+    alpha=0.85, zorder=2
 )
 
 # Línea de totales encima
-ax.plot(anios, total, color=COLOR_TOTAL, linewidth=2,
-        marker='o', markersize=3, label='Líneas totales', zorder=5)
+ax.plot(anios, total, color=COLOR_TOTAL, linewidth=2.5, marker='o', markersize=6, 
+        markeredgewidth=0, label='Líneas totales', zorder=4)
 
-# 9. Etiquetas en extremos (1990 y 2023)
-def label(ax, x, y, txt, ha='left'):
-    ax.annotate(
-        txt,
-        xy=(x, y), xytext=(4 if ha == 'left' else -4, 4),
-        textcoords='offset points',
-        fontsize=8, fontweight='bold', color=COLOR_TOTAL,
-        ha=ha, va='bottom'
-    )
-
-label(ax, anios[0],  total[0],  f"{total[0]:.1f}",  ha='right')
-label(ax, anios[-1], total[-1], f"{total[-1]:.1f}", ha='left')
-
-# Etiquetas intermedias visibles en el Anuario
-etiquetas = {
-    2000: None, 2001: None, 2002: None, 2003: None, 2004: None,
-    2005: None, 2006: None, 2007: None, 2008: None, 2009: None,
-    2010: None, 2011: None, 2012: None, 2013: None, 2014: None,
-    2015: None, 2016: None, 2017: None, 2018: None, 2019: None,
-    2020: None, 2021: None, 2022: None,
-}
-# Sólo etiquetamos los valores visibles en la figura del Anuario
-visible = {
-    2000: 14.1, 2004: 38.5, 2005: 47.1, 2006: 55.4, 2007: 66.6,
-    2008: 75.4, 2009: 83.2, 2010: 90.5, 2011: 94.6, 2012: 101.4,
-    2013: 104.9, 2014: 106.7, 2015: 107.7, 2016: 111.7, 2017: 114.3,
-    2018: 120.2, 2019: 122.9, 2020: 122.0, 2021: 126.5, 2022: 136.0,
-}
-for yr, val in visible.items():
+# ── 4. Etiquetas de datos (Chips estilo F.16 horizontales para todos los puntos) ───
+for yr in anios:
     row = df_anual[df_anual['ANIO'] == yr]
     if not row.empty:
         v = row['L_TOTAL_E'].values[0]
-        ax.annotate(
-            f"{v:.1f}",
-            xy=(yr, v), xytext=(0, 5),
-            textcoords='offset points',
-            fontsize=6.5, color='#333333',
-            ha='center', va='bottom'
-        )
+        ax.annotate(f"{v:.1f}",
+                    xy=(yr, v), xytext=(0, 6), textcoords='offset points',
+                    fontsize=8, fontweight='bold', color=color_texto,
+                    ha='center', va='bottom', zorder=5,
+                    bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=COLOR_TOTAL, linewidth=0.8))
 
-# 10. Ejes y formato
-ax.yaxis.set_major_formatter(mticker.FuncFormatter(
-    lambda x, _: f'{int(x):,}'.replace(',', ',')
-))
-ax.set_ylim(0, 170_000_000 / 1e6 * 1e6)   # eje en unidades absolutas â†’ millones
-ax.yaxis.set_major_formatter(mticker.FuncFormatter(
-    lambda x, _: f'{x:,.0f}'
-))
-
-# Reescalar eje Y a valores en millones (ya convertidos)
-ax.set_ylim(0, 170)
+# ── 5. Diseño limpio de Ejes ──────────────────────────────────────────────────
+ax.set_ylim(0, 180)
 ax.yaxis.set_major_locator(mticker.MultipleLocator(20))
-ax.set_ylabel('Millones de Líneas', fontsize=9)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
 
-ax.set_xlim(1989, 2024)
-ax.set_xticks(range(1990, 2024))
-ax.set_xticklabels(
-    [str(y) for y in range(1990, 2024)],
-    rotation=90, fontsize=7
-)
+ax.set_xlim(1989.5, 2023.5)
+ax.set_xticks(anios)
+ax.set_xticklabels([])
+ax.tick_params(axis='x', length=0, pad=0)
 
-ax.grid(axis='y', linestyle='--', alpha=0.4)
-ax.spines[['top', 'right']].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
 
-# 11. Leyenda
+# ── 6. Títulos ────────────────────────────────────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
+
+ax.annotate("Figura C.5.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
+
+ax.annotate(" Líneas del servicio móvil de telefonía (1990-2023) [Millones]", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(105, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# ── 7. Leyenda ────────────────────────────────────────────────────────────────
 handles, labels_leg = ax.get_legend_handles_labels()
-ax.legend(
-    handles, labels_leg,
-    loc='upper left', fontsize=7.5,
-    frameon=False, ncol=2
-)
+fig.legend(handles, labels_leg, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=6, fontsize=10, frameon=False, handlelength=2.5)
 
-# 12. Título y fuente
-ax.set_title(
-    'Figura C.5. Líneas del servicio móvil de telefonía (1990-2023)',
-    fontsize=11, fontweight='bold', loc='left', pad=10
-)
-fig.text(
-    0.01, -0.04,
-    'Fuente: IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.\n'
-    'Nota: A partir del tercer trimestre de 2017, se agregó la desagregación por pospago libre y pospago controlado.',
-    fontsize=7, color='gray'
-)
+# ── 8. Notas al pie ───────────────────────────────────────────────────────────
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.07
 
-plt.tight_layout()
-# Guardar salida
-plt.savefig('output/Figura_C5.png', dpi=150, bbox_inches='tight')
-plt.savefig('output/Figura_C5.pdf', bbox_inches='tight')
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fig.text(x_start + 0.032, y_fuente, 'IFT con datos de los operadores de telecomunicaciones a diciembre de cada año.', fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+y_nota = 0.045
+fig.text(x_start, y_nota, "Nota: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fig.text(x_start + 0.025, y_nota, 'A partir del tercer trimestre de 2017, se agregó la desagregación por pospago libre y pospago controlado.', fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 9. Layout ─────────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+
+# ── 10. Rectángulo redondeado de años — dibujado DESPUÉS del layout ───────────
+# Forzar el render para que las transformaciones estén actualizadas
+fig.canvas.draw()
+
+# Coordenadas en display (pixels) del área del axes
+ax_bbox = ax.get_window_extent()   # en pixels
+fig_bbox = fig.get_window_extent()  # en pixels
+
+# Altura del rectángulo en pixels y posición Y (debajo del spine)
+gap_px   = 0    # sin espacio — pegado al spine
+rect_h_px = 28  # altura suficiente para el texto
+rect_y_px = ax_bbox.y0 - gap_px - rect_h_px
+
+# Convertir a coordenadas de figura (fracción 0-1)
+def px_to_fig(x_px, y_px):
+    return (x_px / fig_bbox.width, y_px / fig_bbox.height)
+
+rx0, ry0 = px_to_fig(ax_bbox.x0, rect_y_px)
+rw  = (ax_bbox.x1 - ax_bbox.x0) / fig_bbox.width
+rh  = rect_h_px / fig_bbox.height
+
+# Radio de redondeo en fracción de figura (pequeño para que se vea sutil)
+radius = 0.008
+
+rect_patch = FancyBboxPatch(
+    (rx0, ry0), rw, rh,
+    boxstyle=f'round,pad=0,rounding_size={radius}',
+    facecolor='#F8F8FA', edgecolor='#7c7c7c', linewidth=0.9,
+    transform=fig.transFigure, clip_on=False, zorder=10
+)
+fig.add_artist(rect_patch)
+
+# Texto de cada año centrado dentro del rectángulo
+y_text_fig = ry0 + rh / 2  # centro vertical del rectángulo en fracción figura
+
+for year in anios:
+    # X del año en pixels (coordenada de datos → display)
+    x_px, _ = ax.transData.transform((year, 0))
+    x_fig = x_px / fig_bbox.width
+    fig.text(x_fig, y_text_fig, str(year),
+             ha='center', va='center',
+             fontsize=7.5, fontweight='bold', color='#3c3c3b',
+             clip_on=False, zorder=11)
+
+# ── 11. Guardar ───────────────────────────────────────────────────────────────
+plt.savefig('output/Figura_C5.png', dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+plt.savefig('output/Figura_C5.pdf', bbox_inches='tight', facecolor='white', edgecolor='none')
 print("\nGuardado: output/Figura_C5.png y output/Figura_C5.pdf")
 plt.show()

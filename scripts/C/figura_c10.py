@@ -1,14 +1,24 @@
-﻿import pandas as pd
+﻿"""
+Figura C.10 — Índice Herfindahl-Hirschman. Concentración de mercado
+del servicio móvil de telefonía (2013-2023)
+"""
+
+import os
+import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-# 1. Leer y filtrar
-df = pd.read_csv(PROJECT_ROOT / "datos" / "C.10" / "TD_IHH_TELMOVIL_ITE_VA.csv", encoding='latin1')
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
+
+# ── 1. Leer y filtrar ─────────────────────────────────────────────────────────
+df = pd.read_csv(r'C:\Users\ivan-\Documents\GitHub\anuario\datos\C.10\TD_IHH_TELMOVIL_ITE_VA.csv', encoding='latin1')
 
 df = df[(df['MES'] == 12) & (df['ANIO'].between(2013, 2023))]
 df = df.sort_values('ANIO')
@@ -16,65 +26,102 @@ df = df.sort_values('ANIO')
 years = df['ANIO'].tolist()
 values = df['IHH_TELMOVIL_E'].tolist()
 
-# 2. Verificación
 print("Verificación valores clave:")
 for y, v in zip(years, values):
     print(f"  {y}: {v}")
-print(f"\n2013 (Anuario: 5,229): {values[0]}")
-print(f"2023 (Anuario: 3,824): {values[-1]}")
 
-# 3. Valores del Anuario (por si hay discrepancias menores)
-anuario = {
-    2013: 5229, 2014: 5084, 2015: 5227, 2016: 4873, 2017: 4759,
-    2018: 4576, 2019: 4558, 2020: 4549, 2021: 4556, 2022: 4162, 2023: 3824
-}
-# Descomenta la siguiente línea para forzar valores del Anuario:
-# values anuario y for y in years
+# ── 2. Figura estilo A.9 ──────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# 4. Figura
-fig, ax = plt.subplots(figsize=(11, 7))
+fig, ax = plt.subplots(figsize=(16, 8.5))
 fig.patch.set_facecolor('white')
-ax.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-bar_h = 0.55
+COLOR_BAR = '#335a5c'  # Teal oscuro (Extraído de figura_a9)
+color_texto = '#3c3c3b'
+
 y_pos = range(len(years))
+bar_height = 0.55
 
-bars = ax.barh(list(y_pos), values, bar_h,
-               color='#2e8b9a', zorder=2)
+# Barras horizontales
+bars = ax.barh(
+    y_pos, 
+    values, 
+    height=bar_height,
+    color=COLOR_BAR, 
+    edgecolor='none', 
+    zorder=2
+)
 
-# Etiquetas al final de cada barra
-for i, (v, b) in enumerate(zip(values, bars)):
-    ax.text(v + 30, b.get_y() + b.get_height() / 2,
-            f'{v:,}', va='center', ha='left',
-            fontsize=9, color='#333', fontweight='bold')
+# ── 3. Anotaciones de valor ───────────────────────────────────────────────────
+for i, val in enumerate(values):
+    ax.text(
+        val + 50, i,
+        f'{int(val):,}', 
+        va='center', ha='left',
+        fontsize=9, color=color_texto, fontweight='normal', 
+        zorder=3
+    )
 
-# 5. Ejes
-ax.set_yticks(list(y_pos))
-ax.set_yticklabels([str(y) for y in years], fontsize=9)
+# ── 4. Ejes y Cuadrícula ──────────────────────────────────────────────────────
+ax.set_yticks(y_pos)
+ax.set_yticklabels([str(y) for y in years], fontsize=9, fontweight='normal', color=color_texto)
 ax.set_xlim(0, max(values) * 1.15)
-ax.invert_yaxis()   # 2013 arriba, 2023 abajo
+ax.invert_yaxis()
 
-ax.xaxis.set_visible(False)
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{int(v):,}'))
+ax.tick_params(axis='x', labelsize=9, colors=color_texto)
+ax.tick_params(axis='y', length=0)
+
+# Grid y bordes A.9
+ax.grid(axis='x', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_visible(False)
-ax.spines['left'].set_color('#ccc')
-ax.tick_params(colors='#555')
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
 
-# 6. Título y fuente
-fig.text(0.06, 0.97,
-         'Figura C.10. Herfindahl-Hirschman (IHH). Concentración de mercado\n'
-         '   del servicio móvil de telefonía (2013-2023)',
-         fontsize=11, fontweight='bold', color='#1f4e79', va='top')
+# ── 5. Títulos (Bloque Institucional A.9) ─────────────────────────────────────
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-fig.text(0.06, 0.02,
-         'Fuente: IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.\n'
-         'Nota: Herfindahl-Hirschman (IHH) estimado con respecto al número de líneas del servicio móvil de telefonía.',
-         fontsize=7.5, color='#555')
+ax.annotate("Figura C.10.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-plt.tight_layout(rect=[0, 0.06, 1, 0.93])
-# Guardar salida
-plt.savefig('output/Figura_C10.png', dpi=150, bbox_inches='tight')
-plt.savefig('output/Figura_C10.pdf', bbox_inches='tight')
-plt.show()
-print("âœ… Figura C.10 guardada en output/")
+ax.annotate(" Índice Herfindahl-Hirschman (IHH). Concentración de mercado del servicio móvil de telefonía (2013-2023)", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(115, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# ── 6. Notas al pie (Riguroso estilo A.9) ─────────────────────────────────────
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.06
+y_nota = 0.04
+
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+
+ax.annotate("IFT con datos proporcionados por los operadores de telecomunicaciones a diciembre de cada año.", 
+            xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+ax.annotate("Nota: ", xy=(x_start, y_nota), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+
+ax.annotate("IHH estimado con respecto al número de líneas del servicio móvil de telefonía.", 
+            xy=(x_start, y_nota), xycoords='figure fraction',
+            xytext=(26, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# ── 7. Guardar ────────────────────────────────────────────────────────────────
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+output_dir = "output"
+os.makedirs(output_dir, exist_ok=True)
+output_path = os.path.join(output_dir, "Figura_C10.png")
+fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"Gráfica guardada en: {output_path}")
+plt.close(fig)

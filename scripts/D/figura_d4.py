@@ -1,66 +1,41 @@
 ﻿"""
 Figura D.4 — Uso de dispositivos inteligentes conectados a Internet
 Fuente: IFT con datos de la ENDUTIH 2023, del INEGI.
-https://www.inegi.org.mx/programas/endutih/2023/
-
-Archivo de entrada : tr_endutih_usuarios2_anual_2023.csv
-Salida             : Figura_D4.png
-
-Variables usadas (pregunta 9.1 del cuestionario):
-  P9_1_1  â†’ Bocina o asistente del hogar
-  P9_1_2  â†’ Sistemas de videovigilancia
-  P9_1_3  â†’ Puertas o ventanas con cerrado digital
-  P9_1_4  â†’ Dispositivos de ahorro de energía eléctrica
-  P9_1_5  â†’ Luces o interruptores
-  P9_1_6  â†’ Conexión eléctrica (soquet o enchufes)
-  P9_1_7  â†’ Electrodomésticos
-  P9_1_8  â†’ Dispositivos de entretenimiento (Smart TV, DVD, Blu-ray)
-  P9_1_9  â†’ Automóvil o camioneta
-  P9_1_10 â†’ Otros dispositivos
-  FAC_PER â†’ Factor de expansión de persona
-
-Denominador clave:
-  El 100% NO es la totalidad de usuarios de internet,
-  sino únicamente las personas que usan AL MENOS UN
-  dispositivo IoT (P9_1_1 a P9_1_10 con valor '1').
 """
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from _plot_data_logger import enable_plot_data_logging
 enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import matplotlib.ticker as mtick
-from pathlib import Path
 
-# CONFIGURACI N ajusta esta ruta a tu máquina
+# ───────────────────────────────────────────────────────────────────────
+# CONFIGURACIÓN
+# ───────────────────────────────────────────────────────────────────────
+RUTA_CSV = Path(r"C:\Users\ivan-\Documents\GitHub\anuario\datos\D.4\tr_endutih_usuarios2_anual_2023.csv")
+SALIDA   = Path(r"C:\Users\ivan-\Documents\GitHub\anuario\output\Figura_D4.png")
 
-RUTA_CSV = Path(
-    PROJECT_ROOT / "datos" / "D.4" / "tr_endutih_usuarios2_anual_2023.csv"
-)
-SALIDA   = Path(PROJECT_ROOT / "output" / "Figura_D4.png")
-
+# ───────────────────────────────────────────────────────────────────────
 # 1. LEER DATOS
-
+# ───────────────────────────────────────────────────────────────────────
 print("Leyendo datos…")
-# Cargar datos
 df = pd.read_csv(RUTA_CSV, low_memory=False)
 df["FAC_PER"] = pd.to_numeric(df["FAC_PER"], errors="coerce")
 print(f"  Registros totales : {len(df):>10,}")
 print(f"  Población ponderada: {df['FAC_PER'].sum():>15,.0f}")
 
-# 2. DEFINIR VARIABLES Y ORDEN (igual que el Anuario)
-
+# ───────────────────────────────────────────────────────────────────────
+# 2. DEFINIR VARIABLES Y ORDEN
+# ───────────────────────────────────────────────────────────────────────
 VARS_IOT = [
     "P9_1_1","P9_1_2","P9_1_3","P9_1_4","P9_1_5",
     "P9_1_6","P9_1_7","P9_1_8","P9_1_9","P9_1_10",
 ]
 
-# Orden descendente exacto del Anuario
 ORDEN = [
     ("P9_1_8",  "Dispositivos de\nentretenimiento"),
     ("P9_1_1",  "Bocina o\nasistente del\nhogar"),
@@ -74,9 +49,9 @@ ORDEN = [
     ("P9_1_10", "Otros\ndispositivos"),
 ]
 
+# ───────────────────────────────────────────────────────────────────────
 # 3. CALCULAR DENOMINADOR
-# Solo personas que usan al menos un dispositivo IoT
-
+# ───────────────────────────────────────────────────────────────────────
 usa_alguno = (
     df[VARS_IOT]
     .apply(lambda col: col.astype(str).str.strip() == "1")
@@ -84,94 +59,87 @@ usa_alguno = (
 )
 total_iot = df.loc[usa_alguno, "FAC_PER"].sum()
 
-print(f"\n  Usuarios con â‰¥1 dispositivo IoT (ponderado): {total_iot:,.0f}")
-print(f"  ({total_iot / df['FAC_PER'].sum() * 100:.1f}% del total de usuarios)\n")
-
+# ───────────────────────────────────────────────────────────────────────
 # 4. CALCULAR PORCENTAJES
-
-ESPERADOS = {
-    "P9_1_8": 59.6, "P9_1_1": 55.0, "P9_1_2": 21.0,
-    "P9_1_5":  9.9, "P9_1_7":  5.0, "P9_1_6":  5.0,
-    "P9_1_3":  3.7, "P9_1_9":  2.9, "P9_1_4":  2.6, "P9_1_10": 0.2,
-}
-
+# ───────────────────────────────────────────────────────────────────────
 variables, etiquetas, porcentajes = [], [], []
-print("=== VALIDACIÓN vs ANUARIO ===")
 for var, etiq in ORDEN:
     mascara = df[var].astype(str).str.strip() == "1"
     pct     = df.loc[mascara, "FAC_PER"].sum() / total_iot * 100
-    esp     = ESPERADOS[var]
-    estado  = "âœ…" if abs(pct - esp) < 0.05 else "âš ï¸"
-    print(f"  {var:8s}  {etiq.replace(chr(10),' '):42s}  "
-          f"calculado={pct:.1f}%  esperado={esp}%  {estado}")
     variables.append(var)
     etiquetas.append(etiq)
-    porcentajes.append(round(pct, 1))
+    porcentajes.append(pct) # Se guarda sin redondear para mayor precisión gráfica
 
-# 5. GRAFICAR
+# ───────────────────────────────────────────────────────────────────────
+# 5. GRAFICAR CON ESTILO INSTITUCIONAL (Ref: Figura F.16)
+# ───────────────────────────────────────────────────────────────────────
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-COLOR_ALTO = "#C0392B"   # rojo fuerte  — barras â‰¥ 10 %
-COLOR_BAJO = "#E8A89C"   # rojo claro   — barras <  10 %
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
-colores = [COLOR_ALTO if p >= 10 else COLOR_BAJO for p in porcentajes]
+COLOR_BARRA = '#86adae' # Mismo tono verde/teal claro que F.16
+color_texto = '#3c3c3b'
 
-# Crear grafica
-fig, ax = plt.subplots(figsize=(14, 7))
-fig.patch.set_facecolor("white")
+x = np.arange(len(etiquetas))
+width = 0.55
 
-bars = ax.bar(
-    range(len(porcentajes)),
-    porcentajes,
-    color=colores,
-    width=0.55,
-    zorder=3,
-)
+# Dibujar las barras
+bars = ax.bar(x, porcentajes, width, color=COLOR_BARRA, edgecolor='none', zorder=2)
 
-# Etiquetas de valor sobre cada barra
-for bar, val in zip(bars, porcentajes):
-    ax.text(
-        bar.get_x() + bar.get_width() / 2,
-        bar.get_height() + 0.6,
-        f"{val:.1f}%",
-        ha="center", va="bottom",
-        fontsize=9.5, fontweight="bold", color="#222222",
-    )
+# Etiquetas de datos (Chips estilo F.16)
+for rect in bars:
+    height = rect.get_height()
+    ax.annotate(f'{height:.1f}%',
+                xy=(rect.get_x() + rect.get_width() / 2, height),
+                xytext=(0, 6),
+                textcoords="offset points",
+                ha='center', va='bottom', fontsize=8, color=color_texto, fontweight='bold', zorder=3,
+                bbox=dict(boxstyle="round,pad=0.3,rounding_size=0.8", facecolor='white', edgecolor=COLOR_BARRA, linewidth=0.8))
 
-# Eje X
-ax.set_xticks(range(len(etiquetas)))
-ax.set_xticklabels(etiquetas, fontsize=8.5, ha="center", color="#333333",
-                   linespacing=1.3)
-ax.tick_params(axis="x", length=0, pad=6)
+# Diseño limpio de Ejes
+ax.set_xticks(x)
+ax.set_xticklabels(etiquetas, fontsize=9, fontweight='normal', color=color_texto, linespacing=1.3)
+ax.tick_params(axis='x', length=0, pad=8)
 
-# Eje Y
-ax.set_ylim(0, 75)
-ax.set_yticks([0, 10, 20, 30, 40, 50, 60, 70])
-ax.set_yticklabels(["0.0%","10.0%","20.0%","30.0%",
-                    "40.0%","50.0%","60.0%","70.0%"],
-                   fontsize=9, color="#555555")
-ax.yaxis.set_tick_params(length=0)
+ax.set_ylim(0, max(porcentajes) * 1.25)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+ax.tick_params(axis='y', labelsize=9, colors=color_texto)
 
-# Rejilla y marcos
-ax.grid(axis="y", linestyle="--", alpha=0.4, zorder=0)
-ax.spines[["top","right","left","bottom"]].set_visible(False)
+ax.grid(axis='y', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_color('#7c7c7c')
+ax.spines['bottom'].set_color('#7c7c7c')
 
-# Título
-ax.set_title(
-    "Figura D.4. Uso de dispositivos inteligentes conectados a Internet",
-    fontsize=11.5, fontweight="bold", loc="left", pad=14,
-    color="#111111",
-)
+# Títulos
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# Nota de fuente
-fig.text(
-    0.01, -0.02,
-    "Fuente: IFT con datos de la ENDUTIH 2023, del INEGI. "
-    "Datos disponibles en https://www.inegi.org.mx/programas/endutih/2023/.",
-    fontsize=7.5, color="#666666",
-)
+ax.annotate("Figura D.4.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-plt.tight_layout(rect=[0, 0.02, 1, 1])
-# Guardar salida
-plt.savefig(SALIDA, dpi=150, bbox_inches="tight", facecolor="white")
-print(f"\nGuardada: {SALIDA.resolve()}")
-plt.show()
+ax.annotate(" Uso de dispositivos inteligentes conectados a Internet", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(100, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
+
+# Notas al pie
+font_size_notes = 8
+x_start = 0.08
+y_fuente = 0.08
+
+fig.text(x_start, y_fuente, "Fuente: ", fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+fuente_text = ('IFT con datos de la ENDUTIH 2023, del INEGI.\n'
+               'Datos disponibles en: https://www.inegi.org.mx/programas/endutih/2023/')
+fig.text(x_start + 0.032, y_fuente, fuente_text, fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Guardar
+fig.subplots_adjust(left=0.08, right=0.92, top=0.85, bottom=0.22)
+SALIDA.parent.mkdir(parents=True, exist_ok=True)
+plt.savefig(SALIDA, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"¡Figura D.4 construida y validada con estilo institucional en {SALIDA}!")

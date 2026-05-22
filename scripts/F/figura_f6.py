@@ -1,91 +1,141 @@
-﻿import pandas as pd
+﻿# -*- coding: utf-8 -*-
+import os
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-from _plot_data_logger import enable_plot_data_logging
-enable_plot_data_logging()
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-import numpy as np
 import re
 import textwrap
 
-# 1. RUTA AL ARCHIVO EXCEL (Ajusta la carpeta si es necesario)
-ruta_archivo = PROJECT_ROOT / "datos" / "F.6" / "mociba2023_tabulados.xlsx" 
+try:
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from _plot_data_logger import enable_plot_data_logging
+    enable_plot_data_logging()
+except ImportError:
+    pass
 
-# 2. LEER LA TABLA
+# ==============================================================================
+# 1. CARGA DE DATOS MOCIBA 2023
+# ==============================================================================
+BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'datos', 'F.6')
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", 'output')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+ruta_archivo = os.path.join(BASE, 'mociba2023_tabulados.xlsx')
+if not os.path.exists(ruta_archivo):
+    ruta_archivo = r'C:\Users\ivan-\Documents\GitHub\anuario\datos\F.6\mociba2023_tabulados.xlsx'
+
 df = pd.read_excel(ruta_archivo, sheet_name='1.25')
 
-# Buscar automáticamente las filas donde dicen Hombres y Mujeres
 col0_limpia = df.iloc[:, 0].fillna('').astype(str).str.strip()
 idx_hombres = col0_limpia[col0_limpia == 'Hombres'].index[0]
 idx_mujeres = col0_limpia[col0_limpia == 'Mujeres'].index[0]
 
-# Extraer el total de población víctima por sexo (Columna 1)
 total_hombres = float(df.iloc[idx_hombres, 1])
 total_mujeres = float(df.iloc[idx_mujeres, 1])
 
-# Extraer los 13 valores absolutos (Columna 1)
 absolutos_hombres = df.iloc[idx_hombres+1 : idx_hombres+14, 1].astype(float)
 absolutos_mujeres = df.iloc[idx_mujeres+1 : idx_mujeres+14, 1].astype(float)
 
-# Extraer y limpiar las etiquetas (quitar los numeritos finales y ajustar el texto largo)
 etiquetas_raw = df.iloc[idx_hombres+1 : idx_hombres+14, 0].astype(str)
 etiquetas_limpias = [re.sub(r'\d+$', '', lbl).strip() for lbl in etiquetas_raw]
-etiquetas_limpias = [textwrap.fill(lbl, width=38) for lbl in etiquetas_limpias] # Para que no queden muy largas en la Gráfica
+etiquetas_limpias = [textwrap.fill(lbl, width=45) for lbl in etiquetas_limpias]
 
-# 3. CÁLCULO DE PORCENTAJES
 pct_hombres = (absolutos_hombres.values / total_hombres) * 100
 pct_mujeres = (absolutos_mujeres.values / total_mujeres) * 100
 
-# Armar tabla interna y ordenar de mayor a menor basándonos en Mujeres (como la infografía)
 df_res = pd.DataFrame({
     'Situacion': etiquetas_limpias,
     'Hombres': pct_hombres,
     'Mujeres': pct_mujeres
 })
-df_res = df_res.sort_values(by='Mujeres', ascending=True)
+# Ordenar de menor a mayor para que los valores más altos queden en la parte superior de la gráfica
+df_res = df_res.sort_values(by='Mujeres', ascending=True).reset_index(drop=True)
 
-# 4. CREAR LA GRÁFICA ESTILO ANUARIO (Barras Horizontales)
-fig, ax = plt.subplots(figsize=(12, 9))
-fig.patch.set_facecolor('#ffffff')
+# ==============================================================================
+# 2. GRÁFICA ESTILO A.7
+# ==============================================================================
+plt.rcParams['font.family'] = ['Noto Sans', 'DejaVu Sans', 'sans-serif']
 
-# Colores similares a la infografía
-color_hombres = '#F39180' # Coral/Naranja
-color_mujeres = '#8AD2D1' # Aqua/Cyan
+fig, ax = plt.subplots(figsize=(16, 8.5))
+fig.patch.set_facecolor('white')
+ax.set_facecolor('#F8F8FA')
 
 y = np.arange(len(df_res))
-height = 0.35 # Grosor de la barra
+bar_width = 0.38
 
-# Dibujar las barras
-bars_h = ax.barh(y - height/2, df_res['Hombres'], height, color=color_hombres, label='Hombres', edgecolor='none')
-bars_m = ax.barh(y + height/2, df_res['Mujeres'], height, color=color_mujeres, label='Mujeres', edgecolor='none')
+# Colores replicados EXACTOS de Figura A.9 / A.7
+COLOR_HOMBRES = '#335a5c'  # Teal oscuro
+COLOR_MUJERES = '#86adae'  # Teal claro
+color_texto = '#3c3c3b'
 
-# Formatear ejes y textos
+# Barras horizontales
+bars1 = ax.barh(y - bar_width/2, df_res['Hombres'], bar_width, label='Hombres', color=COLOR_HOMBRES, edgecolor='none', zorder=2)
+bars2 = ax.barh(y + bar_width/2, df_res['Mujeres'], bar_width, label='Mujeres', color=COLOR_MUJERES, edgecolor='none', zorder=2)
+
+# Ejes
 ax.set_yticks(y)
-ax.set_yticklabels(df_res['Situacion'], fontsize=10, color='#666666')
+ax.set_yticklabels(df_res['Situacion'], fontsize=9, fontweight='normal', color=color_texto)
+
+ax.set_xlim(0, max(df_res['Hombres'].max(), df_res['Mujeres'].max()) * 1.15) 
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v:.0f}%'))
+ax.tick_params(axis='x', labelsize=9, colors=color_texto)
+
+# Grid y bordes A.7
+ax.grid(axis='x', alpha=1.0, color='#d1d1d1', linewidth=1, zorder=0)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
-ax.spines['left'].set_visible(False) # Ocultamos la línea izquierda para que sea más limpio
-ax.spines['bottom'].set_color('#cccccc')
+ax.spines['bottom'].set_color('#7c7c7c')
+ax.spines['left'].set_color('#7c7c7c')
 
-# Etiquetas con los porcentajes exactos en la punta de cada barra
-ax.bar_label(bars_h, fmt='%.1f%%', padding=5, color='#404040', fontsize=9, fontweight='bold')
-ax.bar_label(bars_m, fmt='%.1f%%', padding=5, color='#404040', fontsize=9, fontweight='bold')
+# Agregar los % al final de las barras
+for i in range(len(df_res)):
+    ax.text(df_res['Hombres'][i] + 0.5, y[i] - bar_width/2, f"{df_res['Hombres'][i]:.1f}%",
+            va='center', ha='left', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
+    ax.text(df_res['Mujeres'][i] + 0.5, y[i] + bar_width/2, f"{df_res['Mujeres'][i]:.1f}%",
+            va='center', ha='left', fontsize=9, color=color_texto, fontweight='normal', zorder=3)
 
-# Título y Leyenda
-plt.title('Distribución porcentual de las situaciones de ciberacoso experimentadas\nen los últimos 12 meses, por sexo', 
-          fontsize=14, fontweight='bold', color='#404040', pad=20)
-ax.legend(loc='lower right', frameon=False, fontsize=11)
+# ==============================================================================
+# 3. ENCABEZADO Y NOTAS (BLOQUE INSTITUCIONAL)
+# ==============================================================================
+# Títulos
+ax.annotate('   ', xy=(0, 1), xycoords='axes fraction', 
+            xytext=(0, 30), textcoords='offset points',
+            va='center', ha='left', fontsize=2,
+            bbox=dict(boxstyle='round,pad=1.6,rounding_size=0.2', facecolor='#4a7d75', edgecolor='none'))
 
-# Ajustar márgenes, guardar y mostrar
-fig.suptitle('Figura F.6. Distribución porcentual de las situaciones de ciberacoso experimentadas por sexo', fontsize=14, fontweight='bold', y=1.02)
-plt.tight_layout()
-# Guardar salida
-plt.savefig(PROJECT_ROOT / "output" / "figura_f6.png", dpi=300, bbox_inches='tight')
+ax.annotate("Figura F.6.", xy=(0, 1), xycoords='axes fraction', 
+            xytext=(15, 30), textcoords='offset points',
+            fontsize=14, fontweight='bold', color=color_texto, ha='left', va='center')
 
-print("\n--- DATOS CALCULADOS CON 100% DE PRECISIÓN ---")
-print(df_res.sort_values(by='Mujeres', ascending=False).to_string(index=False))
-print("\n¡Gráfica generada con éxito como 'figura_f6.png'!")
+ax.annotate(" Distribución porcentual de las situaciones de ciberacoso experimentadas en los últimos 12 meses, por sexo", 
+            xy=(0, 1), xycoords='axes fraction', 
+            xytext=(95, 30), textcoords='offset points',
+            fontsize=14, fontweight='medium', color=color_texto, ha='left', va='center')
 
-plt.show()
+# Leyenda
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, loc='lower center', bbox_to_anchor=(0.5, 0.12), ncol=2, fontsize=10, frameon=False, handlelength=2.5)
+
+# Notas al pie
+font_size_notes = 8
+x_start = 0.08
+
+y_fuente = 0.06
+ax.annotate("Fuente: ", xy=(x_start, y_fuente), xycoords='figure fraction',
+            fontsize=font_size_notes, fontweight='bold', color=color_texto, ha='left', va='top')
+note1_content = 'INEGI. Módulo sobre Ciberacoso (MOCIBA) 2023.'
+ax.annotate(note1_content, xy=(x_start, y_fuente), xycoords='figure fraction',
+            xytext=(35, 0), textcoords='offset points',
+            fontsize=font_size_notes, fontweight='normal', color=color_texto, ha='left', va='top')
+
+# Ajustes de layout (Aumentado el margen 'left' para que quepan las etiquetas largas de texto)
+fig.subplots_adjust(left=0.25, right=0.92, top=0.85, bottom=0.22)
+
+# Guardar
+output_path = os.path.join(OUTPUT_DIR, 'figura_f6.png')
+plt.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white', edgecolor='none')
+print(f"Figura guardada en: {output_path}")
+plt.close(fig)
