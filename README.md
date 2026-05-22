@@ -10,13 +10,15 @@ de las páginas del INEGI e IFT. Este Anuario saco de un link: [https://www.ift.
 
 ## Guía rápida para desarrolladores
 
-- **Códigos:** Se encuentran en la carpeta `scripts/`. **Nota importante:** No se cuenta con un orquestador automatizado; cada figura debe generarse corriendo su script individualmente (código a código).
+- **Códigos:** Se encuentran en la carpeta `scripts/`. **Nota importante:** Descarga el repositorio completo en el enlace de google drive: [https://drive.google.com/drive/folders/1irmjFLrpUSrr2Y0r_quSYIHGYQ6H3fJX?usp=sharing](https://drive.google.com/drive/folders/1irmjFLrpUSrr2Y0r_quSYIHGYQ6H3fJX?usp=sharing). No se cuenta con un orquestador automatizado; cada figura debe generarse corriendo su script individualmente (código a código).
 - **Resultados:** Las gráficas generadas (imágenes PNG) se guardan en la carpeta `output/`.
 - **Datos:** Los archivos base se ubican en `datos/`.
 - **Documentación adicional:**
   - **Paleta de Colores:** Ver [reportes/Guia_colores.md](reportes/Guia_colores.md).
   - **Estilos de Gráficas:** Ver [reportes/clasificacion_estilos.md](reportes/clasificacion_estilos.md).
   - **Complemento Técnico:** El archivo [README_complemento.md](README_complemento.md) era un intento de documentar todo eso (fuentes, trazabilidad), pero es trabajo que se realizará próximamente ya que no se reportó todo por falta de tiempo.
+
+Nota importante: Este repositorio no tiene los datos, se deben descargar los archivos fuente desde el enlace de Google Drive [aquí](https://drive.google.com/drive/folders/1irmjFLrpUSrr2Y0r_quSYIHGYQ6H3fJX?usp=sharing).
 
 ---
 
