@@ -182,3 +182,282 @@ py -m pip install reportlab             # Para exportar a PDF
 ## Vinculo del reporte final
 
 - Reporte técnico A-G: [17-CRT_DGP_017_2026_reporte.docx](17-CRT_DGP_017_2026_reporte.docx)
+
+## Gráficas Generadas
+
+### Figura_A1.png
+![Figura_A1.png](output/Figura_A1.png)
+
+### Figura_A2.png
+![Figura_A2.png](output/Figura_A2.png)
+
+### Figura_A3.png
+![Figura_A3.png](output/Figura_A3.png)
+
+### Figura_A4.png
+![Figura_A4.png](output/Figura_A4.png)
+
+### Figura_A5.png
+![Figura_A5.png](output/Figura_A5.png)
+
+### Figura_A6.png
+![Figura_A6.png](output/Figura_A6.png)
+
+### Figura_A7.png
+![Figura_A7.png](output/Figura_A7.png)
+
+### Figura_A8.png
+![Figura_A8.png](output/Figura_A8.png)
+
+### Figura_A9.png
+![Figura_A9.png](output/Figura_A9.png)
+
+### Figura_A10.png
+![Figura_A10.png](output/Figura_A10.png)
+
+### Figura_B1.png
+![Figura_B1.png](output/Figura_B1.png)
+
+### Figura_B2.png
+![Figura_B2.png](output/Figura_B2.png)
+
+### Figura_B3.png
+![Figura_B3.png](output/Figura_B3.png)
+
+### Figura_B4.png
+![Figura_B4.png](output/Figura_B4.png)
+
+### Figura_B5.png
+![Figura_B5.png](output/Figura_B5.png)
+
+### Figura_B6.png
+![Figura_B6.png](output/Figura_B6.png)
+
+### Figura_B7.png
+![Figura_B7.png](output/Figura_B7.png)
+
+### Figura_B8.png
+![Figura_B8.png](output/Figura_B8.png)
+
+### Figura_B9.png
+![Figura_B9.png](output/Figura_B9.png)
+
+### Figura_B10.png
+![Figura_B10.png](output/Figura_B10.png)
+
+### Figura_B11.png
+![Figura_B11.png](output/Figura_B11.png)
+
+### Figura_B12.png
+![Figura_B12.png](output/Figura_B12.png)
+
+### Figura_B13.png
+![Figura_B13.png](output/Figura_B13.png)
+
+### Figura_B14.png
+![Figura_B14.png](output/Figura_B14.png)
+
+### Figura_B15.png
+![Figura_B15.png](output/Figura_B15.png)
+
+### Figura_B16.png
+![Figura_B16.png](output/Figura_B16.png)
+
+### Figura_B17.png
+![Figura_B17.png](output/Figura_B17.png)
+
+### Figura_B18.png
+![Figura_B18.png](output/Figura_B18.png)
+
+### Figura_B19.png
+![Figura_B19.png](output/Figura_B19.png)
+
+### Figura_B20.png
+![Figura_B20.png](output/Figura_B20.png)
+
+### Figura_B21.png
+![Figura_B21.png](output/Figura_B21.png)
+
+### Figura_B22.png
+![Figura_B22.png](output/Figura_B22.png)
+
+### Figura_B23.png
+![Figura_B23.png](output/Figura_B23.png)
+
+### Figura_B24.png
+![Figura_B24.png](output/Figura_B24.png)
+
+### Figura_B25.png
+![Figura_B25.png](output/Figura_B25.png)
+
+### Figura_C1.png
+![Figura_C1.png](output/Figura_C1.png)
+
+### Figura_C2.png
+![Figura_C2.png](output/Figura_C2.png)
+
+### Figura_C3.png
+![Figura_C3.png](output/Figura_C3.png)
+
+### Figura_C4.png
+![Figura_C4.png](output/Figura_C4.png)
+
+### Figura_C5.png
+![Figura_C5.png](output/Figura_C5.png)
+
+### Figura_C6.png
+![Figura_C6.png](output/Figura_C6.png)
+
+### Figura_C7.png
+![Figura_C7.png](output/Figura_C7.png)
+
+### Figura_C8.png
+![Figura_C8.png](output/Figura_C8.png)
+
+### Figura_C9.png
+![Figura_C9.png](output/Figura_C9.png)
+
+### Figura_C10.png
+![Figura_C10.png](output/Figura_C10.png)
+
+### Figura_C11.png
+![Figura_C11.png](output/Figura_C11.png)
+
+### Figura_C12.png
+![Figura_C12.png](output/Figura_C12.png)
+
+### Figura_C13.png
+![Figura_C13.png](output/Figura_C13.png)
+
+### Figura_C14.png
+![Figura_C14.png](output/Figura_C14.png)
+
+### Figura_C15.png
+![Figura_C15.png](output/Figura_C15.png)
+
+### Figura_C16.png
+![Figura_C16.png](output/Figura_C16.png)
+
+### Figura_D1.png
+![Figura_D1.png](output/Figura_D1.png)
+
+### Figura_D2.png
+![Figura_D2.png](output/Figura_D2.png)
+
+### Figura_D3.png
+![Figura_D3.png](output/Figura_D3.png)
+
+### Figura_D4.png
+![Figura_D4.png](output/Figura_D4.png)
+
+### Figura_D5.png
+![Figura_D5.png](output/Figura_D5.png)
+
+### Figura_D6.png
+![Figura_D6.png](output/Figura_D6.png)
+
+### Figura_D7.png
+![Figura_D7.png](output/Figura_D7.png)
+
+### Figura_D8.png
+![Figura_D8.png](output/Figura_D8.png)
+
+### Figura_D9.png
+![Figura_D9.png](output/Figura_D9.png)
+
+### figura_D10.png
+![figura_D10.png](output/figura_D10.png)
+
+### Figura_D11.png
+![Figura_D11.png](output/Figura_D11.png)
+
+### Figura_E1.png
+![Figura_E1.png](output/Figura_E1.png)
+
+### figura_e2.png
+![figura_e2.png](output/figura_e2.png)
+
+### Figura_E3.png
+![Figura_E3.png](output/Figura_E3.png)
+
+### Figura_E4.png
+![Figura_E4.png](output/Figura_E4.png)
+
+### Figura_E5.png
+![Figura_E5.png](output/Figura_E5.png)
+
+### Figura_E6.png
+![Figura_E6.png](output/Figura_E6.png)
+
+### figura_E7.png
+![figura_E7.png](output/figura_E7.png)
+
+### Figura_E8.png
+![Figura_E8.png](output/Figura_E8.png)
+
+### Figura_E9.png
+![Figura_E9.png](output/Figura_E9.png)
+
+### figura_f1.1.png
+![figura_f1.1.png](output/figura_f1.1.png)
+
+### Figura_F1.2.png
+![Figura_F1.2.png](output/Figura_F1.2.png)
+
+### figura_f1.3.png
+![figura_f1.3.png](output/figura_f1.3.png)
+
+### figura_f1.4.png
+![figura_f1.4.png](output/figura_f1.4.png)
+
+### figura_f2.png
+![figura_f2.png](output/figura_f2.png)
+
+### Figura_F4.png
+![Figura_F4.png](output/Figura_F4.png)
+
+### figura_f5.png
+![figura_f5.png](output/figura_f5.png)
+
+### figura_f6.png
+![figura_f6.png](output/figura_f6.png)
+
+### figura_f7.png
+![figura_f7.png](output/figura_f7.png)
+
+### figura_f8.png
+![figura_f8.png](output/figura_f8.png)
+
+### figura_f9.png
+![figura_f9.png](output/figura_f9.png)
+
+### figura_f10.png
+![figura_f10.png](output/figura_f10.png)
+
+### figura_f11.png
+![figura_f11.png](output/figura_f11.png)
+
+### figura_f12.png
+![figura_f12.png](output/figura_f12.png)
+
+### figura_f13.png
+![figura_f13.png](output/figura_f13.png)
+
+### figura_f14.png
+![figura_f14.png](output/figura_f14.png)
+
+### figura_f15.png
+![figura_f15.png](output/figura_f15.png)
+
+### figura_f16.png
+![figura_f16.png](output/figura_f16.png)
+
+### Figura_G1.png
+![Figura_G1.png](output/Figura_G1.png)
+
+### figura_h1.png
+![figura_h1.png](output/figura_h1.png)
+
+### figura_h2.png
+![figura_h2.png](output/figura_h2.png)
+
